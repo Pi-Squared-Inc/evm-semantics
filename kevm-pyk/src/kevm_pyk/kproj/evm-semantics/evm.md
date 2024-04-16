@@ -352,7 +352,7 @@ The `#next [_]` operator initiates execution by:
 ```k
     syntax Bool ::= #stackUnderflow ( List , OpCode ) [klabel(#stackUnderflow), macro]
                   | #stackOverflow  ( List , OpCode ) [klabel(#stackOverflow), macro]
- // ---------------------------------------------------------------------------------------
+ // ---------------------------------------------------------------------------------
     rule #stackUnderflow(WS, OP:OpCode) => size(WS) <Int #stackNeeded(OP)
     rule #stackOverflow (WS, OP) => size(WS) +Int #stackDelta(OP) >Int 1024
 

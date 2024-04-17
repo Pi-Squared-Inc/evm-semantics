@@ -290,13 +290,22 @@ OpCode Execution
 -   `#execute` loads the next opcode.
 
 ```k
+    syntax KItem ::= "timer" "(" Int ")" | "timerstop"
+    rule timer(I:Int) => timerCount(I)
+    rule timerstop => timerStop()
+    syntax Int ::= "#getOpCodeInt" "(" Bytes "," Int ")" [function, total]
+    rule #getOpCodeInt(P:Bytes, I:Int) => P[I] requires 0 <=Int I andBool I <Int lengthBytes(P)
+    rule #getOpCodeInt(_, _) => -1 [owise]
+```
+
+```k
     syntax KItem ::= "#execute"
  // ---------------------------
     rule [halt]:
          <k> #halt ~> (#execute => .K) ... </k>
 
     rule [step]:
-         <k> (.K => #next [ #lookupOpCode(PGM, PCOUNT, SCHED) ]) ~> #execute ... </k>
+         <k> (.K => timer(#getOpCodeInt(PGM, PCOUNT)) ~> #next [ #lookupOpCode(PGM, PCOUNT, SCHED) ]) ~> #execute ... </k>
          <program> PGM </program>
          <pc> PCOUNT </pc>
          <schedule> SCHED </schedule>
@@ -538,9 +547,6 @@ After executing a transaction, it's necessary to have the effect of the substate
            ...
          </account>
 
-    syntax KItem ::= "timerstop"
-    rule timerstop => timerStop()
-    
     rule <k> #finalizeStorage(.List) => timerstop ... </k>
 
     rule <k> (.K => #newAccount ACCT) ~> #finalizeStorage(ListItem(ACCT) _ACCTS) ... </k> [owise]

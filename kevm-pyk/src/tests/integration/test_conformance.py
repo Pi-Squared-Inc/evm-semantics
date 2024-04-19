@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import logging
 import sys
 from typing import TYPE_CHECKING
@@ -34,12 +33,10 @@ GOLDEN: Final = (REPO_ROOT / 'tests/templates/output-success-llvm.json').read_te
 
 def _test(gst_file: Path, schedule: str, mode: str, chainid: int, usegas: bool) -> None:
     with gst_file.open() as f:
-        gst_data = json.load(f)
+        gst_data = f.read()
 
-    for test_name, test in gst_data.items():
-        _LOGGER.info(f'Running test: {gst_file} - {test_name}')
-        res = interpret({test_name: test}, schedule, mode, chainid, usegas, check=False)
-        _assert_exit_code_zero(res)
+    res = interpret(gst_data, schedule, mode, chainid, usegas, check=False)
+    _assert_exit_code_zero(res)
 
 
 def _assert_exit_code_zero(pattern: Pattern) -> None:

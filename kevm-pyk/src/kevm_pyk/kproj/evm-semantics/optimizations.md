@@ -371,7 +371,7 @@ module EVM-OPTIMIZATIONS
   rule
     <kevm>
       <k>
-        ( #next [ JUMP ] => #if W0 in DESTS #then .K #else #end EVMC_BAD_JUMP_DESTINATION #fi ) ...
+        ( #next [ JUMP ] => .K ) ...
       </k>
       <schedule>
         SCHED
@@ -400,12 +400,13 @@ module EVM-OPTIMIZATIONS
       ...
     </kevm>
     requires ( Gmid < SCHED > <=Gas GAVAIL )
+     andBool W0 in DESTS
      [priority(40)]
 
   rule
     <kevm>
       <k>
-        ( #next [ JUMPI ] => #if W0 in DESTS #then .K #else #end EVMC_BAD_JUMP_DESTINATION #fi ) ...
+        ( #next [ JUMPI ] => .K ) ...
       </k>
       <schedule>
         SCHED
@@ -434,6 +435,7 @@ module EVM-OPTIMIZATIONS
       ...
     </kevm>
     requires ( Ghigh < SCHED > <=Gas GAVAIL )
+     andBool W0 in DESTS
      [priority(40)]
 
 

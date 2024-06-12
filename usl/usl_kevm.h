@@ -232,7 +232,7 @@ void init_network(network_t network);
 
 void execute_transaction(const schedule_t schedule, const block_t &block,
                          const message_t &tx, result_t &result,
-                         substate_t &substate);
+                         log_list_t &log);
 
 } // end namespace usl_kevm
 

@@ -16,7 +16,7 @@ void usl_kevm::init_network(network_t network) {
 
 void usl_kevm::execute_transaction(const schedule_t schedule,
                                    const block_t &block, const message_t &tx,
-                                   result_t &result, substate_t &substate) {
+                                   result_t &result, log_list_t &log) {
   assert(network_.has_value());
 
   kllvm_init();

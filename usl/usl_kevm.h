@@ -202,9 +202,6 @@ struct result_t {
   status_code_option_t status_code;
 };
 
-// KEVM mode
-enum class mode_t { NORMAL, VMTESTS };
-
 // Schedule
 enum class schedule_t {
   DEFAULT,
@@ -222,17 +219,10 @@ enum class schedule_t {
   SHANGHAI
 };
 
-// KEVM configuartion
-struct kevm_config_t {
-  mode_t mode;
-  schedule_t schedule;
-  bool use_gas;
-};
-
 // APIs
 void init_network(network_t network);
 
-void execute_transaction(const kevm_config_t &kevm_config, const block_t &block,
+void execute_transaction(const schedule_t schedule, const block_t &block,
                          const message_t &tx, result_t &result,
                          substate_t &substate);
 

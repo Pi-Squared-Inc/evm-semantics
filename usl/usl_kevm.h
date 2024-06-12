@@ -9,19 +9,23 @@
 
 namespace usl_kevm {
 
+// We use the std::uint64_t type as a place holder for various data types. The
+// actual bitwidth can be found in a comment. The bitwidth is refered to as
+// scalar for data types that are described as arbitrary natural numbers in the
+// Ethereum yellow paper.
+
 // Common data types
 using bytes_t = std::string;
-using block_nonce_t = std::uint64_t;
-using account_nonce_t = std::uint64_t;
-using ether_t = std::uint64_t;
-using gas_t = std::uint64_t;
-using hash_t = std::uint64_t;
-using account_address_t = std::uint64_t;
-using storage_key_t = std::uint64_t;
-using storage_value_t = std::uint64_t;
-using chain_id_t = std::uint64_t;
+using account_nonce_t = std::uint64_t;   // scalar
+using ether_t = std::uint64_t;           // scalar (wei)
+using gas_t = std::uint64_t;             // scalar
+using hash_t = std::uint64_t;            // u256 (a keccak-256 hash)
+using account_address_t = std::uint64_t; // u160
+using storage_key_t = std::uint64_t;     // u256
+using storage_value_t = std::uint64_t;   // u256
+using chain_id_t = std::uint64_t; // scalar, equal to 1 for main Ethereum chain
 using message_id_t = std::uint64_t;
-using number_t = std::uint64_t;
+using number_t = std::uint64_t; // scalar
 
 // Ommer List
 struct ommer_t {
@@ -31,9 +35,11 @@ struct ommer_t {
 using ommer_list_t = std::vector<ommer_t>;
 
 // Block
-using difficulty_t = std::uint64_t;
-using timestamp_t = std::time_t;
-using mix_hash_t = std::uint64_t;
+using difficulty_t = std::uint64_t; // scalar, typically 0
+using timestamp_t =
+    std::time_t; // scalar, equal to reasonable output of Unix's time()
+using mix_hash_t = std::uint64_t;    // RANDAO mix
+using block_nonce_t = std::uint64_t; // u64
 struct block_t {
   hash_t previous_hash;
   hash_t ommers_hash;
@@ -150,7 +156,7 @@ struct network_t {
 };
 
 // Log
-using log_topic_t = bytes_t;
+using log_topic_t = std::uint64_t; // u256 (char[32])
 using log_topic_list_t = std::vector<log_topic_t>;
 struct log_t {
   account_address_t account;

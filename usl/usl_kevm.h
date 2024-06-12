@@ -11,7 +11,8 @@ namespace usl_kevm {
 
 // Common data types
 using bytes_t = std::string;
-using nonce_t = std::uint64_t;
+using block_nonce_t = std::uint64_t;
+using account_nonce_t = std::uint64_t;
 using ether_t = std::uint64_t;
 using gas_t = std::uint64_t;
 using hash_t = std::uint64_t;
@@ -48,7 +49,7 @@ struct block_t {
   timestamp_t timestamp;
   bytes_t extra_data;
   mix_hash_t mix_hash;
-  nonce_t block_nonce;
+  block_nonce_t block_nonce;
   ether_t base_fee;
   hash_t withdrawals_root;
   ommer_list_t ommer_block_headers;
@@ -59,7 +60,7 @@ struct account_t {
   account_address_t account_id;
   ether_t balance;
   bytes_t code;
-  nonce_t nonce;
+  account_nonce_t nonce;
 };
 
 // Access List
@@ -79,7 +80,7 @@ using account_address_option_t = std::optional<account_address_t>;
 using sig_v_t = std::uint64_t;
 struct message_t {
   message_id_t message_id;
-  nonce_t tx_nonce;
+  account_nonce_t tx_nonce;
   ether_t tx_gas_price;
   gas_t tx_gas_limit;
   account_address_option_t to;
@@ -108,8 +109,9 @@ using get_account_code_callback_t =
 using set_account_code_callback_t = void (*)(account_address_t, bytes_t);
 
 using get_account_nonce_callback_t =
-    std::optional<nonce_t> (*)(account_address_t);
-using set_account_nonce_callback_t = void (*)(account_address_t, nonce_t);
+    std::optional<account_nonce_t> (*)(account_address_t);
+using set_account_nonce_callback_t = void (*)(account_address_t,
+                                              account_nonce_t);
 
 using get_account_storage_callback_t =
     std::optional<storage_value_t> (*)(account_address_t, storage_key_t);

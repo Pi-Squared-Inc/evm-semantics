@@ -16,7 +16,7 @@ namespace usl_kevm {
 
 // Common data types
 using bytes_t = std::string;
-using account_nonce_t = std::uint64_t;   // scalar
+using account_nonce_t = std::uint64_t;   // u64
 using ether_t = std::uint64_t;           // scalar (wei)
 using gas_t = std::uint64_t;             // scalar
 using hash_t = std::uint64_t;            // u256 (a keccak-256 hash)
@@ -24,7 +24,6 @@ using account_address_t = std::uint64_t; // u160
 using storage_key_t = std::uint64_t;     // u256
 using storage_value_t = std::uint64_t;   // u256
 using chain_id_t = std::uint64_t; // scalar, equal to 1 for main Ethereum chain
-using message_id_t = std::uint64_t;
 using number_t = std::uint64_t; // scalar
 
 // Ommer List
@@ -85,7 +84,6 @@ using tx_type_option_t = std::optional<tx_type_t>;
 using account_address_option_t = std::optional<account_address_t>;
 using sig_v_t = std::uint64_t;
 struct message_t {
-  message_id_t message_id;
   account_nonce_t tx_nonce;
   ether_t tx_gas_price;
   gas_t tx_gas_limit;
@@ -130,9 +128,6 @@ using set_account_orig_storage_callback_t = void (*)(account_address_t,
                                                      storage_key_t,
                                                      storage_value_t);
 
-using add_message_callback_t = void (*)(message_t);
-using get_message_callback_t = std::optional<message_t> (*)(message_id_t);
-
 using get_blockhash_callback_t = hash_t (*)(size_t offset);
 
 // Network
@@ -150,8 +145,6 @@ struct network_t {
   set_account_storage_callback_t set_account_storage;
   get_account_orig_storage_callback_t get_account_orig_storage;
   set_account_orig_storage_callback_t set_account_orig_storage;
-  add_message_callback_t add_message;
-  get_message_callback_t get_message;
   get_blockhash_callback_t get_blockhash;
 };
 

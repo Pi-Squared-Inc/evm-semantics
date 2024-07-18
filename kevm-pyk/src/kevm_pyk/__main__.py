@@ -595,6 +595,7 @@ def exec_run(options: RunOptions) -> None:
         output=options.output,
         check=True,
         debugger=options.debugger,
+        proof_hint=options.proof_hint,
     )
 
 

@@ -255,7 +255,7 @@ def _create_argument_parser() -> ArgumentParser:
         dest='proof_hint',
         default=None,
         action='store_true',
-        help='Generate proof hint instead of final configuration.'
+        help='Generate proof hint instead of final configuration.',
     )
 
     kast_args = command_parser.add_parser(

@@ -116,16 +116,24 @@ Here we perform pre-proccesing on account data which allows "pretty" specificati
     rule <k> loadAccount _ { .JSONs } => .K ... </k>
 
     rule <k> loadAccount ACCT { "balance" : (BAL:Int), REST => REST } ... </k>
-         <account> <acctID> ACCT </acctID> <balance> _ => BAL </balance> ... </account>
+          <accounts>
+              <account> <acctID> ACCT </acctID> <balance> _ => BAL </balance> ... </account> // offending rule
+          </accounts>
 
     rule <k> loadAccount ACCT { "code" : (CODE:Bytes), REST => REST } ... </k>
-         <account> <acctID> ACCT </acctID> <code> _ => CODE </code> ... </account>
+          <accounts>
+              <account> <acctID> ACCT </acctID> <code> _ => CODE </code> ... </account>
+          </accounts>
 
     rule <k> loadAccount ACCT { "nonce" : (NONCE:Int), REST => REST } ... </k>
-         <account> <acctID> ACCT </acctID> <nonce> _ => NONCE </nonce> ... </account>
+          <accounts>
+              <account> <acctID> ACCT </acctID> <nonce> _ => NONCE </nonce> ... </account>
+          </accounts>
 
     rule <k> loadAccount ACCT { "storage" : (STORAGE:Map), REST => REST } ... </k>
-         <account> <acctID> ACCT </acctID> <origStorage> _ => STORAGE </origStorage> <storage> _ => STORAGE </storage> ... </account>
+          <accounts>
+              <account> <acctID> ACCT </acctID> <origStorage> _ => STORAGE </origStorage> <storage> _ => STORAGE </storage> ... </account>
+          </accounts>
 ```
 
 Here we load the environmental information.

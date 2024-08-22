@@ -598,8 +598,18 @@ def exec_run(options: RunOptions) -> None:
         )
 
     if options.proof_hint:
-        logging.warning('Running KEVM with proof hint options enabled, remember to not use this with any `--verbose` mode if you\'re redirecting its output.')
-        output_bytes = kevm.run_proof_hint(kore_pattern, depth=options.depth, parser='cat', term=True, proof_hint=True)
+        logging.warning(
+            'Running KEVM with proof hint options enabled, remember to not use this with any `--verbose` mode if you are redirecting its output.'
+        )
+        output_bytes = kevm.run_proof_hint(
+            kore_pattern,
+            depth=options.depth,
+            parser='cat',
+            term=True,
+            expand_macros=options.expand_macros,
+            debugger=options.debugger,
+            proof_hint=True,
+        )
         sys.stdout.buffer.write(output_bytes)
     else:
         kevm.run(

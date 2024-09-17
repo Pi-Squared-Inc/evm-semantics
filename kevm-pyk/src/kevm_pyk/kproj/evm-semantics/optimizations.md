@@ -375,9 +375,9 @@ module EVM-OPTIMIZATIONS
       <ethereum>
         <evm>
           <callState>
-            <jumpDests>
+            <program>
               DESTS
-            </jumpDests>
+            </program>
             <wordStack>
               ( ListItem(W0) WS => WS )
             </wordStack>
@@ -396,7 +396,7 @@ module EVM-OPTIMIZATIONS
       ...
     </kevm>
     requires ( Gmid < SCHED > <=Gas GAVAIL )
-     andBool ( W0 <Int lengthBytes(DESTS) andBool DESTS[W0] ==Int 1 )
+     andBool ( W0 <Int lengthBytes(DESTS) andBool DESTS[W0] ==Int 91 )
      [priority(40)]
 
   rule
@@ -410,9 +410,9 @@ module EVM-OPTIMIZATIONS
       <ethereum>
         <evm>
           <callState>
-            <jumpDests>
+            <program>
               DESTS
-            </jumpDests>
+            </program>
             <wordStack>
               ( ListItem(W0) ListItem(W1) WS => WS )
             </wordStack>
@@ -431,7 +431,7 @@ module EVM-OPTIMIZATIONS
       ...
     </kevm>
     requires ( Ghigh < SCHED > <=Gas GAVAIL )
-     andBool ( W0 <Int lengthBytes(DESTS) andBool DESTS[W0] ==Int 1 )
+     andBool ( W0 <Int lengthBytes(DESTS) andBool DESTS[W0] ==Int 91 )
      [priority(40)]
 
 

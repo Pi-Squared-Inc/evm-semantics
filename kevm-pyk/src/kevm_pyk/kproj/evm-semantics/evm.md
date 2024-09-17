@@ -54,7 +54,6 @@ In the comments next to each cell, we've marked which component of the YellowPap
 
             <callState>
               <program>   .Bytes </program>
-              <jumpDests> .Bytes </jumpDests>
 
               // I_*
               <id>        .Account </id>                    // I_a
@@ -1066,8 +1065,8 @@ The `JUMP*` family of operations affect the current program counter.
  // ---------------------------
     rule <k> JUMP DEST => #endBasicBlock ... </k>
          <pc> _ => DEST </pc>
-         <jumpDests> DESTS </jumpDests>
-      requires DEST <Int lengthBytes(DESTS) andBool DESTS[DEST] ==Int 1
+         <program> DESTS </program>
+      requires DEST <Int lengthBytes(DESTS) andBool DESTS[DEST] ==Int 91
 
     rule <k> JUMP _ => #end EVMC_BAD_JUMP_DESTINATION ... </k> [owise]
 
@@ -1399,7 +1398,6 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
     rule [program.load]:
          <k> #loadProgram BYTES => .K ... </k>
          <program> _ => BYTES </program>
-         <jumpDests> _ => #computeValidJumpDests(BYTES) </jumpDests>
 
     syntax KItem ::= "#touchAccounts" Account | "#touchAccounts" Account Account
  // ----------------------------------------------------------------------------
@@ -1439,19 +1437,6 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
 
     rule <k> #accessAccounts ADDRSET:Set => .K ... </k>
          <accessedAccounts> TOUCHED_ACCOUNTS => TOUCHED_ACCOUNTS |Set ADDRSET </accessedAccounts>
-
-    syntax Bytes ::= #computeValidJumpDests(Bytes)             [symbol(computeValidJumpDests),    function, memo, total]
-                   | #computeValidJumpDests(Bytes, Int, Bytes) [symbol(computeValidJumpDestsAux), function             ]
- // --------------------------------------------------------------------------------------------------------------------
-    rule #computeValidJumpDests(PGM) => #computeValidJumpDests(PGM, 0, padRightBytes(.Bytes, lengthBytes(PGM), 0))
-
-    syntax Bytes ::= #computeValidJumpDestsWithinBound(Bytes, Int, Bytes) [symbol(computeValidJumpDestsWithinBound), function]
- // --------------------------------------------------------------------------------------------------------------------------
-    rule #computeValidJumpDests(PGM, I, RESULT) => RESULT requires I >=Int lengthBytes(PGM)
-    rule #computeValidJumpDests(PGM, I, RESULT) => #computeValidJumpDestsWithinBound(PGM, I, RESULT) requires I <Int lengthBytes(PGM)
-
-    rule #computeValidJumpDestsWithinBound(PGM, I, RESULT) => #computeValidJumpDests(PGM, I +Int 1, RESULT[I <- 1]) requires PGM [ I ] ==Int 91
-    rule #computeValidJumpDestsWithinBound(PGM, I, RESULT) => #computeValidJumpDests(PGM, I +Int #widthOpCode(PGM [ I ]), RESULT) requires notBool PGM [ I ] ==Int 91
 ```
 
 ```k

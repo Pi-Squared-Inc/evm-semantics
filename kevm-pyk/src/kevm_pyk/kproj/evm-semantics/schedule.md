@@ -1317,7 +1317,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gcoldsload             < CANCUN > => 2100
     rule Gcoldaccountaccess     < CANCUN > => 2600
     rule Gwarmstorageread       < CANCUN > => 100
-    rule Gwarmstoragedirtystore < DEFAULT > => 100
+    rule Gwarmstoragedirtystore < CANCUN > => 100
 
     rule Gaccessliststoragekey < CANCUN > => 1900
     rule Gaccesslistaddress    < CANCUN > => 2400

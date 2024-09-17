@@ -32,9 +32,6 @@
         <program>
           b""
         </program>
-        <jumpDests>
-          .Set
-        </jumpDests>
         <id>
           .Account
         </id>

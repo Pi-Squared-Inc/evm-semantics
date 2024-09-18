@@ -776,33 +776,9 @@ These rules reach into the network state and load/store from account storage:
 
 The various `CALL*` (and other inter-contract control flow) operations will be desugared into these `InternalOp`s.
 
--   `#checkCall` takes the calling account and the value of the call and triggers several checks before executing the call.
--   `#checkBalanceUnderflow` takes the calling account and the value of the call and checks if the call value is greater than the account balance.
--   `#checkDepthExceeded` checks if the current call depth is greater than or equal to `1024`.
--   `#checkNonceExceeded` takes the calling account and checks if the nonce is less than `maxUInt64` (`18446744073709551615`).
--   `#call` takes the calling account, the account to execute as, the account whose code should execute, the gas limit, the amount to transfer, the arguments, and the static flag.
--   `#callWithCode` takes the calling account, the account to execute as, the code to execute (as a `Bytes`), the gas limit, the amount to transfer, the arguments, and the static flag.
 -   `#return` is a placeholder for the calling program, specifying where to place the returned data in memory.
 
 ```k
-    syntax InternalOp ::= "#checkCall"             Int Int
-                        | "#checkBalanceUnderflow" Int Int
-                        | "#checkNonceExceeded"    Int
-                        | "#checkDepthExceeded"
-                        | "#call"                  Int Int Int Int Int Bytes Bool
-                        | "#callWithCode"          Int Int Int Bytes Int Int Bytes Bool
-                        | "#mkCall"                Int Int Int Bytes     Int Bytes Bool
- // -----------------------------------------------------------------------------------
-     rule <k> #checkBalanceUnderflow ACCT VALUE => #refund GCALL ~> #end EVMC_BALANCE_UNDERFLOW ... </k>
-         <output> _ => .Bytes </output>
-         <callGas> GCALL </callGas>
-      requires VALUE >Int GetAccountBalance(ACCT)
-
-    rule <k> #checkBalanceUnderflow ACCT VALUE => .K ... </k>
-      requires VALUE <=Int GetAccountBalance(ACCT)
-
-    rule <k> #checkCall ACCT VALUE => #checkBalanceUnderflow ACCT VALUE ... </k>
-
     syntax InternalOp ::= "#precompiled?" "(" Int "," Schedule ")"
  // --------------------------------------------------------------
     rule [precompile.true]:  <k> #precompiled?(ACCTCODE, SCHED) => #next [ #precompiled(ACCTCODE) ] ... </k> requires         #isPrecompiledAccount(ACCTCODE, SCHED) [preserves-definedness]
@@ -886,41 +862,41 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
     syntax CallOp ::= "CALL"
  // ------------------------
     rule [call]:
-         <k> CALL GCAP ACCTTO VALUE ARGSTART ARGWIDTH RETSTART RETWIDTH
-          => #checkCall Address() VALUE
-          ~> #return RETSTART RETWIDTH Call(GCAP, ACCTTO, VALUE, #range(LM, ARGSTART, ARGWIDTH))
+         <k> CALL _GCAP ACCTTO VALUE ARGSTART ARGWIDTH RETSTART RETWIDTH
+          => #return RETSTART RETWIDTH Call(GCALL, ACCTTO, VALUE, #range(LM, ARGSTART, ARGWIDTH))
          ...
          </k>
+         <callGas> GCALL </callGas>
          <localMem> LM </localMem>
 
     syntax CallOp ::= "CALLCODE"
  // ----------------------------
     rule [callcode]:
-         <k> CALLCODE GCAP ACCTTO VALUE ARGSTART ARGWIDTH RETSTART RETWIDTH
-          => #checkCall Address() VALUE
-          ~> #return RETSTART RETWIDTH CallCode(GCAP, ACCTTO, VALUE, #range(LM, ARGSTART, ARGWIDTH))
+         <k> CALLCODE _GCAP ACCTTO VALUE ARGSTART ARGWIDTH RETSTART RETWIDTH
+          => #return RETSTART RETWIDTH CallCode(GCALL, ACCTTO, VALUE, #range(LM, ARGSTART, ARGWIDTH))
          ...
          </k>
+         <callGas> GCALL </callGas>
          <localMem> LM </localMem>
 
     syntax CallSixOp ::= "DELEGATECALL"
  // -----------------------------------
     rule [delegatecall]:
-         <k> DELEGATECALL GCAP ACCTTO ARGSTART ARGWIDTH RETSTART RETWIDTH
-          => #checkCall Address() 0
-          ~> #return RETSTART RETWIDTH DelegateCall(GCAP, ACCTTO, #range(LM, ARGSTART, ARGWIDTH))
+         <k> DELEGATECALL _GCAP ACCTTO ARGSTART ARGWIDTH RETSTART RETWIDTH
+          => #return RETSTART RETWIDTH DelegateCall(GCALL, ACCTTO, #range(LM, ARGSTART, ARGWIDTH))
          ...
          </k>
+         <callGas> GCALL </callGas>
          <localMem> LM </localMem>
 
     syntax CallSixOp ::= "STATICCALL"
  // ---------------------------------
     rule [staticcall]:
-         <k> STATICCALL GCAP ACCTTO ARGSTART ARGWIDTH RETSTART RETWIDTH
-          => #checkCall Address() 0
-          ~> #return RETSTART RETWIDTH StaticCall(GCAP, ACCTTO, #range(LM, ARGSTART, ARGWIDTH))
+         <k> STATICCALL _GCAP ACCTTO ARGSTART ARGWIDTH RETSTART RETWIDTH
+          => #return RETSTART RETWIDTH StaticCall(GCALL, ACCTTO, #range(LM, ARGSTART, ARGWIDTH))
          ...
          </k>
+         <callGas> GCALL </callGas>
          <localMem> LM </localMem>
 ```
 
@@ -952,8 +928,6 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
     rule <k> #codeDeposit(MessageResult(... gas: GAVAIL, status: STATUS, target: ACCT)) => #refund GAVAIL ~> ACCT ~> #push ...</k>
          <output> _ => .Bytes </output>
       requires STATUS ==Int EVMC_SUCCESS
-
-    rule <k> #checkCreate ACCT VALUE => #checkBalanceUnderflow ACCT VALUE ~> #checkDepthExceeded ~> #checkNonceExceeded ACCT ... </k>
 ```
 
 `CREATE` will attempt to `#create` the account using the initialization code and cleans up the result with `#codeDeposit`.
@@ -963,10 +937,10 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
  // -------------------------------
     rule [create-valid]:
          <k> CREATE VALUE MEMSTART MEMWIDTH
-          => #checkCreate Address() VALUE
-          ~> #codeDeposit Create(VALUE, #range(LM, MEMSTART, MEMWIDTH))
+          => #codeDeposit Create(VALUE, #range(LM, MEMSTART, MEMWIDTH), GCALL)
          ...
          </k>
+         <callGas> GCALL </callGas>
          <localMem> LM </localMem>
          <schedule> SCHED </schedule>
       requires #hasValidInitCode(MEMWIDTH, SCHED)
@@ -984,10 +958,11 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
     rule [create2-valid]:
          <k> CREATE2 VALUE MEMSTART MEMWIDTH SALT
           => #checkCreate Address() VALUE
-          ~> #codeDeposit Create2(VALUE, #range(LM, MEMSTART, MEMWIDTH), Int2Bytes(32, SALT, BE))
+          ~> #codeDeposit Create2(VALUE, #range(LM, MEMSTART, MEMWIDTH), Int2Bytes(32, SALT, BE), GCALL)
          ...
          </k>
          <localMem> LM </localMem>
+         <callGas> GCALL </callGas> 
          <schedule> SCHED </schedule>
       requires #hasValidInitCode(MEMWIDTH, SCHED)
 

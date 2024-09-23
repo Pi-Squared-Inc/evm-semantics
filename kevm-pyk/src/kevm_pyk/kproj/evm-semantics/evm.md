@@ -32,10 +32,9 @@ In the comments next to each cell, we've marked which component of the YellowPap
 
 ```k
     configuration
-      <kevm>
-        <k> $PGM:EthereumSimulation </k>
+        <k> #loadProgram($PGM:Bytes) ~> #precompiled?($ACCTCODE:Int, getSchedule($SCHEDULE:Int)) ~> #execute </k>
         <exit-code exit=""> 1 </exit-code>
-        <schedule> $SCHEDULE:Schedule </schedule>
+        <schedule> getSchedule($SCHEDULE:Int) </schedule>
 
         <ethereum>
 
@@ -58,18 +57,17 @@ In the comments next to each cell, we've marked which component of the YellowPap
               <wordStack>   .List  </wordStack>           // \mu_s
               <localMem>    .Bytes </localMem>            // \mu_m
               <pc>          0      </pc>                  // \mu_pc
-              <gas>         0:Gas  </gas>                 // \mau_g
+              <gas>         $GAS:Int </gas>                 // \mau_g
               <memoryUsed>  0      </memoryUsed>          // \mu_i
               <callGas>     0:Gas  </callGas>
 
-              <static>    false </static>
+              <static>    $STATIC:Bool </static>
             </callState>
 
             // Immutable during a single transaction
             // -------------------------------------
           </evm>
         </ethereum>
-      </kevm>
 
     syntax EthereumSimulation
  // -------------------------

@@ -923,10 +923,6 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
 -   `#hasValidInitCode` checks the length of the transaction data in a create transaction. [EIP-3860]
 
 ```k
-    syntax InternalOp ::= "#checkCreate" Int Int
- // --------------------------------------------
-
-
     syntax Bool ::= #hasValidInitCode ( Int , Schedule ) [symbol(#hasValidInitCode), function]
  // ------------------------------------------------------------------------------------------
     rule #hasValidInitCode(INITCODELEN, SCHED) => notBool Ghasmaxinitcodesize << SCHED >> orBool INITCODELEN <=Int maxInitCodeSize < SCHED >
@@ -972,8 +968,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
  // --------------------------------
     rule [create2-valid]:
          <k> CREATE2 VALUE MEMSTART MEMWIDTH SALT
-          => #checkCreate Address() VALUE
-          ~> #codeDeposit Create2(VALUE, #range(LM, MEMSTART, MEMWIDTH), Int2Bytes(32, SALT, BE), GCALL)
+          => #codeDeposit Create2(VALUE, #range(LM, MEMSTART, MEMWIDTH), Int2Bytes(32, SALT, BE), GCALL)
          ...
          </k>
          <localMem> LM </localMem>

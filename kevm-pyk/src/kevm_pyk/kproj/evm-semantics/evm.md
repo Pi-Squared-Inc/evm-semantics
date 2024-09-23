@@ -73,8 +73,35 @@ In the comments next to each cell, we've marked which component of the YellowPap
  // -------------------------
 ```
 
+Output Extraction
+-----------------
 
 ```k
+    rule getStatus(<generatedTop>... <statusCode> STATUS:StatusCode </statusCode> ...</generatedTop>) => getStatus(STATUS)
+
+    syntax Int ::= getStatus(StatusCode) [function]
+    rule getStatus(EVMC_REJECTED) => EVMC_REJECTED
+    rule getStatus(EVMC_INTERNAL_ERROR) => EVMC_INTERNAL_ERROR
+    rule getStatus(EVMC_SUCCESS) => EVMC_SUCCESS
+    rule getStatus(EVMC_REVERT) => EVMC_REVERT
+    rule getStatus(EVMC_FAILURE) => EVMC_FAILURE
+    rule getStatus(EVMC_INVALID_INSTRUCTION) => EVMC_INVALID_INSTRUCTION
+    rule getStatus(EVMC_UNDEFINED_INSTRUCTION) => EVMC_UNDEFINED_INSTRUCTION
+    rule getStatus(EVMC_OUT_OF_GAS) => EVMC_OUT_OF_GAS 
+    rule getStatus(EVMC_BAD_JUMP_DESTINATION) => EVMC_BAD_JUMP_DESTINATION
+    rule getStatus(EVMC_STACK_OVERFLOW) => EVMC_STACK_OVERFLOW
+    rule getStatus(EVMC_STACK_UNDERFLOW) => EVMC_STACK_UNDERFLOW
+    rule getStatus(EVMC_CALL_DEPTH_EXCEEDED) => EVMC_CALL_DEPTH_EXCEEDED
+    rule getStatus(EVMC_INVALID_MEMORY_ACCESS) => EVMC_INVALID_MEMORY_ACCESS
+    rule getStatus(EVMC_STATIC_MODE_VIOLATION) => EVMC_STATIC_MODE_VIOLATION
+    rule getStatus(EVMC_PRECOMPILE_FAILURE) => EVMC_PRECOMPILE_FAILURE
+    rule getStatus(EVMC_NONCE_EXCEEDED) => EVMC_NONCE_EXCEEDED
+
+    rule getGasLeft(G) => 0 requires getStatus(G) =/=Int EVMC_SUCCESS andBool getStatus(G) =/=Int EVMC_REVERT
+    rule getGasLeft(<generatedTop>... <gas> G </gas> ...</generatedTop>) => G [priority(51)]
+
+    rule getOutput(G) => .Bytes requires getStatus(G) =/=Int EVMC_SUCCESS andBool getStatus(G) =/=Int EVMC_REVERT
+    rule getOutput(<generatedTop>... <output> O </output> ...</generatedTop>) => O [priority(51)]
 ```
 
 Control Flow

@@ -1170,8 +1170,8 @@ Overall Gas
  // ------------------------------------------------------
     rule <k> #gas [ OP , AOP ]
           => #memory [ OP , AOP ]
-          ~> #gas [ AOP ]
           ~> #access [ OP , AOP ]
+          ~> #gas [ AOP ]
          ...
         </k>
 

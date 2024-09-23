@@ -73,18 +73,8 @@ In the comments next to each cell, we've marked which component of the YellowPap
  // -------------------------
 ```
 
-Modal Semantics
----------------
-
-Our semantics is modal, with the initial mode being set on the command line via `-cMODE=EXECMODE`.
-
--   `NORMAL` executes as a client on the network would.
--   `VMTESTS` skips `CALL*` and `CREATE` operations.
 
 ```k
-    syntax Mode ::= "NORMAL"  [symbol(NORMAL) ]
-                  | "VMTESTS" [symbol(VMTESTS)]
- // -------------------------------------------
 ```
 
 Control Flow

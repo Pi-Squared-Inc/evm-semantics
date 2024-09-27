@@ -1160,8 +1160,8 @@ Overall Gas
  // ------------------------------------------------------
     rule <k> #gas [ OP , AOP ]
           => #memory [ OP , AOP ]
-          ~> #access [ OP , AOP ]
           ~> #gas [ AOP ]
+          ~> #access [ OP , AOP, #isAccess(AOP) ]
          ...
         </k>
 
@@ -1271,24 +1271,34 @@ Access List Gas
     rule #usesAccessList(SSTORE) => true
     rule #usesAccessList(_)      => false [owise]
 
-    syntax InternalOp ::= "#access" "[" OpCode "," OpCode "]"
+    syntax InternalOp ::= "#access" "[" OpCode "," OpCode "," Bool "]"
  // ---------------------------------------------------------
-    rule <k> #access [ OP , AOP ] => #gasAccess(SCHED, AOP) ~> #deductGas ... </k>
+    rule <k> #access [ OP , AOP, ACCESS ] => #gasAccess(SCHED, AOP, ACCESS) ~> #deductGas ... </k>
          <schedule> SCHED </schedule>
       requires Ghasaccesslist << SCHED >> andBool #usesAccessList(OP)
 
-    rule <k> #access [ _ , _ ] => .K ... </k> <schedule> _ </schedule> [owise]
+    rule <k> #access [ _ , _ , _ ] => .K ... </k> <schedule> _ </schedule> [owise]
 
-    syntax InternalOp ::= #gasAccess ( Schedule, OpCode ) [symbol(#gasAccess)]
+    syntax Bool ::= #isAccess ( OpCode ) [function, total]
+ // ------------------------------------------------------
+    rule #isAccess(EXTCODESIZE ACCT) => AccessedAccount(ACCT)
+    rule #isAccess(EXTCODECOPY ACCT _ _ _) => AccessedAccount(ACCT)
+    rule #isAccess(EXTCODEHASH ACCT) => AccessedAccount(ACCT)
+    rule #isAccess(BALANCE ACCT) => AccessedAccount(ACCT)
+    rule #isAccess(SELFDESTRUCT ACCT) => AccessedAccount(ACCT)
+    rule #isAccess(SSTORE INDEX _) => AccessedStorage(INDEX)
+    rule #isAccess(_) => false [owise]
+
+    syntax InternalOp ::= #gasAccess ( Schedule, OpCode, Bool ) [symbol(#gasAccess)]
  // --------------------------------------------------------------------------
-    rule <k> #gasAccess(SCHED, EXTCODESIZE ACCT)       => Caddraccess(SCHED, AccessedAccount(ACCT))                                ... </k>
-    rule <k> #gasAccess(SCHED, EXTCODECOPY ACCT _ _ _) => Caddraccess(SCHED, AccessedAccount(ACCT))                                ... </k>
-    rule <k> #gasAccess(SCHED, EXTCODEHASH ACCT)       => Caddraccess(SCHED, AccessedAccount(ACCT))                                ... </k>
-    rule <k> #gasAccess(SCHED, BALANCE ACCT)           => Caddraccess(SCHED, AccessedAccount(ACCT))                                ... </k>
-    rule <k> #gasAccess(SCHED, SELFDESTRUCT ACCT)      => #if AccessedAccount(ACCT) #then 0 #else Gcoldaccountaccess < SCHED > #fi ... </k>
-    rule <k> #gasAccess(_    , SLOAD _ )               => 0                                                                        ... </k>
-    rule <k> #gasAccess(SCHED, SSTORE INDEX _)         => #if AccessedStorage(INDEX) #then 0 #else Gcoldsload < SCHED > #fi        ... </k>
-    rule <k> #gasAccess(_    , _ )                     => 0                                                                        ... </k> [owise]
+    rule <k> #gasAccess(SCHED, EXTCODESIZE ACCT, ACCESS)       => Caddraccess(SCHED, ACCESS)                                ... </k>
+    rule <k> #gasAccess(SCHED, EXTCODECOPY ACCT _ _ _, ACCESS) => Caddraccess(SCHED, ACCESS)                                ... </k>
+    rule <k> #gasAccess(SCHED, EXTCODEHASH ACCT, ACCESS)       => Caddraccess(SCHED, ACCESS)                                ... </k>
+    rule <k> #gasAccess(SCHED, BALANCE ACCT, ACCESS)           => Caddraccess(SCHED, ACCESS)                                ... </k>
+    rule <k> #gasAccess(SCHED, SELFDESTRUCT ACCT, ACCESS)      => #if ACCESS #then 0 #else Gcoldaccountaccess < SCHED > #fi ... </k>
+    rule <k> #gasAccess(_    , SLOAD _, ACCESS)                => 0                                                         ... </k>
+    rule <k> #gasAccess(SCHED, SSTORE INDEX _, ACCESS)         => #if ACCESS #then 0 #else Gcoldsload < SCHED > #fi         ... </k>
+    rule <k> #gasAccess(_    , _, ACCESS)                      => 0                                                         ... </k> [owise]
 
 ```
 

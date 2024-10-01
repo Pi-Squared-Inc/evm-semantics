@@ -1,5 +1,4 @@
-Ethereum Simulations
-====================
+# Ethereum Simulations
 
 Ethereum is using the EVM to drive updates over the world state.
 Actual execution of the EVM is defined in [the EVM file](../evm).
@@ -9,12 +8,14 @@ requires "evm.md"
 requires "optimizations.md"
 requires "asm.md"
 requires "state-utils.md"
+requires "lemmas/uniswap-lemmas.k"
 
 module ETHEREUM-SIMULATION
     imports EVM
     imports EVM-OPTIMIZATIONS
     imports EVM-ASSEMBLY
     imports STATE-UTILS
+    imports UNISWAP-LEMMAS
 ```
 
 An Ethereum simulation is a list of Ethereum commands.
@@ -46,8 +47,8 @@ To do so, we'll extend sort `JSON` with some EVM specific syntax, and provide a 
 
 ### Driving Execution
 
--   `start` places `#next` on the `<k>` cell so that execution of the loaded state begin.
--   `flush` places `#finalize` on the `<k>` cell.
+- `start` places `#next` on the `<k>` cell so that execution of the loaded state begin.
+- `flush` places `#finalize` on the `<k>` cell.
 
 ```k
     syntax EthereumCommand ::= "start"
@@ -61,9 +62,9 @@ To do so, we'll extend sort `JSON` with some EVM specific syntax, and provide a 
     rule <mode> EXECMODE </mode> <statusCode> _:ExceptionalStatusCode </statusCode> <k> #halt ~> flush => #finalizeTx(EXECMODE ==K VMTESTS) ~> #halt ... </k>
 ```
 
--   `startTx` computes the sender of the transaction, and places loadTx on the `k` cell.
--   `loadTx(_)` loads the next transaction to be executed into the current state.
--   `finishTx` is a place-holder for performing necessary cleanup after a transaction.
+- `startTx` computes the sender of the transaction, and places loadTx on the `k` cell.
+- `loadTx(_)` loads the next transaction to be executed into the current state.
+- `finishTx` is a place-holder for performing necessary cleanup after a transaction.
 
 ```k
     syntax EthereumCommand ::= "startTx"
@@ -219,9 +220,9 @@ To do so, we'll extend sort `JSON` with some EVM specific syntax, and provide a 
          <callGas> GLIMIT => GLIMIT -Int Gaccesslistaddress < SCHED > </callGas>
 ```
 
--   `exception` only clears from the `<k>` cell if there is an exception preceding it.
--   `failure_` holds the name of a test that failed if a test does fail.
--   `success` sets the `<exit-code>` to `0` and the `<mode>` to `SUCCESS`.
+- `exception` only clears from the `<k>` cell if there is an exception preceding it.
+- `failure_` holds the name of a test that failed if a test does fail.
+- `success` sets the `<exit-code>` to `0` and the `<mode>` to `SUCCESS`.
 
 ```k
     syntax Mode ::= "SUCCESS"
@@ -246,7 +247,7 @@ To do so, we'll extend sort `JSON` with some EVM specific syntax, and provide a 
 
 ### Running Tests
 
--   `run` runs a given set of Ethereum tests (from the test-set).
+- `run` runs a given set of Ethereum tests (from the test-set).
 
 Note that `TEST` is sorted here so that key `"network"` comes before key `"pre"`.
 
@@ -268,7 +269,7 @@ Note that `TEST` is sorted here so that key `"network"` comes before key `"pre"`
     rule #hasPost? ({ (KEY:String) : _ , REST }) => (KEY in #postKeys) orBool #hasPost? ({ REST })
 ```
 
--   `#loadKeys` are all the JSON nodes which should be considered as loads before execution.
+- `#loadKeys` are all the JSON nodes which should be considered as loads before execution.
 
 ```k
     syntax Set ::= "#loadKeys" [function]
@@ -279,7 +280,7 @@ Note that `TEST` is sorted here so that key `"network"` comes before key `"pre"`
       requires KEY in #loadKeys
 ```
 
--   `#execKeys` are all the JSON nodes which should be considered for execution (between loading and checking).
+- `#execKeys` are all the JSON nodes which should be considered for execution (between loading and checking).
 
 ```k
     syntax Set ::= "#execKeys" [function]
@@ -321,8 +322,8 @@ Note that `TEST` is sorted here so that key `"network"` comes before key `"pre"`
     rule <k> loadCallState { "code" : ((CODE:String) => #parseByteStack(CODE)), _ } ... </k>
 ```
 
--   `#postKeys` are a subset of `#checkKeys` which correspond to post-state account checks.
--   `#checkKeys` are all the JSON nodes which should be considered as checks after execution.
+- `#postKeys` are a subset of `#checkKeys` which correspond to post-state account checks.
+- `#checkKeys` are all the JSON nodes which should be considered as checks after execution.
 
 ```k
     syntax Set ::= "#postKeys" [function] | "#allPostKeys" [function] | "#checkKeys" [function]
@@ -338,7 +339,7 @@ Note that `TEST` is sorted here so that key `"network"` comes before key `"pre"`
     rule <k> run TESTID : { KEY : (VAL:JSON) , REST } => run TESTID : { REST } ~> check TESTID : { KEY    : VAL } ... </k> requires KEY in #checkKeys andBool notBool KEY in #allPostKeys
 ```
 
--   `#discardKeys` are all the JSON nodes in the tests which should just be ignored.
+- `#discardKeys` are all the JSON nodes in the tests which should just be ignored.
 
 ```k
     syntax Set ::= "#discardKeys" [function]
@@ -348,7 +349,7 @@ Note that `TEST` is sorted here so that key `"network"` comes before key `"pre"`
     rule <k> run TESTID : { KEY : _ , REST } => run TESTID : { REST } ... </k> requires KEY in #discardKeys
 ```
 
--   `driver.md` specific handling of state-utils commands
+- `driver.md` specific handling of state-utils commands
 
 ```k
     rule <k> load "account" : { ACCTID : ACCT } => loadAccount ACCTID ACCT ... </k>
@@ -374,7 +375,7 @@ Note that `TEST` is sorted here so that key `"network"` comes before key `"pre"`
 
 ### Checking State
 
--   `check_` checks if an account/transaction appears in the world-state as stated.
+- `check_` checks if an account/transaction appears in the world-state as stated.
 
 ```k
     syntax EthereumCommand ::= "check" JSON
@@ -440,7 +441,7 @@ Note that `TEST` is sorted here so that key `"network"` comes before key `"pre"`
          </account>
 ```
 
--   `#removeZeros` removes any entries in a map with zero values.
+- `#removeZeros` removes any entries in a map with zero values.
 
 ```k
     syntax Map ::= #removeZeros ( Map )        [symbol(#removeZeros), function]
@@ -614,6 +615,7 @@ TODO: case with nonzero ommers.
     rule <k> check "blocknumber" : (VALUE:String => #parseWord(VALUE)) ... </k>
     rule <k> check "blocknumber" : BN => .K ... </k> <number> BN </number>
 ```
+
 ```k
 endmodule
 ```

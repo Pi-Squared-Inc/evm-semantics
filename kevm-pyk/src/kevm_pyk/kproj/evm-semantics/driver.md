@@ -1,4 +1,5 @@
-# Ethereum Simulations
+Ethereum Simulations
+====================
 
 Ethereum is using the EVM to drive updates over the world state.
 Actual execution of the EVM is defined in [the EVM file](../evm).
@@ -615,7 +616,6 @@ TODO: case with nonzero ommers.
     rule <k> check "blocknumber" : (VALUE:String => #parseWord(VALUE)) ... </k>
     rule <k> check "blocknumber" : BN => .K ... </k> <number> BN </number>
 ```
-
 ```k
 endmodule
 ```

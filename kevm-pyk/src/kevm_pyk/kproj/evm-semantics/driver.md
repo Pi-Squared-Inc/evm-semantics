@@ -9,12 +9,14 @@ requires "evm.md"
 requires "optimizations.md"
 requires "asm.md"
 requires "state-utils.md"
+requires "lemmas/uniswap-lemmas.k"
 
 module ETHEREUM-SIMULATION
     imports EVM
     imports EVM-OPTIMIZATIONS
     imports EVM-ASSEMBLY
     imports STATE-UTILS
+    imports UNISWAP-LEMMAS
 ```
 
 An Ethereum simulation is a list of Ethereum commands.

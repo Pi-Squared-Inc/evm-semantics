@@ -20,6 +20,21 @@ requires "data.md"
 module SCHEDULE
     imports EVM-DATA
 
+    syntax Schedule ::= getSchedule(Int) [function]
+    rule getSchedule(0) => FRONTIER
+    rule getSchedule(1) => HOMESTEAD
+    rule getSchedule(2) => TANGERINE_WHISTLE
+    rule getSchedule(3) => SPURIOUS_DRAGON
+    rule getSchedule(4) => BYZANTIUM
+    rule getSchedule(5) => CONSTANTINOPLE
+    rule getSchedule(6) => PETERSBURG
+    rule getSchedule(7) => ISTANBUL
+    rule getSchedule(8) => BERLIN
+    rule getSchedule(9) => LONDON
+    rule getSchedule(10) => MERGE
+    rule getSchedule(11) => SHANGHAI
+    rule getSchedule(12) => CANCUN
+
     syntax Bool ::= ScheduleFlag "<<" Schedule ">>" [function, total]
  // -----------------------------------------------------------------
 
@@ -1317,7 +1332,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gcoldsload             < CANCUN > => 2100
     rule Gcoldaccountaccess     < CANCUN > => 2600
     rule Gwarmstorageread       < CANCUN > => 100
-    rule Gwarmstoragedirtystore < DEFAULT > => 100
+    rule Gwarmstoragedirtystore < CANCUN > => 100
 
     rule Gaccessliststoragekey < CANCUN > => 1900
     rule Gaccesslistaddress    < CANCUN > => 2400

@@ -34,6 +34,7 @@ In the comments next to each cell, we've marked which component of the YellowPap
         <k> $PGM:EthereumSimulation </k>
         <exit-code exit=""> 1 </exit-code>
         <mode> $MODE:Mode </mode>
+         <contract-summary> $CONTRACT:ContractToSummary </contract-summary>
         <schedule> $SCHEDULE:Schedule </schedule>
 
         <ethereum>
@@ -175,6 +176,12 @@ In the comments next to each cell, we've marked which component of the YellowPap
 
     syntax EthereumSimulation
  // -------------------------
+```
+
+```k
+    syntax ContractToSummary ::= "ERC20TransferValid"
+                               | ""
+ // -------------------------------------------
 ```
 
 Modal Semantics

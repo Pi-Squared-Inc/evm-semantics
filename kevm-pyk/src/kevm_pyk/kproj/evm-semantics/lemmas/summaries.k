@@ -6,6 +6,7 @@ module ERC20TRANSFERVALID-SUMMARY
 
 	rule [program.load]:
 		<k> #loadProgram BYTES => .K ...</k>
+		<contract-summary> ERC20TransferValid </contract-summary>
 		<program> _ => BYTES </program>
 		<jumpDests> _ => b"\x00\x00\x00\x00\x00\x00\x00\x00\x00" </jumpDests> [priority(40)]
 endmodule

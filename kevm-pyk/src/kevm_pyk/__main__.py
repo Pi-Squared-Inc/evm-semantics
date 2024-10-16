@@ -589,13 +589,21 @@ def exec_run(options: RunOptions) -> None:
 
     try:
         json_read = json.loads(options.input_file.read_text())
-        kore_pattern = gst_to_kore(json_read, options.schedule, options.mode, options.chainid, options.usegas)
+        kore_pattern = gst_to_kore(
+            json_read, options.schedule, options.mode, options.chainid, options.usegas, options.contract
+        )
     except json.JSONDecodeError:
         pgm_token = KToken(options.input_file.read_text(), KSort('EthereumSimulation'))
         kast_pgm = kevm.parse_token(pgm_token)
         kore_pgm = kevm.kast_to_kore(kast_pgm, sort=KSort('EthereumSimulation'))
         kore_pattern = kore_pgm_to_kore(
-            kore_pgm, SORT_ETHEREUM_SIMULATION, options.schedule, options.mode, options.chainid, options.usegas
+            kore_pgm,
+            SORT_ETHEREUM_SIMULATION,
+            options.schedule,
+            options.mode,
+            options.chainid,
+            options.usegas,
+            options.contract,
         )
 
     if options.proof_hint:
@@ -639,7 +647,13 @@ def exec_kast(options: KastOptions) -> None:
         kast_pgm = kevm.parse_token(pgm_token)
         kore_pgm = kevm.kast_to_kore(kast_pgm)
         kore_pattern = kore_pgm_to_kore(
-            kore_pgm, SORT_ETHEREUM_SIMULATION, options.schedule, options.mode, options.chainid, options.usegas
+            kore_pgm,
+            SORT_ETHEREUM_SIMULATION,
+            options.schedule,
+            options.mode,
+            options.chainid,
+            options.usegas,
+            options.contract,
         )
 
     output_text = kore_print(kore_pattern, definition_dir=kevm.definition_dir, output=options.output)

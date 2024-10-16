@@ -183,6 +183,8 @@ In the comments next to each cell, we've marked which component of the YellowPap
                                | "ERC1155BalanceOf"
                                | "ERC1155BalanceOfBatch"
                                | "ERC1155IsApprovedForAll"
+                               | "ERC1155SafeBatchTransferFromInvalid1"
+                               | "ERC1155SafeBatchTransferFromInvalid2"
                                | ""
  // -------------------------------------------
 ```

@@ -197,6 +197,7 @@ In the comments next to each cell, we've marked which component of the YellowPap
                                | "ERC20Allowance"
                                | "ERC20Approve"
                                | "ERC20BalanceOf"
+                               | "ERC20Decimals"
                                | ""
  // -------------------------------------------
 ```

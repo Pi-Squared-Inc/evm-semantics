@@ -203,6 +203,7 @@ In the comments next to each cell, we've marked which component of the YellowPap
                                | "ERC20TokenDeployment"
                                | "ERC20TotalSupply"
                                | "ERC20TransferFromInvalid"
+                               | "ERC20TransferFromInvalid2"
                                | ""
  // -------------------------------------------
 ```

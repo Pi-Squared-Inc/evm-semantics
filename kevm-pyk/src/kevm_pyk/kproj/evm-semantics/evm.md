@@ -196,6 +196,7 @@ In the comments next to each cell, we've marked which component of the YellowPap
                                | "ERC1155TokenDeployment"
                                | "ERC20Allowance"
                                | "ERC20Approve"
+                               | "ERC20BalanceOf"
                                | ""
  // -------------------------------------------
 ```

@@ -188,6 +188,7 @@ In the comments next to each cell, we've marked which component of the YellowPap
                                | "ERC1155SafeBatchTransferFromValid1"
                                | "ERC1155SafeBatchTransferFromValid2"
                                | "ERC1155SafeTransferFromInvalid1"
+                               | "ERC1155SafeTransferFromInvalid2"
                                | ""
  // -------------------------------------------
 ```

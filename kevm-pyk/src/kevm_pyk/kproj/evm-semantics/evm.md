@@ -205,6 +205,7 @@ In the comments next to each cell, we've marked which component of the YellowPap
                                | "ERC20TransferFromInvalid"
                                | "ERC20TransferFromInvalid2"
                                | "ERC20TransferFromValid"
+                               | "ERC20TransferInvalid"
                                | ""
  // -------------------------------------------
 ```

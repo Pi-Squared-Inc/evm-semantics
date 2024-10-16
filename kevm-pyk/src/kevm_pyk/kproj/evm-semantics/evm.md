@@ -199,6 +199,7 @@ In the comments next to each cell, we've marked which component of the YellowPap
                                | "ERC20BalanceOf"
                                | "ERC20Decimals"
                                | "ERC20Name"
+                               | "ERC20Symbol"
                                | ""
  // -------------------------------------------
 ```

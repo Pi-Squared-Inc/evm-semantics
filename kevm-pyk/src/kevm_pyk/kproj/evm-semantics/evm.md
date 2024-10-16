@@ -179,8 +179,7 @@ In the comments next to each cell, we've marked which component of the YellowPap
 ```
 
 ```k
-    syntax ContractToSummary ::= "ERC20TransferValid"
-                               | "ERC1155BalanceOf"
+    syntax ContractToSummary ::= "ERC1155BalanceOf"
                                | "ERC1155BalanceOfBatch"
                                | "ERC1155IsApprovedForAll"
                                | "ERC1155SafeBatchTransferFromInvalid1"
@@ -206,6 +205,7 @@ In the comments next to each cell, we've marked which component of the YellowPap
                                | "ERC20TransferFromInvalid2"
                                | "ERC20TransferFromValid"
                                | "ERC20TransferInvalid"
+                               | "ERC20TransferValid"
                                | ""
  // -------------------------------------------
 ```

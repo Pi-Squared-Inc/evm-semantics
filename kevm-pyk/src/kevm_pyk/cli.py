@@ -451,6 +451,7 @@ class EVMChainOptions(Options):
     chainid: int
     mode: str
     usegas: bool
+    contract: str
 
     @staticmethod
     def default() -> dict[str, Any]:
@@ -459,6 +460,7 @@ class EVMChainOptions(Options):
             'chainid': 1,
             'mode': 'NORMAL',
             'usegas': True,
+            'contract': '',
         }
 
     @staticmethod
@@ -939,6 +941,8 @@ class KEVMCLIArgs(KCLIArgs):
         args.add_argument(
             '--no-gas', default=None, action='store_false', dest='usegas', help='omit gas cost computations.'
         )
+
+        args.add_argument('--contract', default='', type=str, help='Name of the contract to apply the summary.')
         return args
 
     @cached_property

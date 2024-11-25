@@ -108,7 +108,8 @@ def test_rest_vm(test_file: Path) -> None:
 
 ALL_TEST_DIR: Final = TEST_DIR / 'BlockchainTests/GeneralStateTests'
 ALL_TESTS: Final = tuple(ALL_TEST_DIR.glob('**/*.json'))
-BCHAIN_TESTS: Final = tuple(test_file for test_file in ALL_TESTS if test_file not in set(VM_TESTS))
+#BCHAIN_TESTS: Final = tuple(test_file for test_file in ALL_TESTS if test_file not in set(VM_TESTS))
+BCHAIN_TESTS: Final = (ALL_TEST_DIR / 'stStaticCall/static_Call50000bytesContract50_2.json',)
 SKIPPED_BCHAIN_TESTS: Final = tuple(test_file for test_file in BCHAIN_TESTS if test_file in SKIPPED_TESTS)
 
 

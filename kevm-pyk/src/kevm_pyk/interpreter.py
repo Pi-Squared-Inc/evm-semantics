@@ -28,5 +28,7 @@ def interpret(gst_data: Any, schedule: str, mode: str, chainid: int, usegas: boo
 def _interpret(gst_data: Any, schedule: str, mode: str, chainid: int, usegas: bool) -> CompletedProcess:
     interpreter = kdist.get('evm-semantics.llvm') / 'interpreter'
     init_kore = gst_to_kore(gst_data, schedule, mode, chainid, usegas)
+    with open("init_kore.txt", "w") as init_kore_f:
+      init_kore.write(init_kore_f)
     proc_res = run_process_2([str(interpreter), '/dev/stdin', '-1', '/dev/stdout'], input=init_kore.text, check=False)
     return proc_res

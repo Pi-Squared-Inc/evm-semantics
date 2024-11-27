@@ -336,9 +336,11 @@ The `"rlp"` key loads the block information.
 
     rule <k> loadTransaction TXID { "r" : TR:Bytes, REST => REST } ... </k>
          <message> <msgID> TXID </msgID> <sigR> _ => TR </sigR> ... </message>
+      requires lengthBytes(TR) ==Int 32
 
     rule <k> loadTransaction TXID { "s" : TS:Bytes, REST => REST } ... </k>
          <message> <msgID> TXID </msgID> <sigS> _ => TS </sigS> ... </message>
+      requires lengthBytes(TS) ==Int 32
 
     rule <k> loadTransaction TXID { "type" : T:Int, REST => REST } ... </k>
          <message> <msgID> TXID </msgID> <txType> _ => #asmTxPrefix(T) </txType> ... </message>

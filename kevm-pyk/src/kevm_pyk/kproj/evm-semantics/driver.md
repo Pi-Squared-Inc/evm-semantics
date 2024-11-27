@@ -473,9 +473,6 @@ Here we check the other post-conditions associated with an EVM test.
 
     rule check TESTID : { "blockHeader" : BLOCKHEADER } => check "blockHeader" : BLOCKHEADER ~> failure TESTID
  // ----------------------------------------------------------------------------------------------------------
-    rule <k> check "blockHeader" : { KEY : VALUE , REST } => check "blockHeader" : { KEY : VALUE } ~> check "blockHeader" : { REST } ... </k>
-      requires REST =/=K .JSONs
-
     rule <k> check "blockHeader" : { _KEY : (VALUE:String => #parseByteStack(VALUE)) } ... </k>
 
     rule <k> check "blockHeader" : {  KEY : (VALUE:Bytes => #asWord(VALUE)) } ... </k>
@@ -536,9 +533,6 @@ Here we check the other post-conditions associated with an EVM test.
 
     rule check TESTID : { "genesisBlockHeader" : BLOCKHEADER } => check "genesisBlockHeader" : BLOCKHEADER ~> failure TESTID
  // ------------------------------------------------------------------------------------------------------------------------
-    rule <k> check "genesisBlockHeader" : { KEY : VALUE , REST } => check "genesisBlockHeader" : { KEY : VALUE } ~> check "genesisBlockHeader" : { REST } ... </k>
-      requires REST =/=K .JSONs
-
     rule <k> check "genesisBlockHeader" : { KEY : _ } => .K ... </k> requires KEY =/=String "hash"
 
     rule <k> check "genesisBlockHeader" : { "hash": (HASH:String => #asWord(#parseByteStack(HASH))) } ... </k>
@@ -547,7 +541,6 @@ Here we check the other post-conditions associated with an EVM test.
 
     rule <k> check TESTID : { "transactions" : TRANSACTIONS } => check "transactions" : TRANSACTIONS ~> failure TESTID ... </k>
  // ---------------------------------------------------------------------------------------------------------------------------
-    rule <k> check "transactions" : [ .JSONs ] => .K ... </k> <txOrder> .List                    </txOrder>
     rule <k> check "transactions" : { .JSONs } => .K ... </k> <txOrder> ListItem(_) => .List ... </txOrder>
 
     rule <k> check "transactions" : [ TRANSACTION , REST ] => check "transactions" : TRANSACTION   ~> check "transactions" : [ REST ] ... </k>

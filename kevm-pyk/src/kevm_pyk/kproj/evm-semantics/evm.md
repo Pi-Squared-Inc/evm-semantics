@@ -87,7 +87,7 @@ Output Extraction
     rule getStatus(EVMC_FAILURE) => EVMC_FAILURE
     rule getStatus(EVMC_INVALID_INSTRUCTION) => EVMC_INVALID_INSTRUCTION
     rule getStatus(EVMC_UNDEFINED_INSTRUCTION) => EVMC_UNDEFINED_INSTRUCTION
-    rule getStatus(EVMC_OUT_OF_GAS) => EVMC_OUT_OF_GAS 
+    rule getStatus(EVMC_OUT_OF_GAS) => EVMC_OUT_OF_GAS
     rule getStatus(EVMC_BAD_JUMP_DESTINATION) => EVMC_BAD_JUMP_DESTINATION
     rule getStatus(EVMC_STACK_OVERFLOW) => EVMC_STACK_OVERFLOW
     rule getStatus(EVMC_STACK_UNDERFLOW) => EVMC_STACK_UNDERFLOW
@@ -570,12 +570,12 @@ These operators make queries about the current execution state.
 ```k
     syntax NullStackOp ::= "PC" | "GAS" | "GASPRICE" | "GASLIMIT" | "BASEFEE" | "BLOBBASEFEE"
  // -----------------------------------------------------------------------------------------
-    rule <k> PC          => PCOUNT                      ~> #push ... </k> <pc> PCOUNT </pc>
-    rule <k> GAS         => gas2Int(GAVAIL)             ~> #push ... </k> <gas> GAVAIL </gas>
-    rule <k> GASPRICE    => GPRICE                      ~> #push ... </k> <gasPrice> GPRICE </gasPrice>
-    rule <k> GASLIMIT    => GLIMIT                      ~> #push ... </k> <gasLimit> GLIMIT </gasLimit>
-    rule <k> BASEFEE     => BFEE                        ~> #push ... </k> <baseFee> BFEE </baseFee>
-    rule <k> BLOBBASEFEE => #baseFeePerBlobGas(BLOBGAS) ~> #push ... </k> <excessBlobGas> BLOBGAS </excessBlobGas>  requires notBool #rangeNegUInt64(BLOBGAS)
+    rule <k> PC          => PCOUNT          ~> #push ... </k> <pc> PCOUNT </pc>
+    rule <k> GAS         => gas2Int(GAVAIL) ~> #push ... </k> <gas> GAVAIL </gas>
+    rule <k> GASPRICE    => GasPrice()      ~> #push ... </k>
+    rule <k> GASLIMIT    => GasLimit()      ~> #push ... </k>
+    rule <k> BASEFEE     => BaseFee()       ~> #push ... </k>
+    rule <k> BLOBBASEFEE => BlobBaseFee()   ~> #push ... </k>
 
     syntax NullStackOp ::= "COINBASE" | "TIMESTAMP" | "NUMBER" | "DIFFICULTY" | "PREVRANDAO"
  // ----------------------------------------------------------------------------------------
@@ -620,12 +620,10 @@ The blockhash is calculated here using the "shortcut" formula used for running t
  // -------------------------------
 
     rule <k> BLOBHASH INDEX => 0 ~> #push ... </k>
-         <versionedHashes> HASHES </versionedHashes>
-       requires INDEX >=Int size(HASHES)
+       requires INDEX >=Int BlobHashesSize()
 
-    rule <k> BLOBHASH INDEX => #asWord( {HASHES[INDEX]}:>Bytes ) ~> #push ... </k>
-         <versionedHashes> HASHES </versionedHashes>
-       requires INDEX <Int size(HASHES)
+    rule <k> BLOBHASH INDEX => BlobHash(INDEX) ~> #push ... </k>
+       requires INDEX <Int BlobHashesSize()
 ```
 
 EVM OpCodes
@@ -977,7 +975,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
          ...
          </k>
          <localMem> LM </localMem>
-         <callGas> GCALL </callGas> 
+         <callGas> GCALL </callGas>
          <schedule> SCHED </schedule>
       requires #hasValidInitCode(MEMWIDTH, SCHED)
 
@@ -1163,28 +1161,25 @@ Precompiled Contracts
        andBool CallData()[212] >Int 1
 
     rule <k> BLAKE2F => #end EVMC_PRECOMPILE_FAILURE ... </k>
-         <callData> DATA </callData>
-      requires lengthBytes( DATA ) =/=Int 213
+      requires lengthBytes( CallData() ) =/=Int 213
 
     syntax PrecompiledOp ::= "KZGPOINTEVAL"
  // ---------------------------------------
     // FIELD_ELEMENTS_PER_BLOB = 4096
     rule <k> KZGPOINTEVAL => #end EVMC_SUCCESS ... </k>
          <output> _ => Int2Bytes(32, 4096, BE) +Bytes Int2Bytes(32, blsModulus, BE) </output>
-         <callData> DATA </callData>
-      requires lengthBytes( DATA ) ==Int 192
-       andBool #kzg2vh(substrBytes(DATA, 96, 144)) ==K substrBytes(DATA, 0, 32)
-       andBool Bytes2Int(substrBytes(DATA, 32, 64), BE, Unsigned) <Int blsModulus
-       andBool Bytes2Int(substrBytes(DATA, 64, 96), BE, Unsigned) <Int blsModulus
-       andBool verifyKZGProof(substrBytes(DATA, 96, 144), substrBytes(DATA, 32, 64), substrBytes(DATA, 64, 96), substrBytes(DATA, 144, 192))
+      requires lengthBytes( CallData() ) ==Int 192
+       andBool #kzg2vh(substrBytes(CallData(), 96, 144)) ==K substrBytes(CallData(), 0, 32)
+       andBool Bytes2Int(substrBytes(CallData(), 32, 64), BE, Unsigned) <Int blsModulus
+       andBool Bytes2Int(substrBytes(CallData(), 64, 96), BE, Unsigned) <Int blsModulus
+       andBool verifyKZGProof(substrBytes(CallData(), 96, 144), substrBytes(CallData(), 32, 64), substrBytes(CallData(), 64, 96), substrBytes(CallData(), 144, 192))
 
     rule <k> KZGPOINTEVAL => #end EVMC_PRECOMPILE_FAILURE ... </k>
-         <callData> DATA </callData>
-      requires lengthBytes( DATA ) =/=Int 192
-       orBool #kzg2vh(substrBytes(DATA, 96, 144)) =/=K substrBytes(DATA, 0, 32)
-       orBool Bytes2Int(substrBytes(DATA, 32, 64), BE, Unsigned) >=Int blsModulus
-       orBool Bytes2Int(substrBytes(DATA, 64, 96), BE, Unsigned) >=Int blsModulus
-       orBool notBool verifyKZGProof(substrBytes(DATA, 96, 144), substrBytes(DATA, 32, 64), substrBytes(DATA, 64, 96), substrBytes(DATA, 144, 192))
+      requires lengthBytes( CallData() ) =/=Int 192
+       orBool #kzg2vh(substrBytes(CallData(), 96, 144)) =/=K substrBytes(CallData(), 0, 32)
+       orBool Bytes2Int(substrBytes(CallData(), 32, 64), BE, Unsigned) >=Int blsModulus
+       orBool Bytes2Int(substrBytes(CallData(), 64, 96), BE, Unsigned) >=Int blsModulus
+       orBool notBool verifyKZGProof(substrBytes(CallData(), 96, 144), substrBytes(CallData(), 32, 64), substrBytes(CallData(), 64, 96), substrBytes(CallData(), 144, 192))
 
     syntax Bytes ::= #kzg2vh ( Bytes ) [symbol(#kzg2vh), function, total]
  // ---------------------------------------------------------------------

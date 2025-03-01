@@ -10,7 +10,7 @@
 namespace usl_kevm {
 
 // We use the std::uint64_t type as a place holder for various data types. The
-// actual bitwidth can be found in a comment. The bitwidth is refered to as
+// actual bitwidth can be found in a comment. The bitwidth is referred to as
 // scalar for data types that are described as arbitrary natural numbers in the
 // Ethereum yellow paper.
 
@@ -168,7 +168,7 @@ using accessed_storage_list_t = std::vector<accessed_storage_t>;
 // Substate
 using account_address_list_t = std::vector<account_address_t>;
 struct substate_t {
-  account_address_list_t self_destrcut;
+  account_address_list_t self_destruct;
   log_list_t log;
   account_address_list_t touched_accounts;
   ether_t refund;

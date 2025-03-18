@@ -940,7 +940,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
          <output> _ => OUT </output>
       requires STATUS ==Int EVMC_REVERT
 
-    rule <k> #codeDeposit(MessageResult(... gas: GAVAIL, status: STATUS)) => #refund GAVAIL ~> 0 ~> #push ...</k>
+    rule <k> #codeDeposit(MessageResult(... status: STATUS)) => 0 ~> #push ...</k>
         <output> _ => .Bytes </output>
       requires STATUS =/=Int EVMC_SUCCESS andBool STATUS =/=Int EVMC_REVERT
 

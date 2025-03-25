@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+# This Nishant's one-click build script.
+# This helps checking that the current build environment is sane, and automates
+# some of the build procedure.
+
+set -euo pipefail
+
+# Utils
+# -----
+
+die() {
+    echo >&2 -e "Fatal:" "$@"
+    exit 1
+}
+
+announce() {
+    echo -e '\n\n---- ' "$@"
+}
+
+# Checks
+# ------
+
+check_k() {
+    update='\n\tkup shell k --version v$(cat deps/k_release)'
+    type kompile 2>/dev/null >/dev/null \
+        || die 'K not found in path.' \
+               '\nInstall with:' "$update"
+    found_version="$(kompile --version | head -n 1)" \
+        || die "Unable to determine K version"
+    found_version="${found_version#K version:    v}"
+    expected_version="$(cat deps/k_release)"
+    [[ "$found_version" = "$expected_version"  ]] \
+        || die 'Unexpected kompile version.\n'  \
+               "\n   Found: $found_version"     \
+               "\nExpected: $expected_version"  \
+               '\nUpdate with:' "$update"
+}
+
+# Main
+# ----
+
+# Prevent poetry from asking for Keyring information. It started promting me for
+# it once I installed some Gnome packages. I'm not sure why it wants it, perhaps
+# to access project github dependencies, or enable SSH keys?
+export PYTHON_KEYRING_BACKEND=keyring.backends.fail.Keyring
+
+check_k

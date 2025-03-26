@@ -939,6 +939,11 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
     rule <k> #codeDeposit(MessageResult(... gas: GAVAIL, status: STATUS)) => #refund GAVAIL ~> 0 ~> #push ...</k>
       requires STATUS =/=Int EVMC_SUCCESS
 
+       rule <k> #codeDeposit(MessageResult(... gas: GAVAIL, status: STATUS, target: ACCT)) => #refund GAVAIL ~> ACCT ~> #push ...</k>
+          <output> _ => .Bytes </output>
+          <schedule> FRONTIER </schedule>
+      requires STATUS =/=Int EVMC_SUCCESS andBool STATUS =/=Int EVMC_REVERT
+
     rule <k> #codeDeposit(MessageResult(... gas: GAVAIL, status: STATUS, target: ACCT)) => #refund GAVAIL ~> ACCT ~> #push ...</k>
          <output> _ => .Bytes </output>
       requires STATUS ==Int EVMC_SUCCESS

@@ -854,6 +854,11 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
 
     syntax KItem ::= "#return" Int Int MessageResult
  // ------------------------------------------------
+   rule [return.exception]:
+         <k> #halt ~> #return _ _ MessageResult(... status: STATUS) => 0 ~> #push ...</k>
+         <output> _ => .Bytes </output>
+      requires STATUS =/=Int EVMC_SUCCESS andBool STATUS =/=Int EVMC_REVERT
+
     rule [return.revert]:
          <k> #return RETSTART RETWIDTH MessageResult(... gas: GAVAIL, status: STATUS, data: OUT) => 0 ~> #push ~> #refund GAVAIL ~> #setLocalMem RETSTART RETWIDTH OUT ...</k>
          <output> _ => OUT </output>

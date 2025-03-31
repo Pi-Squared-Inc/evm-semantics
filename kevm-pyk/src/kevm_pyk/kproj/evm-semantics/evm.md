@@ -936,7 +936,8 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
     rule #hasValidInitCode(INITCODELEN, SCHED) => notBool Ghasmaxinitcodesize << SCHED >> orBool INITCODELEN <=Int maxInitCodeSize < SCHED >
 
     syntax KItem ::= "#codeDeposit" MessageResult
-    rule <k> #codeDeposit(MessageResult(... gas: GAVAIL, status: STATUS)) => #refund GAVAIL ~> 0 ~> #push ...</k>
+    rule <k> #codeDeposit(MessageResult(... gas: GAVAIL, status: STATUS, data:OUT)) => #refund GAVAIL ~> 0 ~> #push ...</k>
+         <output> _ => OUT </output>
       requires STATUS =/=Int EVMC_SUCCESS
 
        rule <k> #codeDeposit(MessageResult(... gas: GAVAIL, status: STATUS, target: ACCT)) => #refund GAVAIL ~> ACCT ~> #push ...</k>
@@ -1563,6 +1564,7 @@ There are several helpers for calculating gas (most of them also specified in th
  // -------------------------------------------------------------------------
     rule <k> #accountNonexistent(ACCT) => IsAccountEmpty(ACCT) andBool Gemptyisnonexistent << SCHED >> ... </k>
          <schedule> SCHED </schedule>
+      requires AccountExists(ACCT)
 
    rule <k> #accountNonexistent(_) => true ... </k> [owise]
 ```

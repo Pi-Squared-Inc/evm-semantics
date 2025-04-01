@@ -1514,7 +1514,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gcoldsload             < PRAGUE > => 2100
     rule Gcoldaccountaccess     < PRAGUE > => 2600
     rule Gwarmstorageread       < PRAGUE > => 100
-    rule Gwarmstoragedirtystore < DEFAULT > => 100
+    rule Gwarmstoragedirtystore < PRAGUE > => 100
+
+    rule Gpointeval < PRAGUE > => 50000
 
     rule Gaccessliststoragekey < PRAGUE > => 1900
     rule Gaccesslistaddress    < PRAGUE > => 2400
@@ -1545,9 +1547,13 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasmaxinitcodesize     << PRAGUE >> => true
     rule Ghaspushzero            << PRAGUE >> => true
     rule Ghaswarmcoinbase        << PRAGUE >> => true
+    rule Ghaswithdrawals         << PRAGUE >> => true
     rule Ghastransient           << PRAGUE >> => true
     rule Ghasmcopy               << PRAGUE >> => true
     rule Ghasbeaconroot          << PRAGUE >> => true
+    rule Ghaseip6780             << PRAGUE >> => true
+    rule Ghasblobbasefee         << PRAGUE >> => true
+    rule Ghasblobhash            << PRAGUE >> => true
 
 endmodule
 ```

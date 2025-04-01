@@ -40,6 +40,12 @@ check_submodules() {
 }
 
 
+check_clang_version() {
+    minimum_version="15.0.0"
+    actual_version="$(clang --version | head -n 1 | cut -d' ' -f 3)"
+    [[  "$minimum_version" = $(echo -e "$minimum_version\n$actual_version" | sort -V | head -n1) ]] ||
+        die "Clang version $minimum_version or higher needed."
+}
 # Main
 # ----
 
@@ -50,3 +56,4 @@ export PYTHON_KEYRING_BACKEND=keyring.backends.fail.Keyring
 
 check_submodules
 check_k
+check_clang_version

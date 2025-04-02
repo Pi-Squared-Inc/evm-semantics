@@ -27,6 +27,14 @@ check_clang_version() {
         die "Clang version $minimum_version or higher needed."
 }
 
+check_go_version() {
+    expected_version="go1.23.3"
+    actual_version="$(go version | head -n 1 | cut -d' ' -f3)" ||
+        die "go not installed"
+    [[ "$expected_version" = "$actual_version" ]] ||
+        die "Unexpected go version.\nExpected: $expected_version;\n     got: $actual_version"
+}
+
 check_k() {
     update='\n\tkup shell k.openssl --version v$(cat deps/k_release)'
     type kompile 2>/dev/null >/dev/null \
@@ -114,6 +122,7 @@ verbose=
 check_submodules
 check_k
 check_clang_version
+check_go_version
 
 announce 'Setting up Python dependencies';   make -s poetry
 announce 'Building Blockchain Plugin';       build_with_kdist "evm-semantics.plugin"

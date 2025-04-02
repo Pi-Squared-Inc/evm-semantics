@@ -53,6 +53,10 @@ build_with_kdist() {
         die "Building blockchain plugin failed. Run with '-v'for logs"
 }
 
+build_ulm_hooks() {
+    mkdir -p .build
+    make -C deps/ulm/kllvm/ CXX=clang++ ULM_LIB_NAME=$(pwd)/.build/libulmkllvm.so
+}
 
 # Main
 # ----
@@ -72,6 +76,6 @@ check_clang_version
 announce 'Setting up Python dependencies';   make -s poetry
 announce 'Building Blockchain Plugin';       build_with_kdist "evm-semantics.plugin"
 announce 'Building Symbolic Semantics';      build_with_kdist "evm-semantics.haskell"
+announce 'Building Blockchain Plugin';       build_ulm_hooks
 
-# TODO: Hangs up, possibly due to a race in KDist?
 # announce 'Building Concrete Semantics';      build_with_kdist "evm-semantics.llvm"

@@ -14,3 +14,6 @@
 [submodule "web/k-web-theme"]
 	path = web/k-web-theme
 	url = https://github.com/runtimeverification/k-web-theme
+[submodule "deps/ulm"]
+	path = deps/ulm
+	url = git@github.com:Pi-Squared-Inc/ulm

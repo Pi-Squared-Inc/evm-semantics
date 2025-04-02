@@ -107,6 +107,12 @@ build_k_semantics() {
 export CGO_LDFLAGS="-lulmkllvm -L$build_dir/lib/ -lkevm -L${build_dir}/libkevm/"
 
 build_ulm_server() { (cd "$ulm_geth_dir"; make geth; ) }
+test_ulm() {
+    (   cd "$ulm_geth_dir"/tests;
+        go test -c;
+        ./tests.test -test.run TestULMBlockchain -test.parallel 1 -test.v
+    )
+}
 
 # Main
 # ----
@@ -129,3 +135,4 @@ announce 'Building Blockchain Plugin';       build_with_kdist "evm-semantics.plu
 announce 'Building ULM Hooks';               build_ulm_hooks
 announce 'Building K Semantics';             build_k_semantics
 announce 'Build ULM Server';                 build_ulm_server
+announce 'Running ULM Tests';                test_ulm

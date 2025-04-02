@@ -1341,14 +1341,14 @@ Access List Gas
 
     syntax InternalOp ::= #gasAccess ( Schedule, OpCode, Bool ) [symbol(#gasAccess)]
  // --------------------------------------------------------------------------
-    rule <k> #gasAccess(SCHED, EXTCODESIZE ACCT, ACCESS)       => Caddraccess(SCHED, ACCESS)                                ... </k>
-    rule <k> #gasAccess(SCHED, EXTCODECOPY ACCT _ _ _, ACCESS) => Caddraccess(SCHED, ACCESS)                                ... </k>
-    rule <k> #gasAccess(SCHED, EXTCODEHASH ACCT, ACCESS)       => Caddraccess(SCHED, ACCESS)                                ... </k>
-    rule <k> #gasAccess(SCHED, BALANCE ACCT, ACCESS)           => Caddraccess(SCHED, ACCESS)                                ... </k>
-    rule <k> #gasAccess(SCHED, SELFDESTRUCT ACCT, ACCESS)      => #if ACCESS #then 0 #else Gcoldaccountaccess < SCHED > #fi ... </k>
-    rule <k> #gasAccess(_    , SLOAD _, ACCESS)                => 0                                                         ... </k>
-    rule <k> #gasAccess(SCHED, SSTORE INDEX _, ACCESS)         => #if ACCESS #then 0 #else Gcoldsload < SCHED > #fi         ... </k>
-    rule <k> #gasAccess(_    , _, ACCESS)                      => 0                                                         ... </k> [owise]
+    rule <k> #gasAccess(SCHED, EXTCODESIZE _ACCT, ACCESS)       => Caddraccess(SCHED, ACCESS)                                ... </k>
+    rule <k> #gasAccess(SCHED, EXTCODECOPY _ACCT _ _ _, ACCESS) => Caddraccess(SCHED, ACCESS)                                ... </k>
+    rule <k> #gasAccess(SCHED, EXTCODEHASH _ACCT, ACCESS)       => Caddraccess(SCHED, ACCESS)                                ... </k>
+    rule <k> #gasAccess(SCHED, BALANCE _ACCT, ACCESS)           => Caddraccess(SCHED, ACCESS)                                ... </k>
+    rule <k> #gasAccess(SCHED, SELFDESTRUCT _ACCT, ACCESS)      => #if ACCESS #then 0 #else Gcoldaccountaccess < SCHED > #fi ... </k>
+    rule <k> #gasAccess(_    , SLOAD _, _ACCESS)                => 0                                                         ... </k>
+    rule <k> #gasAccess(SCHED, SSTORE _INDEX _, ACCESS)         => #if ACCESS #then 0 #else Gcoldsload < SCHED > #fi         ... </k>
+    rule <k> #gasAccess(_    , _, _ACCESS)                      => 0                                                         ... </k> [owise]
 
 ```
 

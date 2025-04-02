@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# This script commandeers the CI Dockerfile to build dependencies
+# It depends on the pip package `dent`, that allows you to enter
+# the same docker image from different terminals.
+#
+# 1. Install `dent` using pip, or preferably pipx
+# 2. Build the Docker image: `./dockerShell build`
+# 3. Create and enter the first container:
+#
+#       ./dockerShell create
+#
+# 4. Use `./dockerShell enter` to enter the existing container from additional terminals
+
+TAG_NAME=evm-cse
+
+usage() { echo >&2 -e "Usage: $0 [build|create|enter|clean]\n\nNote thace create also enters the container"   "$@"; exit 1; }
+
+build_docker_image() {
+
+    # See: .github/actions/with-docker/action.yml
+    USER=$(     id -u -n)
+    USER_ID=$(  id -u   )
+
+    # TODO: This fails on MacOS
+    GROUP=$(    id -g -n)
+    GROUP_ID=$( id -g   )
+
+    BASE_DISTRO=jammy
+    K_VERSION=$(cat deps/k_release)
+    Z3_VERSION=$(cat deps/z3)
+    LLVM_VERSION=16
+
+    DOCKERFILE=./Dockerfile
+
+    docker build . --file ${DOCKERFILE}        \
+      --tag ${TAG_NAME}                        \
+      --build-arg USER_ID=${USER_ID}           \
+      --build-arg GROUP_ID=${GROUP_ID}         \
+      --build-arg USER=${USER}                 \
+      --build-arg GROUP=${GROUP}               \
+      --build-arg BASE_DISTRO=${BASE_DISTRO}   \
+      --build-arg K_VERSION=${K_VERSION}       \
+      --build-arg Z3_VERSION=${Z3_VERSION}     \
+      --build-arg LLVM_VERSION=${LLVM_VERSION}
+}
+
+dent_create_and_enter_container() {
+    dent -i "$TAG_NAME"                       \
+         "-r=-v=$(pwd):/home/$USER/workspace" \
+         evm-cse-dent
+}
+
+dent_enter_container() { dent evm-cse-dent ; }
+dent_clean() {
+    docker container kill evm-cse-dent  || true
+    docker container rm   evm-cse-dent  || true
+}
+
+
+# Main
+# ----
+
+[[ "$#" = 1 ]]  || usage
+
+case "$1" in
+    build)      build_docker_image;;
+    create)     dent_create_and_enter_container;;
+    enter)      dent_enter_container;;
+    clean)      dent_clean;;
+    *)          usage;;
+esac

@@ -10,8 +10,7 @@ die()       { echo >&2 -e "fatal:" "$@"; exit 1;    }
 # ------
 
 submodules=(tests/ethereum-tests kevm-pyk/src/kevm_pyk/kproj/plugin
-            deps/metropolis web/k-web-theme
-)
+            deps/metropolis web/k-web-theme)
 check_submodules() {
     for s in "${submodules[@]}"; do
         (cd "$s" && [[ -e '.git' ]]) ||
@@ -44,12 +43,19 @@ check_k() {
                '\nUpdate with:' "$update"
 }
 
+# Paths
+# -----
+
+repo_root="$(cd "$(dirname "$0")" && pwd -P)"
+build_dir="$repo_root/.build"
+lib_dir=$build_dir/lib/
+lib_ulm_hooks="$lib_dir/libulmkllvm.so"
+ulm_dir="$repo_root"/deps/ulm
+ulm_kllvm_dir="$ulm_dir"/kllvm/
+ulm_geth_dir="$ulm_dir"/op-geth/
+
 # Builders
 # --------
-
-ULM_DIR=deps/ulm
-ULM_KLLVM_DIR="$ULM_DIR"/kllvm/
-ULM_GETH_DIR="$ULM_DIR"/op-geth/
 
 build_with_kdist() {
     declare -g verbose
@@ -57,12 +63,11 @@ build_with_kdist() {
         die "Building blockchain plugin failed. Run with '-v'for logs"
 }
 
-LIB_ULM_HOOKS=$(pwd)/.build/libulmkllvm.so
 build_ulm_hooks() {
-    mkdir -p .build
-    make -C "$ULM_KLLVM_DIR"                \
+    mkdir -p "$build_dir/lib/"
+    make -C "$ulm_kllvm_dir"                \
             CXX="clang++"                   \
-            ULM_LIB_NAME="$LIB_ULM_HOOKS"   \
+            ULM_LIB_NAME="$lib_ulm_hooks"   \
             CPPFLAGS=-D"EVM_ONLY"
 }
 
@@ -70,12 +75,13 @@ build_k_semantics() {
     # NOTE: We manually build so that we can add additional flags, not in the kdist build.
     # NOTE: These flags must be manually kept in sync with:
     #
-    #       https://github.com/Pi-Squared-Inc/ulm/blob/main/Docker/OP-KEVM/Dockerfile.opkevm
-
+    #   https://github.com/Pi-Squared-Inc/ulm/blob/main/Docker/OP-KEVM/Dockerfile.opkevm
+    #
+    # TODO: Use Makefile for this build rule
     kompile kevm-pyk/src/kevm_pyk/kproj/evm-semantics/evm.md                                \
+            --output-definition $build_dir/libkevm                                          \
             --main-module EVM --syntax-module EVM                                           \
             --md-selector 'k & ! symbolic'                                                  \
-            --output-definition libkevm                                                     \
             -I kevm-pyk/src/kevm_pyk/kproj/evm-semantics                                    \
             -I kevm-pyk/src/kevm_pyk/kproj/plugin                                           \
             --hook-namespaces 'JSON KRYPTO ULM'                                             \
@@ -83,18 +89,14 @@ build_k_semantics() {
             -ccopt -std=c++20  -ccopt -lssl    -ccopt -lcrypto    -ccopt -lsecp256k1        \
             -ccopt $(poetry -C kevm-pyk run kdist which evm-semantics.plugin)/krypto.a      \
             -ccopt -Wno-deprecated-declarations                                             \
-            --type-inference-mode simplesub --verbose -I "$ULM_KLLVM_DIR"                   \
-            -ccopt -L".build" -ccopt -lulmkllvm --llvm-kompile-type library                 \
+            --type-inference-mode simplesub --verbose -I "$ulm_kllvm_dir"                   \
+            -ccopt -L"$build_dir/lib" -ccopt -lulmkllvm --llvm-kompile-type library         \
             --llvm-kompile-output libkevm.so -ccopt -g --llvm-mutable-bytes                 \
-            -ccopt "$ULM_KLLVM_DIR"/lang/ulm_language_entry.cpp -ccopt -I"$ULM_KLLVM_DIR"   \
+            -ccopt "$ulm_kllvm_dir"/lang/ulm_language_entry.cpp -ccopt -I"$ulm_kllvm_dir"   \
             -ccopt -DULM_LANG_ID=kevm --llvm-hidden-visibility                              \
             -ccopt -fPIC -ccopt -shared
 }
-
-
-build_ulm_server() {
-    (cd "$ULM_GETH_DIR"; make geth)
-}
+build_ulm_server() { (cd "$ulm_geth_dir"; make geth; ) }
 
 # Main
 # ----

@@ -96,6 +96,8 @@ build_k_semantics() {
             -ccopt -DULM_LANG_ID=kevm --llvm-hidden-visibility                              \
             -ccopt -fPIC -ccopt -shared
 }
+export CGO_LDFLAGS="-lulmkllvm -L$build_dir/lib/ -lkevm -L${build_dir}/libkevm/"
+
 build_ulm_server() { (cd "$ulm_geth_dir"; make geth; ) }
 
 # Main

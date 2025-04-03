@@ -9,14 +9,14 @@ die()       { echo >&2 -e "fatal:" "$@"; exit 1;    }
 # Checks
 # ------
 
-submodules=(tests/ethereum-tests kevm-pyk/src/kevm_pyk/kproj/plugin
-            deps/metropolis web/k-web-theme)
+submodules=(tests/ethereum-tests kevm-pyk/src/kevm_pyk/kproj/plugin deps/ulm)
 check_submodules() {
+    submodule_update_cmd="git submodule update --init --recursive --depth 1 --single-branch ${submodules[@]}"
     for s in "${submodules[@]}"; do
         (cd "$s" && [[ -e '.git' ]]) ||
-            die "Git submodule '$s' not initialized.\n Initialize with:\n\n\tgit submodule update --init --recursive"
+            die "Git submodule '$s' not initialized.\n Initialize with:\n\n\t$submodule_update_cmd"
         git diff  --exit-code --ignore-submodules=none "$s" ||
-            die "Git submodule '$s' is modified.\n Use 'git add' to cache this change, or update modules with:\n\n\tgit submodule update --init --recursive"
+            die "Git submodule '$s' is modified.\n Use 'git add' to cache this change, or update modules with:\n\n\t$submodule_update_cmd"
     done
 }
 

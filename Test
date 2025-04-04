@@ -28,7 +28,7 @@ check_clang_version() {
 }
 
 check_go_version() {
-    expected_version="go1.23.3"
+    expected_version="go1.23.1"
     actual_version="$(go version | head -n 1 | cut -d' ' -f3)" ||
         die "go not installed"
     [[ "$expected_version" = "$actual_version" ]] ||

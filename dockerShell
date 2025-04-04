@@ -16,7 +16,7 @@ set -euo pipefail
 
 TAG_NAME=evm-cse
 
-usage() { echo >&2 -e "Usage: $0 [build|create|enter|clean]\n\nNote thace create also enters the container"   "$@"; exit 1; }
+usage() { echo >&2 -e "Usage: $0 [build|create|enter|clean]\n\nNote that create also enters the container"   "$@"; exit 1; }
 
 build_docker_image() {
 

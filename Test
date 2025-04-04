@@ -88,7 +88,7 @@ build_k_semantics() {
     # TODO: Use Makefile for this build rule
     kompile kevm-pyk/src/kevm_pyk/kproj/evm-semantics/evm.md                                 \
             --output-definition $build_dir/libkevm                                           \
-            --llvm-kompile-output "$build_dir"/lib/libkevm.so                                \
+            --llvm-kompile-output "$lib_dir"/libkevm.so                                      \
             --main-module EVM --syntax-module EVM                                            \
             --md-selector 'k & ! symbolic'                                                   \
             -I kevm-pyk/src/kevm_pyk/kproj/evm-semantics                                     \
@@ -105,7 +105,9 @@ build_k_semantics() {
             -ccopt -DULM_LANG_ID=kevm --llvm-hidden-visibility                               \
             -ccopt -fPIC -ccopt -shared
 }
-export CGO_LDFLAGS="-lulmkllvm -L$build_dir/lib/ -lkevm -L${build_dir}/libkevm/"
+
+export CGO_LDFLAGS="-lulmkllvm -L$lib_dir/ -lkevm -L${build_dir}/libkevm/"
+export LD_LIBRARY_PATH="$lib_dir/"
 
 build_ulm_server() { (cd "$ulm_geth_dir"; make geth; ) }
 test_ulm() {

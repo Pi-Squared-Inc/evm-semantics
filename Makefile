@@ -1,4 +1,4 @@
-all: poetry
+all: evm-semantics
 
 
 # Building
@@ -195,3 +195,75 @@ metropolis-theme: $(BUILD_DIR)/media/metropolis/beamerthememetropolis.sty
 
 $(BUILD_DIR)/media/metropolis/beamerthememetropolis.sty:
 	cd $(dir $@) && $(MAKE)
+
+# Python-independent build commands.
+# -----------------------------------
+
+EVM_PROJ_DIR      := ./kevm-pyk/src/kevm_pyk/kproj
+EVM_SEMANTICS_DIR := $(EVM_PROJ_DIR)/evm-semantics
+CRYPTO_PLUGIN_DIR := $(EVM_PROJ_DIR)/plugin
+CRYPTO_PLUGIN_LIB := $(CRYPTO_PLUGIN_DIR)/build/krypto/lib/krypto.a
+EVM_K_SOURCES     := $(shell find $(EVM_SEMANTICS_DIR) \( -name \*.md -o -name \*.k \) -print)
+VLM_KLLVM_DIR     := ../vlm/kllvm
+VLM_KLLVM_LIB     := $(VLM_KLLVM_DIR)/libulmkllvm.so
+KEVM_LIB_DIR      := ./libkevm
+KEVM_LIB          := libkevm.so
+KEVM_TARGET_LIB   := $(KEVM_LIB_DIR)/$(KEVM_LIB)
+CXX               := clang++-16
+
+$(VLM_KLLVM_LIB):
+	$(MAKE) -C $(VLM_KLLVM_DIR) CPPFLAGS=-DEVM_ONLY
+
+$(CRYPTO_PLUGIN_LIB): init-submodules
+	$(MAKE) -C $(CRYPTO_PLUGIN_DIR)
+
+$(KEVM_TARGET_LIB): $(VLM_KLLVM_LIB) $(EVM_K_SOURCES) $(CRYPTO_PLUGIN_LIB)
+	kompile \
+		$(EVM_SEMANTICS_DIR)/evm.md \
+		--verbose \
+		--main-module EVM \
+		--syntax-module EVM \
+		-I $(EVM_SEMANTICS_DIR) \
+		-I $(CRYPTO_PLUGIN_DIR) \
+		-I $(VLM_KLLVM_DIR) \
+		\
+		--md-selector 'k & ! symbolic' \
+		--hook-namespaces 'JSON KRYPTO ULM' \
+		--output-definition $(KEVM_LIB_DIR) \
+		--type-inference-mode simplesub \
+		--backend llvm \
+		\
+		--llvm-hidden-visibility \
+		--llvm-kompile-type library \
+		--llvm-kompile-output $(KEVM_LIB) \
+		--llvm-mutable-bytes \
+		\
+		-O3 \
+		-ccopt -std=c++20 \
+		-ccopt -lssl \
+		-ccopt -lcrypto \
+		-ccopt -lsecp256k1 \
+		-ccopt $(CRYPTO_PLUGIN_LIB) \
+		-ccopt -Wno-deprecated-declarations \
+		-ccopt -L$(VLM_KLLVM_DIR) \
+		-ccopt -lulmkllvm \
+		-ccopt -g \
+		-ccopt $(VLM_KLLVM_DIR)/lang/ulm_language_entry.cpp \
+		-ccopt -I$(VLM_KLLVM_DIR) \
+		-ccopt -DULM_LANG_ID=kevm \
+		-ccopt -fPIC \
+		-ccopt -shared
+
+.PHONY: init-submodules
+init-submodules:
+	git submodule update --init --recursive
+	cd $(CRYPTO_PLUGIN_DIR) && git submodule update --init --recursive
+
+.PHONY: evm-semantics
+evm-semantics: init-submodules $(KEVM_TARGET_LIB)
+
+.PHONY: clean
+clean:
+	if [ -d $(CRYPTO_PLUGIN_DIR) ]; then rm -fr $(CRYPTO_PLUGIN_DIR)/build/*; fi
+	if [ -d $(KEVM_LIB_DIR) ]; then rm -fr $(KEVM_LIB_DIR)/*; fi
+	$(MAKE) -C $(VLM_KLLVM_DIR) clean

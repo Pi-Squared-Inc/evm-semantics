@@ -12,13 +12,16 @@ module BLOCK-SUMMARY
            <ethereum>
              <evm>
                <callState>
-                 <program> PROGRAM_CELL:Bytes </program>
+                 <program> b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x01\x00" </program>
                  <wordStack>
-                     (W0:Int : W1:Int            : WS:WordStack)
-                 =>  (chop((W0:Int +Int W1:Int)) : WS:WordStack)
+                     (W0:Int : W1:Int : W2:Int   : WS:WordStack)
+                 =>  (chop(W0:Int +Int W1:Int +Int W2:Int)
+                                                 : WS:WordStack)
                  </wordStack>
-                 <pc>  PC_CELL:Int  => (PC_CELL:Int +Int 1) </pc>
-                 <gas> GAS_CELL:Int => (GAS_CELL:Int -Int Gverylow < SCHEDULE_CELL:Schedule >)
+                 <pc>  10  => 12 </pc>
+                 <gas> GAS_CELL:Int => (GAS_CELL:Int -Int Gverylow < SCHEDULE_CELL:Schedule >
+                                                     -Int Gverylow < SCHEDULE_CELL:Schedule >
+                                       )
                  </gas>
                  ...
                </callState>
@@ -28,6 +31,7 @@ module BLOCK-SUMMARY
            </ethereum>
            ...
          </kevm>
-      requires Gverylow<SCHEDULE_CELL:Schedule> <=Int GAS_CELL:Int
-       andBool #lookupOpCode(PROGRAM_CELL, PC_CELL, SCHEDULE_CELL) ==K ADD
+      requires       Gverylow<SCHEDULE_CELL:Schedule> +Int Gverylow<SCHEDULE_CELL:Schedule>
+               <=Int GAS_CELL:Int
+       andBool SCHEDULE_CELL ==K DEFAULT
 endmodule

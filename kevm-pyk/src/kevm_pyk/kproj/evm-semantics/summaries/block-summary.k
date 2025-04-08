@@ -1,5 +1,8 @@
 requires "../evm.md"
 
+// Run using:
+// kprove kevm-pyk/src/kevm_pyk/kproj/evm-semantics/summaries/block-summary.k --definition /home/njr/.cache/kdist-e374d3c/evm-semantics/summary --md-selector k -I /home/njr/workspace/kevm-pyk/src/kevm_pyk/kproj/evm-semantics -I /home/njr/workspace/kevm-pyk/src/kevm_pyk/kproj/plugin --depth 100
+
 
 module VERIFICATION
     imports EDSL-PURE

@@ -33,17 +33,35 @@ module BLOCK-SUMMARY
            <ethereum>
              <evm>
                <callState>
-                 <program> b"\x00\x00\x00\x00\x00\x00\x60\x1a\x60\x10\x01\x01\x00\x00\x00\x00\x00" </program>
-                 //                                  ^6                   ^12
+                 //              00                  05  06              10                  15
+                 <program>   b"\x00\x00\x00\x00\x5b\x00\x60\x1a\x60\x10\x01\x01\x80\x60\x04\x57\x00\x00" </program>
+                 //  04:  JUMPDEST
+                 //       STOP      # Change to JUMPDEST as a No-Op to actually loop.
+                 //  06:  PUSH 0x1a
+                 //  08:  PUSH 0x10
+                 //  10:  ADD
+                 //       ADD
+                 //  12:  ADD
+                 //       DUP
+                 //  14:  PUSH 0x05
+                 //       JUMPI
+                 <jumpDests> b"\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" </jumpDests>
                  <wordStack>
                      (              W0:Int : WS:WordStack)
                   => (chop(W0:Int +Int 42) : WS:WordStack)
                  </wordStack>
-                 <pc>   6  => 12 </pc>
+                 <pc>   6  => 04 </pc>
+                        // ==========================
+                        // Uncomment for other branch
+                        // ==========================
+                        // => 16 </pc>
                  <gas> GAS_CELL:Int => (GAS_CELL:Int -Int Gverylow < SCHEDULE_CELL:Schedule >
                                                      -Int Gverylow < SCHEDULE_CELL:Schedule >
                                                      -Int Gverylow < SCHEDULE_CELL:Schedule >
                                                      -Int Gverylow < SCHEDULE_CELL:Schedule >
+                                                     -Int Gverylow < SCHEDULE_CELL:Schedule >
+                                                     -Int Gverylow < SCHEDULE_CELL:Schedule >
+                                                     -Int Ghigh    < SCHEDULE_CELL:Schedule>
                                        )
                  </gas>
                  ...
@@ -54,11 +72,20 @@ module BLOCK-SUMMARY
            </ethereum>
            ...
          </kevm>
-      requires       Gverylow<SCHEDULE_CELL:Schedule>
+       requires      Gverylow<SCHEDULE_CELL:Schedule>
                 +Int Gverylow<SCHEDULE_CELL:Schedule>
                 +Int Gverylow<SCHEDULE_CELL:Schedule>
                 +Int Gverylow<SCHEDULE_CELL:Schedule>
+                +Int Gverylow<SCHEDULE_CELL:Schedule>
+                +Int Gverylow<SCHEDULE_CELL:Schedule> // PUSH(1)/ADD/DUP
+                +Int Ghigh   <SCHEDULE_CELL:Schedule> // JUMPI
                <=Int GAS_CELL:Int
-       andBool #sizeWordStack(WS:WordStack, 0) <=Int 1000
+       andBool #sizeWordStack(WS:WordStack, 0) <=Int 100
        andBool SCHEDULE_CELL ==K DEFAULT
+
+       andBool 0 =/=Int chop(W0 +Int 42)
+   // ==========================
+   // Uncomment for other branch
+   // ==========================
+   //  andBool 0  ==Int chop(W0 +Int 42)
 endmodule

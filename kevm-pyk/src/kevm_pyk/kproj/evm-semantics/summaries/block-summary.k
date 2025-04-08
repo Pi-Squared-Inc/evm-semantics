@@ -7,8 +7,8 @@ module BLOCK-SUMMARY
 
     claim <kevm>
            <k>
-             ( #next [ ADD ] ~> .K => .K )
-            ...
+             #execute
+             ...
            </k>
            <schedule>
              SCHEDULE_CELL:Schedule
@@ -19,6 +19,9 @@ module BLOCK-SUMMARY
            <ethereum>
              <evm>
                <callState>
+                 <program>
+                   PROGRAM_CELL:Bytes
+                 </program>
                  <wordStack>
                    ( ( W0:Int => chop ( ( W0:Int +Int W1:Int ) ) ) : ( ( W1:Int : WS:WordStack ) => WS:WordStack ) )
                  </wordStack>
@@ -37,6 +40,6 @@ module BLOCK-SUMMARY
            ...
          </kevm>
       requires ( USEGAS_CELL:Bool
-       andBool ( Gverylow < SCHEDULE_CELL:Schedule > <=Int GAS_CELL:Int
-               ))
+       andBool ( Gverylow < SCHEDULE_CELL:Schedule > <=Int GAS_CELL:Int ))
+       andBool #lookupOpCode(PROGRAM_CELL, PC_CELL, SCHEDULE_CELL) ==K ADD
 endmodule

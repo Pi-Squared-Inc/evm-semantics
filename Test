@@ -79,7 +79,7 @@ build_ulm_hooks() {
             CPPFLAGS=-D"EVM_ONLY"
 }
 
-build_k_semantics() {
+build_concrete_semantics() {
     # NOTE: We manually build so that we can add additional flags, not in the kdist build.
     # NOTE: These flags must be manually kept in sync with:
     #
@@ -106,6 +106,33 @@ build_k_semantics() {
             -ccopt -fPIC -ccopt -shared
 }
 
+build_symbolic_semantics() {
+    # NOTE: We manually build so that we can add additional flags, not in the kdist build.
+    # NOTE: These flags must be manually kept in sync with:
+    #
+    #   https://github.com/Pi-Squared-Inc/ulm/blob/main/Docker/OP-KEVM/Dockerfile.opkevm
+    #
+    # TODO: Use Makefile for this build rule
+    kompile kevm-pyk/src/kevm_pyk/kproj/evm-semantics/cse.md                                 \
+            --output-definition $build_dir/symbolic                                          \
+            --main-module CSE --syntax-module CSE                                            \
+            --md-selector 'k'                                                                \
+            -I kevm-pyk/src/kevm_pyk/kproj/evm-semantics                                     \
+            -I kevm-pyk/src/kevm_pyk/kproj/plugin                                            \
+            --hook-namespaces 'JSON KRYPTO ULM'                                              \
+            --backend haskell                                                                \
+            --type-inference-mode simplesub --verbose -I "$ulm_kllvm_dir"
+}
+
+test_symbolic_backend() {
+        kprove kevm-pyk/src/kevm_pyk/kproj/evm-semantics/summaries/block-summary.k \
+               --definition .build/symbolic/                                       \
+               --md-selector k                                                     \
+               -I kevm-pyk/src/kevm_pyk/kproj/evm-semantics                        \
+               -I kevm-pyk/src/kevm_pyk/kproj/plugin                               \
+               -I deps/ulm/kllvm/ --depth 100
+}
+
 export CGO_LDFLAGS="-lulmkllvm -L$lib_dir/ -lkevm -L${build_dir}/libkevm/"
 export LD_LIBRARY_PATH="$lib_dir/"
 
@@ -116,6 +143,8 @@ test_ulm() {
         ./tests.test -test.run TestULMBlockchain -test.parallel 1 -test.v
     )
 }
+
+
 
 # Main
 # ----
@@ -136,6 +165,9 @@ check_go_version
 announce 'Setting up Python dependencies';   make -s poetry
 announce 'Building Blockchain Plugin';       build_with_kdist "evm-semantics.plugin"
 announce 'Building ULM Hooks';               build_ulm_hooks
-announce 'Building K Semantics';             build_k_semantics
+announce 'Building Concrete Semantics';      build_concrete_semantics
+announce 'Building Symbolic Semantics';      build_symbolic_semantics
 announce 'Build ULM Server';                 build_ulm_server
-announce 'Running ULM Tests';                test_ulm
+
+announce 'Testing Symbolic Backend';         test_symbolic_backend
+announce 'Testing ULM';                test_ulm

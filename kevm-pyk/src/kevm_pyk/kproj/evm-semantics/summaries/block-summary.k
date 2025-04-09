@@ -43,7 +43,7 @@ module BLOCK-SUMMARY
                  //       ADD
                  //  12:  ADD
                  //       DUP
-                 //  14:  PUSH 0x05
+                 //  14:  PUSH 0x04
                  //       JUMPI
                  <jumpDests> b"\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" </jumpDests>
                  <wordStack>

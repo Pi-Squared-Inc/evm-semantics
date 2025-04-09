@@ -34,6 +34,7 @@ module SCHEDULE
     rule getSchedule(10) => MERGE
     rule getSchedule(11) => SHANGHAI
     rule getSchedule(12) => CANCUN
+    rule getSchedule(13) => PRAGUE
 
     syntax Bool ::= ScheduleFlag "<<" Schedule ">>" [function, total]
  // -----------------------------------------------------------------

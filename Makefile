@@ -214,7 +214,7 @@ CXX               := clang++-16
 $(VLM_KLLVM_LIB):
 	$(MAKE) -C $(VLM_KLLVM_DIR) CPPFLAGS=-DEVM_ONLY
 
-$(CRYPTO_PLUGIN_LIB): init-submodules
+$(CRYPTO_PLUGIN_LIB):
 	$(MAKE) -C $(CRYPTO_PLUGIN_DIR)
 
 $(KEVM_TARGET_LIB): $(VLM_KLLVM_LIB) $(EVM_K_SOURCES) $(CRYPTO_PLUGIN_LIB)
@@ -260,7 +260,7 @@ init-submodules:
 	cd $(CRYPTO_PLUGIN_DIR) && git submodule update --init --recursive
 
 .PHONY: evm-semantics
-evm-semantics: init-submodules $(KEVM_TARGET_LIB)
+evm-semantics: $(KEVM_TARGET_LIB)
 
 .PHONY: clean
 clean:

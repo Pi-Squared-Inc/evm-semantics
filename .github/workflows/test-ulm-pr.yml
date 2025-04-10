@@ -1,0 +1,66 @@
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  push:
+    branches: ["main"]
+
+concurrency:
+  group: run-tests
+
+jobs:
+  test:
+    runs-on: [self-hosted, aws, us-east-2, m6a.4xlarge]
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - uses: actions/create-github-app-token@v1
+        id: temp-token
+        name: Generate temporary GitHub Token
+        with:
+          app-id: ${{ vars.CICD_GITHUB_WEBAPP_ID }}
+          private-key: ${{ secrets.CICD_GITHUB_WEBAPP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - uses: docker/login-action@v3
+        name: Login to GitHub Container Registry
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install system dependencies
+        run: |
+          sudo add-apt-repository --yes ppa:ethereum/ethereum
+          sudo apt-get update
+        
+        #  sudo apt-get install -y curl solc build-essential git
+
+      #- name: Get solc
+      #  uses: pontem-network/get-solc@master
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Install pipenv
+        run: |
+          python -m pip install --upgrade pip
+          pip install pipenv
+
+      - name: Install dependencies
+        run: pipenv run pip install web3 eth_abi
+
+      - name: Run tests
+        run: make test-all-blockchain
+        env:
+          GITHUB_TOKEN: ${{ steps.temp-token.outputs.token }}
+          GITHUB_ACTOR: ${{ github.actor }}

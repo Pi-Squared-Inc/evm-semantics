@@ -1,4 +1,4 @@
-all: evm-semantics
+all: test-all-blockchain
 
 
 # Building
@@ -204,7 +204,8 @@ EVM_SEMANTICS_DIR := $(EVM_PROJ_DIR)/evm-semantics
 CRYPTO_PLUGIN_DIR := $(EVM_PROJ_DIR)/plugin
 CRYPTO_PLUGIN_LIB := $(CRYPTO_PLUGIN_DIR)/build/krypto/lib/krypto.a
 EVM_K_SOURCES     := $(shell find $(EVM_SEMANTICS_DIR) \( -name \*.md -o -name \*.k \) -print)
-VLM_KLLVM_DIR     := ../vlm/kllvm
+VLM_DIR           := ../vlm
+VLM_KLLVM_DIR     := $(VLM_DIR)/kllvm
 VLM_KLLVM_LIB     := $(VLM_KLLVM_DIR)/libulmkllvm.so
 KEVM_LIB_DIR      := ./libkevm
 KEVM_LIB          := libkevm.so
@@ -267,3 +268,29 @@ clean:
 	if [ -d $(CRYPTO_PLUGIN_DIR) ]; then rm -fr $(CRYPTO_PLUGIN_DIR)/build/*; fi
 	if [ -d $(KEVM_LIB_DIR) ]; then rm -fr $(KEVM_LIB_DIR)/*; fi
 	$(MAKE) -C $(VLM_KLLVM_DIR) clean
+
+
+# CI integration tests.
+# -----------------------------------
+
+# Build OP-geth
+$(VLM_DIR)/op-geth/tests/tests.test: evm-semantics
+	cd $(VLM_DIR)/op-geth && $(MAKE) geth && cd tests && go test -c
+
+LD_LIBRARY_PATH := $(shell pwd)/$(VLM_KLLVM_DIR):$(shell pwd)/$(KEVM_LIB_DIR)
+
+# Run the Ethereum tests
+.PHONY: test-vlm-blockchain
+test-vlm-blockchain: $(VLM_DIR)/op-geth/tests/tests.test
+	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestULMBlockchain -test.parallel 1 -test.v
+
+.PHONY: test-spec-blockchain
+test-spec-blockchain: $(VLM_DIR)/op-geth/tests/tests.test
+	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestSpecBlockchain -test.parallel 1 -test.v
+
+.PHONY: test-blockchain
+test-blockchain: $(VLM_DIR)/op-geth/tests/tests.test
+	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestBlockchain -test.parallel 1 -test.v
+
+.PHONY: test-all-blockchain
+test-all-blockchain: test-vlm-blockchain test-spec-blockchain test-blockchain

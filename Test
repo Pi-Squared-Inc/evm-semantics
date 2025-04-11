@@ -90,7 +90,7 @@ build_concrete_semantics() {
             --output-definition $build_dir/libkevm                                           \
             --llvm-kompile-output "$lib_dir"/libkevm.so                                      \
             --main-module EVM --syntax-module EVM                                            \
-            --md-selector 'k & ! symbolic'                                                   \
+            --md-selector 'k & standard'                                                     \
             -I kevm-pyk/src/kevm_pyk/kproj/evm-semantics                                     \
             -I kevm-pyk/src/kevm_pyk/kproj/plugin                                            \
             --hook-namespaces 'JSON KRYPTO ULM'                                              \
@@ -116,7 +116,7 @@ build_symbolic_semantics() {
     kompile kevm-pyk/src/kevm_pyk/kproj/evm-semantics/cse.md                                 \
             --output-definition $build_dir/symbolic                                          \
             --main-module CSE --syntax-module CSE                                            \
-            --md-selector 'k'                                                                \
+            --md-selector 'k & standard'                                                     \
             -I kevm-pyk/src/kevm_pyk/kproj/evm-semantics                                     \
             -I kevm-pyk/src/kevm_pyk/kproj/plugin                                            \
             --hook-namespaces 'JSON KRYPTO ULM'                                              \

@@ -806,7 +806,7 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
 
 -   `#return` is a placeholder for the calling program, specifying where to place the returned data in memory.
 
-```standard
+```k
     syntax InternalOp ::= "#precompiled?" "(" Int "," Schedule ")"
  // --------------------------------------------------------------
     rule [precompile.true]:  <k> #precompiled?(ACCTCODE, SCHED) => #next [ #precompiled(ACCTCODE) ] ... </k> requires         #isPrecompiledAccount(ACCTCODE, SCHED) [preserves-definedness]
@@ -1012,7 +1012,7 @@ Precompiled Contracts
 -   `#precompiledAccountsUB`  returns the highest address (upper bound) of the precompiled contract accounts
 -   `#precompiledAccountsSet` returns the set of addresses of the precompiled contract accounts
 
-```standard
+```k
     syntax NullStackOp   ::= PrecompiledOp
     syntax PrecompiledOp ::= #precompiled ( Int ) [symbol(#precompiled), function]
  // ------------------------------------------------------------------------------

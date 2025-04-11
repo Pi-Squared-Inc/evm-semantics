@@ -102,6 +102,9 @@ Here are some internal helper functions for calculating gas. Most of these funct
 module GAS-FEES
     imports GAS-SYNTAX
     imports SCHEDULE
+```
+
+```standard
 
     syntax Gas ::= Cgascap        ( Schedule , Gas , Gas , Int ) [symbol(Cgascap_Gas), overload(Cgascap), function, total, smtlib(gas_Cgascap_Gas)]
     syntax Int ::= Cgascap        ( Schedule , Int , Int , Int ) [symbol(Cgascap_Int), overload(Cgascap), function, total, smtlib(gas_Cgascap_Int)]
@@ -248,6 +251,9 @@ module GAS-FEES
     rule #adjustedExpLength(0) => 0
     rule #adjustedExpLength(1) => 0
     rule #adjustedExpLength(N) => 1 +Int #adjustedExpLength(N /Int 2) requires N >Int 1
+```
+
+```k
 endmodule
 ```
 

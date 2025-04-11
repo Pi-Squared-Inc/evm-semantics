@@ -1024,7 +1024,7 @@ Precompiled Contracts
 -   `#precompiledAccountsUB`  returns the highest address (upper bound) of the precompiled contract accounts
 -   `#precompiledAccountsSet` returns the set of addresses of the precompiled contract accounts
 
-```k
+```standard
     syntax NullStackOp   ::= PrecompiledOp
     syntax PrecompiledOp ::= #precompiled ( Int ) [symbol(#precompiled), function]
  // ------------------------------------------------------------------------------

@@ -1465,6 +1465,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghaseip6780             << CANCUN >> => true
     rule Ghasblobbasefee         << CANCUN >> => true
     rule Ghasblobhash            << CANCUN >> => true
+```
 
+```k
 endmodule
 ```

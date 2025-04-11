@@ -8,7 +8,7 @@ concurrency:
   group: run-tests
 
 jobs:
-  setup:
+  blockchain-tests:
     runs-on: [self-hosted, aws, us-east-2, m6a.4xlarge]
 
     permissions:

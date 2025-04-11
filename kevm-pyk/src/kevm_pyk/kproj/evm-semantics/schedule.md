@@ -21,7 +21,7 @@ module SCHEDULE
     imports EVM-DATA
 ```
 
-```standard
+```k
     syntax Schedule ::= getSchedule(Int) [function]
     rule getSchedule(0) => FRONTIER
     rule getSchedule(1) => HOMESTEAD
@@ -36,7 +36,9 @@ module SCHEDULE
     rule getSchedule(10) => MERGE
     rule getSchedule(11) => SHANGHAI
     rule getSchedule(12) => CANCUN
+```
 
+```standard
     syntax Bool ::= ScheduleFlag "<<" Schedule ">>" [function, total]
  // -----------------------------------------------------------------
 

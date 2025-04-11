@@ -42,6 +42,7 @@ RUN apt-get update && \
     maven \
     z3 \
     xxd \
+    clang \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -60,7 +61,8 @@ ENV GITHUB_ACTOR=${GITHUB_ACTOR}
 ARG VLM_REPO=github.com/Pi-Squared-Inc/vlm.git
 ARG EVM_SEMANTICS_REPO=github.com/Pi-Squared-Inc/evm-semantics.git
 ARG VLM_BRANCH=main
-ARG EVM_SEMANTICS_BRANCH=ulm
+#ARG EVM_SEMANTICS_BRANCH=ulm
+ARG EVM_SEMANTICS_BRANCH=dmitry/etherium_conformance_tests_CI
 ARG LLVM_VERSION=16
 ARG GO_VERSION=1.23.1
 ARG KFRAMEWORK_REPO=github.com/runtimeverification/k.git
@@ -101,21 +103,25 @@ ENV CXXFLAGS=-fvisibility=hidden
 RUN cd k && mvn package -Dhaskell.backend.skip -DskipTests
 ENV PATH=$WORKDIR/k/k-distribution/target/release/k/bin:$PATH
 
-## Retrieve the VLM repo
 
-RUN git clone --depth=1 --branch ${VLM_BRANCH} https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${VLM_REPO} vlm
-RUN cd vlm && git submodule update --init --recursive
+# Configure Git to use credentials for all GitHub URLs
+RUN git config --global url."https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
 
 ## Retrieve the KEVM repo
 
 RUN git clone --depth=1 --branch ${EVM_SEMANTICS_BRANCH} https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${EVM_SEMANTICS_REPO} evm-semantics
 RUN cd evm-semantics && git submodule update --init --recursive
 
+## Retrieve the VLM repo
+
+RUN git clone --depth=1 --branch ${VLM_BRANCH} https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${VLM_REPO} vlm
+RUN cd vlm && git submodule update --init --recursive
+
 # Build and test
 
 ## Build the VLM library and K module and the KEVM semantics and run tests.
 
-RUN make test-all-blockchain
+RUN cd evm-semantics && make test-vlm-blockchain
 
 # Build OP-geth
 #RUN cd vlm/op-geth && make geth && cd tests && go test -c

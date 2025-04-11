@@ -1745,5 +1745,8 @@ After interpreting the strings representing programs as a `WordStack`, it should
     rule #dasmOpCode( 254,     _ ) => INVALID
     rule #dasmOpCode( 255,     _ ) => SELFDESTRUCT
     rule #dasmOpCode(   W,     _ ) => UNDEFINED(W) [owise]
+```
+
+```k
 endmodule
 ```

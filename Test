@@ -125,12 +125,12 @@ build_symbolic_semantics() {
 }
 
 test_symbolic_backend() {
-        kprove kevm-pyk/src/kevm_pyk/kproj/evm-semantics/summaries/block-summary.k \
+        kprove kevm-pyk/src/kevm_pyk/kproj/evm-semantics/summaries/sum.k \
                --definition .build/symbolic/                                       \
                --md-selector k                                                     \
                -I kevm-pyk/src/kevm_pyk/kproj/evm-semantics                        \
                -I kevm-pyk/src/kevm_pyk/kproj/plugin                               \
-               -I deps/ulm/kllvm/ --depth 100
+               -I deps/ulm/kllvm/ --depth 200
 }
 
 export CGO_LDFLAGS="-lulmkllvm -L$lib_dir/ -lkevm -L${build_dir}/libkevm/"

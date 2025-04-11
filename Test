@@ -134,8 +134,10 @@ test_symbolic_backend() {
 }
 
 build_csepgm_standalone_semantics() {
-    kompile kevm-pyk/src/kevm_pyk/kproj/evm-semantics/evm.md                                 \
-            --main-module EVM --syntax-module EVM                                            \
+    [ $# -ne 1 ] && die "Building CSE[Pgm] requires a program argument"
+    PROG=$1
+    kompile "csepgm/$PROG.k"                                                                 \
+            --main-module "$PROG" --syntax-module EVM                                        \
             --md-selector 'k | csepgm'                                                       \
             -I kevm-pyk/src/kevm_pyk/kproj/evm-semantics                                     \
             -I kevm-pyk/src/kevm_pyk/kproj/plugin                                            \

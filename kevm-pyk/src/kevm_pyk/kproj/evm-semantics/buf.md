@@ -21,19 +21,23 @@ For this, definition rule RHS should always use `#bufStrict` when array is first
 is just carried on from LHS without changes. Definition rule LHS should only use `#buf`.
 Claims should always use `#bufStrict` in LHS and `#buf` in RHS.
 
-```k
+```standard
     syntax Bytes ::= #bufStrict ( Int , Int ) [symbol(#bufStrict), function]
     syntax Bytes ::= #buf ( Int , Int ) [symbol(buf), function, total, smtlib(buf)]
 
     syntax Int ::= #ceil32 ( Int ) [symbol(#ceil32), macro]
  // -------------------------------------------------------
     rule #ceil32(N) => notMaxUInt5 &Int ( N +Int maxUInt5 )
+```
 
+```k
 endmodule
 
 module BUF
     imports BUF-SYNTAX
+```
 
+```standard
     syntax Int ::= #powByteLen ( Int ) [symbol(#powByteLen), function, no-evaluators]
  // ---------------------------------------------------------------------------------
  // rule #powByteLen(SIZE) => 2 ^Int (8 *Int SIZE)
@@ -50,6 +54,8 @@ module BUF
       requires 0 <Int SIZE
       [concrete]
     rule #buf(_SIZE, _) => .Bytes [owise, concrete] // SIZE <= 0
+```
 
+```k
 endmodule
 ```

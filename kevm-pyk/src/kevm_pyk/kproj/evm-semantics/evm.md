@@ -113,7 +113,7 @@ Control Flow
     It will consume anything related to the current computation behind it on the `<k>` cell.
 -   `#end_` sets the `statusCode` and the program counter of the last executed opcode, then halts execution.
 
-```k
+```standard
     syntax KItem ::= "#halt"           [symbol(halt)]
                    | "#end" StatusCode [symbol(end) ]
  // -------------------------------------------------
@@ -133,7 +133,7 @@ OpCode Execution
 -   `#lookupOpCode` reads an `OpCode` from the program `Bytes` if the program-counter is within the bounds of the program, meaning that it points to an actual opcode.
     It will return `.NoOpCode` otherwise.
 
-```k
+```standard
     syntax MaybeOpCode ::= ".NoOpCode" | OpCode
 
     syntax MaybeOpCode ::= "#lookupOpCode" "(" Bytes "," Int "," Schedule ")" [function, total]
@@ -144,7 +144,7 @@ OpCode Execution
 
 -   `#execute` loads the next opcode.
 
-```k
+```standard
     syntax KItem ::= "#execute" [symbol(execute)]
  // ---------------------------------------------
     rule [halt]:
@@ -168,7 +168,7 @@ The `#next [_]` operator initiates execution by:
 3.  executing the opcode (which includes any gas deduction needed), and
 4.  adjusting the program counter.
 
-```k
+```standard
     syntax InternalOp ::= "#next" "[" MaybeOpCode "]"
  // -------------------------------------------------
     rule <k> #next [ .NoOpCode ] => #end EVMC_SUCCESS ... </k>
@@ -206,7 +206,7 @@ The `#next [_]` operator initiates execution by:
 -   `#stackAdded` is how many arguments that opcode will push onto the top of the stack.
 -   `#stackDelta` is the delta the stack will have after the opcode executes.
 
-```k
+```standard
     syntax Bool ::= #stackUnderflow ( List , OpCode ) [symbol(#stackUnderflow), macro]
                   | #stackOverflow  ( List , OpCode ) [symbol(#stackOverflow), macro]
  // ----------------------------------------------------------------------------------
@@ -259,12 +259,12 @@ The `#next [_]` operator initiates execution by:
 
 -   `#changesState` is true if the given opcode will change `<network>` state given the arguments.
 
-```k
+```standard
     syntax Bool ::= #changesState ( OpCode , List ) [symbol(#changesState), function]
  // ---------------------------------------------------------------------------------
 ```
 
-```k
+```standard
     rule #changesState(CALL         , ListItem(_) ListItem(_) ListItem(VALUE) _) => true  requires VALUE =/=Int 0
     rule #changesState(LOG(_)       , _)                 => true
     rule #changesState(SSTORE       , _)                 => true
@@ -279,7 +279,7 @@ The `#next [_]` operator initiates execution by:
 
 -   `#exec` will load the arguments of the opcode (it assumes `#stackNeeded?` is accurate and has been called) and trigger the subsequent operations.
 
-```k
+```standard
     syntax InternalOp ::= "#exec" "[" OpCode "]"
  // --------------------------------------------
     rule <k> #exec [ IOP:InvalidOp ] => IOP ... </k>
@@ -289,7 +289,7 @@ The `#next [_]` operator initiates execution by:
 
 Here we load the correct number of arguments from the `wordStack` based on the sort of the opcode.
 
-```k
+```standard
     syntax KItem  ::= OpCode
     syntax OpCode ::= NullStackOp | UnStackOp | BinStackOp | TernStackOp | QuadStackOp
                     | InvalidOp | StackOp | InternalOp | CallOp | CallSixOp | PushOp
@@ -308,7 +308,7 @@ Here we load the correct number of arguments from the `wordStack` based on the s
 
 `StackOp` is used for opcodes which require a large portion of the stack.
 
-```k
+```standard
     syntax InternalOp ::= StackOp List
  // ----------------------------------
     rule <k> #exec [ SO:StackOp ] => #gas [ SO , SO WS ] ~> SO WS ... </k> <wordStack> WS </wordStack>
@@ -316,7 +316,7 @@ Here we load the correct number of arguments from the `wordStack` based on the s
 
 The `CallOp` opcodes all interpret their second argument as an address.
 
-```k
+```standard
     syntax InternalOp ::= CallSixOp Int Int     Int Int Int Int
                         | CallOp    Int Int Int Int Int Int Int
  // -----------------------------------------------------------
@@ -329,7 +329,7 @@ The `CallOp` opcodes all interpret their second argument as an address.
 Some opcodes require accessing elements of the state at different addresses.
 We make sure the given arguments (to be interpreted as addresses) are with 160 bits ahead of time.
 
-```k
+```standard
     syntax InternalOp ::= "#addr" "[" OpCode "]"
  // --------------------------------------------
     rule <k> #addr [ OP:OpCode ] => .K ... </k>
@@ -365,7 +365,7 @@ The arguments to `PUSH` must be skipped over (as they are inline), and the opcod
 
 -   `#pc` calculates the next program counter of the given operator.
 
-```k
+```standard
     syntax InternalOp ::= "#pc" "[" OpCode "]" [symbol(pc)]
  // -------------------------------------------------------
     rule [pc.inc]:
@@ -431,7 +431,7 @@ These are just used by the other operators for shuffling local execution state a
 -   `#push` will push an element to the `wordStack` without any checks.
 -   `#setStack_` will set the current stack to the given one.
 
-```k
+```standard
     syntax InternalOp ::= "#push" | "#setStack" List
  // ------------------------------------------------
     rule <k> W0:Int ~> #push => .K ... </k> <wordStack> WS => pushList(W0, WS) </wordStack>
@@ -442,7 +442,7 @@ These are just used by the other operators for shuffling local execution state a
 
 We use `INVALID` both for marking the designated invalid operator, and `UNDEFINED(_)` for garbage bytes in the input program.
 
-```k
+```standard
     syntax InvalidOp ::= "INVALID" | "UNDEFINED" "(" Int ")"
  // --------------------------------------------------------
     rule <k> INVALID      => #end EVMC_INVALID_INSTRUCTION   ... </k>
@@ -453,7 +453,7 @@ We use `INVALID` both for marking the designated invalid operator, and `UNDEFINE
 
 Some operators don't calculate anything, they just push the stack around a bit.
 
-```k
+```standard
     syntax UnStackOp ::= "POP"
  // --------------------------
     rule <k> POP _ => .K ... </k>
@@ -478,7 +478,7 @@ Some operators don't calculate anything, they just push the stack around a bit.
 
 These operations are getters/setters of the local execution memory.
 
-```k
+```standard
     syntax UnStackOp ::= "MLOAD"
  // ----------------------------
     rule <k> MLOAD INDEX => #asWord(#range(LM, INDEX, 32)) ~> #push ... </k>
@@ -504,7 +504,7 @@ Expression calculations are simple and don't require anything but the arguments 
 
 NOTE: We have to call the opcode `OR` by `EVMOR` instead, because K has trouble parsing it/compiling the definition otherwise.
 
-```k
+```standard
     syntax UnStackOp ::= "ISZERO" | "NOT"
  // -------------------------------------
     rule <k> ISZERO W => W ==Word 0 ~> #push ... </k>
@@ -567,7 +567,7 @@ NOTE: We have to call the opcode `OR` by `EVMOR` instead, because K has trouble 
 
 These operators make queries about the current execution state.
 
-```k
+```standard
     syntax NullStackOp ::= "PC" | "GAS" | "GASPRICE" | "GASLIMIT" | "BASEFEE" | "BLOBBASEFEE"
  // -----------------------------------------------------------------------------------------
     rule <k> PC          => PCOUNT          ~> #push ... </k> <pc> PCOUNT </pc>
@@ -611,11 +611,11 @@ These operators make queries about the current execution state.
 
 The blockhash is calculated here using the "shortcut" formula used for running tests.
 
-```k
+```standard
     rule <k> BLOCKHASH N => BlockHash(N) ~> #push ... </k>
 ```
 
-```k
+```standard
     syntax UnStackOp ::= "BLOBHASH"
  // -------------------------------
 
@@ -633,7 +633,7 @@ EVM OpCodes
 
 The `JUMP*` family of operations affect the current program counter.
 
-```k
+```standard
     syntax NullStackOp ::= "JUMPDEST"
  // ---------------------------------
     rule <k> JUMPDEST => .K ... </k>
@@ -661,7 +661,7 @@ The `JUMP*` family of operations affect the current program counter.
 
 ### `STOP`, `REVERT`, and `RETURN`
 
-```k
+```standard
     syntax NullStackOp ::= "STOP"
  // -----------------------------
     rule <k> STOP => #end EVMC_SUCCESS ... </k>
@@ -684,7 +684,7 @@ The `JUMP*` family of operations affect the current program counter.
 
 These operators query about the current `CALL*` state.
 
-```k
+```standard
     syntax NullStackOp ::= "CALLDATASIZE"
  // -------------------------------------
     rule <k> CALLDATASIZE => lengthBytes(CallData()) ~> #push ... </k>
@@ -703,7 +703,7 @@ These operators query about the current `CALL*` state.
 
 These operators query about the current return data buffer.
 
-```k
+```standard
     syntax NullStackOp ::= "RETURNDATASIZE"
  // ---------------------------------------
     rule <k> RETURNDATASIZE => lengthBytes(RD) ~> #push ... </k>
@@ -723,7 +723,7 @@ These operators query about the current return data buffer.
 
 ### Log Operations
 
-```k
+```standard
     syntax BinStackOp ::= LogOp
     syntax LogOp ::= LOG ( Int ) [symbol(LOG)]
  // ------------------------------------------
@@ -750,7 +750,7 @@ Operators that require access to the rest of the Ethereum network world-state ca
 
 ### Account Queries
 
-```k
+```standard
     syntax UnStackOp ::= "BALANCE"
  // ------------------------------
     rule <k> BALANCE ACCT => GetAccountBalance(ACCT) ~> #push ... </k>
@@ -776,7 +776,7 @@ Operators that require access to the rest of the Ethereum network world-state ca
 
 These rules reach into the network state and load/store from account storage:
 
-```k
+```standard
     syntax UnStackOp ::= "SLOAD"
  // ----------------------------
     rule [sload]:
@@ -806,7 +806,7 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
 
 -   `#return` is a placeholder for the calling program, specifying where to place the returned data in memory.
 
-```k
+```standard
     syntax InternalOp ::= "#precompiled?" "(" Int "," Schedule ")"
  // --------------------------------------------------------------
     rule [precompile.true]:  <k> #precompiled?(ACCTCODE, SCHED) => #next [ #precompiled(ACCTCODE) ] ... </k> requires         #isPrecompiledAccount(ACCTCODE, SCHED) [preserves-definedness]
@@ -846,7 +846,7 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
     rule #computeValidJumpDestsWithinBound(PGM, I, RESULT) => #computeValidJumpDests(PGM, I +Int #widthOpCode(PGM [ I ]), RESULT) requires notBool PGM [ I ] ==Int 91
 ```
 
-```k
+```standard
     syntax Int ::= #widthOpCode(Int) [symbol(#widthOpCode), function]
  // -----------------------------------------------------------------
     rule #widthOpCode(W) => W -Int 94 requires W >=Int 96 andBool W <=Int 127
@@ -881,7 +881,7 @@ Ethereum Network OpCodes
 
 For each `CALL*` operation, we make a corresponding call to `#call` and a state-change to setup the custom parts of the calling environment.
 
-```k
+```standard
     syntax CallOp ::= "CALL"
  // ------------------------
     rule [call]:
@@ -930,7 +930,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
 -   `#isValidCode_` checks if the code returned by the execution of the initialization code begins with a reserved byte. [EIP-3541]
 -   `#hasValidInitCode` checks the length of the transaction data in a create transaction. [EIP-3860]
 
-```k
+```standard
     syntax Bool ::= #hasValidInitCode ( Int , Schedule ) [symbol(#hasValidInitCode), function]
  // ------------------------------------------------------------------------------------------
     rule #hasValidInitCode(INITCODELEN, SCHED) => notBool Ghasmaxinitcodesize << SCHED >> orBool INITCODELEN <=Int maxInitCodeSize < SCHED >
@@ -953,7 +953,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
 
 `CREATE` will attempt to `#create` the account using the initialization code and cleans up the result with `#codeDeposit`.
 
-```k
+```standard
     syntax TernStackOp ::= "CREATE"
  // -------------------------------
     rule [create-valid]:
@@ -973,7 +973,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
 
 `CREATE2` will attempt to `#create` the account, but with the new scheme for choosing the account address.
 
-```k
+```standard
     syntax QuadStackOp ::= "CREATE2"
  // --------------------------------
     rule [create2-valid]:
@@ -993,7 +993,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
 `SELFDESTRUCT` marks the current account for deletion and transfers funds out of the current account.
 Self destructing to yourself, unlike a regular transfer, destroys the balance in the account, irreparably losing it.
 
-```k
+```standard
     syntax UnStackOp ::= "SELFDESTRUCT"
  // -----------------------------------
     rule <k> SELFDESTRUCT ACCTTO => SelfDestruct(ACCTTO) ~> #end EVMC_SUCCESS ... </k>
@@ -1012,7 +1012,7 @@ Precompiled Contracts
 -   `#precompiledAccountsUB`  returns the highest address (upper bound) of the precompiled contract accounts
 -   `#precompiledAccountsSet` returns the set of addresses of the precompiled contract accounts
 
-```k
+```standard
     syntax NullStackOp   ::= PrecompiledOp
     syntax PrecompiledOp ::= #precompiled ( Int ) [symbol(#precompiled), function]
  // ------------------------------------------------------------------------------
@@ -1064,7 +1064,7 @@ Precompiled Contracts
 -   `BLAKE2F` performs the compression function F used in the BLAKE2 hashing algorithm.
 -   `KZGPOINTEVAL` performs the point evaluation precompile that is part of EIP 4844.
 
-```k
+```standard
     syntax PrecompiledOp ::= "ECREC"
  // --------------------------------
     rule <k> ECREC => #end EVMC_SUCCESS ... </k>
@@ -1205,7 +1205,7 @@ Overall Gas
 -   `#deductGas` is used to check that there won't be a gas underflow (throwing `EVMC_OUT_OF_GAS` if so), and deducts the gas if not.
 -   `#deductMemory` checks that access to memory stay within sensible bounds (and deducts the correct amount of gas for it), throwing `EVMC_INVALID_MEMORY_ACCESS` if bad access happens.
 
-```k
+```standard
     syntax InternalOp ::= "#gas" "[" OpCode "," OpCode "]"
  // ------------------------------------------------------
     rule <k> #gas [ OP , AOP ]
@@ -1257,7 +1257,7 @@ In the YellowPaper, each opcode is defined to consume zero gas unless specified 
 -   `#memory` computes the new memory size given the old size and next operator (with its arguments).
 -   `#memoryUsageUpdate` is the function `M` in appendix H of the YellowPaper which helps track the memory used.
 
-```k
+```standard
     syntax Int ::= #memory ( OpCode , Int ) [symbol(#memory), function, total]
  // --------------------------------------------------------------------------
     rule #memory ( MLOAD INDEX        , MU ) => #memoryUsageUpdate(MU, INDEX, 32)
@@ -1312,7 +1312,7 @@ In the YellowPaper, each opcode is defined to consume zero gas unless specified 
 Access List Gas
 ---------------
 
-```k
+```standard
     syntax Bool ::= #usesAccessList ( OpCode ) [symbol(#usesAccessList), function, total]
  // -------------------------------------------------------------------------------------
     rule #usesAccessList(OP)     => true  requires isAddr1Op(OP)
@@ -1362,7 +1362,7 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
 -   Gas cost for `TSTORE` is the same as a warm `SSTORE` of a dirty slot (i.e. original value is not new value, original is not current value, currently 100 gas).
 -   Gas cost of `TLOAD` is the same as a hot `SLOAD` (value has been read before, currently 100 gas).
 -   Gas cost cannot be on par with memory access due to transient storage’s interactions with reverts.
-```k
+```standard
     syntax InternalOp ::= #gasExec ( Schedule , OpCode ) [symbol(#gasExec)]
  // -----------------------------------------------------------------------
     rule <k> #gasExec(SCHED, TLOAD _   ) => Gwarmstorageread < SCHED > ... </k>
@@ -1543,7 +1543,7 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
 
 There are several helpers for calculating gas (most of them also specified in the YellowPaper).
 
-```k
+```standard
     syntax Exp     ::= Int | Gas
     syntax KResult ::= Int
     syntax Exp ::= Ccall         ( Schedule , BExp , Gas , Gas , Int , Bool ) [symbol(Ccall), strict(2)]
@@ -1591,7 +1591,7 @@ After interpreting the strings representing programs as a `WordStack`, it should
 
 -   `#dasmOpCode` interprets a `Int` as an `OpCode`.
 
-```k
+```standard
     syntax OpCode ::= #dasmOpCode ( Int , Schedule ) [symbol(#dasmOpCode), function, memo, total]
  // ---------------------------------------------------------------------------------------------
     rule #dasmOpCode(   0,     _ ) => STOP

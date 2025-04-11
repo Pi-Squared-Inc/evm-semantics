@@ -14,7 +14,7 @@ There are `ScheduleFlag`s and `ScheduleConstant`s.
 
 A `ScheduleFlag` is a boolean determined by the fee schedule; applying a `ScheduleFlag` to a `Schedule` yields whether the flag is set or not.
 
-```k
+```standard
 requires "data.md"
 
 module SCHEDULE
@@ -51,7 +51,7 @@ module SCHEDULE
 
 A `ScheduleConst` is a constant determined by the fee schedule.
 
-```k
+```standard
     syntax Int ::= ScheduleConst "<" Schedule ">" [function, total]
  // ---------------------------------------------------------------
 
@@ -67,9 +67,27 @@ A `ScheduleConst` is a constant determined by the fee schedule.
  // ----------------------------------------------------------------------------------------------------------------------------------------------------
 ```
 
+### CSE Schedule Constants
+
+```csepgm
+    syntax Schedule ::= "FRONTIER" [symbol(FRONTIER_EVM), smtlib(schedule_FRONTIER)]
+                      | "HOMESTEAD" [symbol(HOMESTEAD_EVM), smtlib(schedule_HOMESTEAD)]
+                      | "TANGERINE_WHISTLE" [symbol(TANGERINE_WHISTLE_EVM), smtlib(schedule_TANGERINE_WHISTLE)]
+                      | "SPURIOUS_DRAGON" [symbol(SPURIOUS_DRAGON_EVM), smtlib(schedule_SPURIOUS_DRAGON)]
+                      | "BYZANTIUM" [symbol(BYZANTIUM_EVM), smtlib(schedule_BYZANTIUM)]
+                      | "CONSTANTINOPLE" [symbol(CONSTANTINOPLE_EVM), smtlib(schedule_CONSTANTINOPLE)]
+                      | "PETERSBURG" [symbol(PETERSBURG_EVM), smtlib(schedule_PETERSBURG)]
+                      | "ISTANBUL" [symbol(ISTANBUL_EVM), smtlib(schedule_ISTANBUL)]
+                      | "BERLIN" [symbol(BERLIN_EVM), smtlib(schedule_BERLIN)]
+                      | "LONDON" [symbol(LONDON_EVM), smtlib(schedule_LONDON)]
+                      | "MERGE" [symbol(MERGE_EVM), smtlib(schedule_MERGE)]
+                      | "SHANGHAI" [symbol(SHANGHAI_EVM), smtlib(schedule_SHANGHAI)]
+                      | "CANCUN" [symbol(CANCUN_EVM), smtlib(schedule_CANCUN)]
+```
+
 ### Frontier Schedule
 
-```k
+```standard
     syntax Schedule ::= "FRONTIER" [symbol(FRONTIER_EVM), smtlib(schedule_FRONTIER)]
  // --------------------------------------------------------------------------------
     rule Gzero    < FRONTIER > => 0
@@ -175,7 +193,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
 ### Homestead Schedule
 
-```k
+```standard
     syntax Schedule ::= "HOMESTEAD" [symbol(HOMESTEAD_EVM), smtlib(schedule_HOMESTEAD)]
  // -----------------------------------------------------------------------------------
     rule Gzero    < HOMESTEAD > => 0
@@ -281,7 +299,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
 ### Tangerine Whistle Schedule
 
-```k
+```standard
     syntax Schedule ::= "TANGERINE_WHISTLE" [symbol(TANGERINE_WHISTLE_EVM), smtlib(schedule_TANGERINE_WHISTLE)]
  // -----------------------------------------------------------------------------------------------------------
     rule Gzero    < TANGERINE_WHISTLE > => 0
@@ -387,7 +405,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
 ### Spurious Dragon Schedule
 
-```k
+```standard
     syntax Schedule ::= "SPURIOUS_DRAGON" [symbol(SPURIOUS_DRAGON_EVM), smtlib(schedule_SPURIOUS_DRAGON)]
  // -----------------------------------------------------------------------------------------------------
     rule Gzero    < SPURIOUS_DRAGON > => 0
@@ -493,7 +511,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
 ### Byzantium Schedule
 
-```k
+```standard
     syntax Schedule ::= "BYZANTIUM" [symbol(BYZANTIUM_EVM), smtlib(schedule_BYZANTIUM)]
  // -----------------------------------------------------------------------------------
     rule Gzero    < BYZANTIUM > => 0
@@ -599,7 +617,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
 ### Constantinople Schedule
 
-```k
+```standard
     syntax Schedule ::= "CONSTANTINOPLE" [symbol(CONSTANTINOPLE_EVM), smtlib(schedule_CONSTANTINOPLE)]
  // --------------------------------------------------------------------------------------------------
     rule Gzero    < CONSTANTINOPLE > => 0
@@ -705,7 +723,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
 ### Petersburg Schedule
 
-```k
+```standard
     syntax Schedule ::= "PETERSBURG" [symbol(PETERSBURG_EVM), smtlib(schedule_PETERSBURG)]
  // --------------------------------------------------------------------------------------
     rule Gzero    < PETERSBURG > => 0
@@ -811,7 +829,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
 ### Istanbul Schedule
 
-```k
+```standard
     syntax Schedule ::= "ISTANBUL" [symbol(ISTANBUL_EVM), smtlib(schedule_ISTANBUL)]
  // --------------------------------------------------------------------------------
     rule Gzero    < ISTANBUL > => 0
@@ -917,7 +935,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
 ### Berlin Schedule
 
-```k
+```standard
     syntax Schedule ::= "BERLIN" [symbol(BERLIN_EVM), smtlib(schedule_BERLIN)]
  // --------------------------------------------------------------------------
     rule Gzero    < BERLIN > => 0
@@ -1023,7 +1041,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
 ### London Schedule
 
-```k
+```standard
     syntax Schedule ::= "LONDON" [symbol(LONDON_EVM), smtlib(schedule_LONDON)]
  // --------------------------------------------------------------------------
     rule Gzero    < LONDON > => 0
@@ -1129,7 +1147,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
 ### Merge Schedule
 
-```k
+```standard
     syntax Schedule ::= "MERGE" [symbol(MERGE_EVM), smtlib(schedule_MERGE)]
  // -----------------------------------------------------------------------
     rule Gzero    < MERGE > => 0
@@ -1235,7 +1253,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
 ### Shanghai Schedule
 
-```k
+```standard
     syntax Schedule ::= "SHANGHAI" [symbol(SHANGHAI_EVM), smtlib(schedule_SHANGHAI)]
  // --------------------------------------------------------------------------------
     rule Gzero    < SHANGHAI > => 0
@@ -1342,7 +1360,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
 ### Cancun Schedule
 
-```k
+```standard
     syntax Schedule ::= "CANCUN" [symbol(CANCUN_EVM), smtlib(schedule_CANCUN)]
  // --------------------------------------------------------------------------
     rule Gzero    < CANCUN > => 0

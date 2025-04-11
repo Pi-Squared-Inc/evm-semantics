@@ -14,12 +14,14 @@ There are `ScheduleFlag`s and `ScheduleConstant`s.
 
 A `ScheduleFlag` is a boolean determined by the fee schedule; applying a `ScheduleFlag` to a `Schedule` yields whether the flag is set or not.
 
-```standard
+```k
 requires "data.md"
 
 module SCHEDULE
     imports EVM-DATA
+```
 
+```standard
     syntax Schedule ::= getSchedule(Int) [function]
     rule getSchedule(0) => FRONTIER
     rule getSchedule(1) => HOMESTEAD

@@ -144,9 +144,11 @@ OpCode Execution
 
 -   `#execute` loads the next opcode.
 
-```standard
+```k
     syntax KItem ::= "#execute" [symbol(execute)]
  // ---------------------------------------------
+```
+```standard
     rule [halt]:
          <k> #halt ~> (#execute => .K) ... </k>
 
@@ -806,7 +808,13 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
 
 -   `#return` is a placeholder for the calling program, specifying where to place the returned data in memory.
 
-```k
+```csepgm
+    syntax InternalOp ::= "#precompiled?" "(" Int "," Schedule ")"
+ // --------------------------------------------------------------
+    rule <k> #precompiled?(_, _) => .K ... </k>
+```
+
+```standard
     syntax InternalOp ::= "#precompiled?" "(" Int "," Schedule ")"
  // --------------------------------------------------------------
     rule [precompile.true]:  <k> #precompiled?(ACCTCODE, SCHED) => #next [ #precompiled(ACCTCODE) ] ... </k> requires         #isPrecompiledAccount(ACCTCODE, SCHED) [preserves-definedness]
@@ -824,7 +832,9 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
          <output>       _ => .Bytes </output>
          <wordStack>    _ => .List  </wordStack>
          <localMem>     _ => .Bytes </localMem>
+```
 
+```k
     syntax KItem ::= "#loadProgram" Bytes [symbol(loadProgram)]
  // -----------------------------------------------------------
     rule [program.load]:
@@ -846,12 +856,14 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
     rule #computeValidJumpDestsWithinBound(PGM, I, RESULT) => #computeValidJumpDests(PGM, I +Int #widthOpCode(PGM [ I ]), RESULT) requires notBool PGM [ I ] ==Int 91
 ```
 
-```standard
+```k
     syntax Int ::= #widthOpCode(Int) [symbol(#widthOpCode), function]
  // -----------------------------------------------------------------
     rule #widthOpCode(W) => W -Int 94 requires W >=Int 96 andBool W <=Int 127
     rule #widthOpCode(_) => 1 [owise]
+```
 
+```standard
     syntax KItem ::= "#return" Int Int MessageResult
  // ------------------------------------------------
     rule [return.revert]:

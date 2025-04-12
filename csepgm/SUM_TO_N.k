@@ -9,7 +9,7 @@ module SUM_TO_N
              <evm>
                <callState>
                  //  0:       PUSH(1) 0                 // s = 0
-                 //  2:       PUSH(2) 10,000            // n = 10000
+                 //  2:       PUSH(2) 65535             // n = 65535
                  //  5: loop: JUMPDEST
                  //  6:       SWAP; DUP 2; ADD; SWAP    // s = s+n
                  // 10:       PUSH(1) 1; SWAP; SUB      // n = n-1
@@ -17,11 +17,11 @@ module SUM_TO_N
                  // 15:       PUSH loop
                  // 17:       JUMPI
                  //             00  .   .   .   .   05  .   .   .   .   10  .   .   .   .   15  .   .   .
-                 // <program>   b"\x60\x00\x61\x27\x10\x5b\x90\x81\x01\x90\x60\x01\x90\x03\x80\x60\x05\x57\x00" </program>
+                 // <program>   b"\x60\x00\x61\xff\xff\x5b\x90\x81\x01\x90\x60\x01\x90\x03\x80\x60\x05\x57\x00" </program>
                  // <jumpDests> b"\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" </jumpDests>
                  <wordStack>
                      .List
-                  => (ListItem(10000) ListItem(0))
+                  => (ListItem(65535) ListItem(0))
                  </wordStack>
                  <pc>   0  => 5 </pc>
                         // ==========================
@@ -45,7 +45,7 @@ module SUM_TO_N
              <evm>
                <callState>
                  //  0:       PUSH(1) 0                 // s = 0
-                 //  2:       PUSH(2) 10,000            // n = 10000
+                 //  2:       PUSH(2) 65535             // n = 65535
                  //  5: loop: JUMPDEST
                  //  6:       SWAP; DUP 2; ADD; SWAP    // s = s+n
                  // 10:       PUSH(1) 1; SWAP; SUB      // n = n-1
@@ -53,7 +53,7 @@ module SUM_TO_N
                  // 15:       PUSH loop
                  // 17:       JUMPI
                  //             00  .   .   .   .   05  .   .   .   .   10  .   .   .   .   15  .   .   .
-                 // <program>   b"\x60\x00\x61\x27\x10\x5b\x90\x81\x01\x90\x60\x01\x90\x03\x80\x60\x05\x57\x00" </program>
+                 // <program>   b"\x60\x00\x61\xff\xff\x5b\x90\x81\x01\x90\x60\x01\x90\x03\x80\x60\x05\x57\x00" </program>
                  // <jumpDests> b"\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" </jumpDests>
 
                  // ------- Dynamic -----------------------------------------------------------------------------
@@ -77,7 +77,7 @@ module SUM_TO_N
              <evm>
                <callState>
                  //  0:       PUSH(1) 0                 // s = 0
-                 //  2:       PUSH(2) 10,000            // n = 10000
+                 //  2:       PUSH(2) 65535             // n = 65535
                  //  5: loop: JUMPDEST
                  //  6:       SWAP; DUP 2; ADD; SWAP    // s = s+n
                  // 10:       PUSH(1) 1; SWAP; SUB      // n = n-1
@@ -85,7 +85,7 @@ module SUM_TO_N
                  // 15:       PUSH loop
                  // 17:       JUMPI
                  //             00  .   .   .   .   05  .   .   .   .   10  .   .   .   .   15  .   .   .
-                 // <program>   b"\x60\x00\x61\x27\x10\x5b\x90\x81\x01\x90\x60\x01\x90\x03\x80\x60\x05\x57\x00" </program>
+                 // <program>   b"\x60\x00\x61\xff\xff\x5b\x90\x81\x01\x90\x60\x01\x90\x03\x80\x60\x05\x57\x00" </program>
                  // <jumpDests> b"\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" </jumpDests>
 
                  // ------- Dynamic -------------------------------------------------------------------------------------------

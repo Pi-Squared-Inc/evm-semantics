@@ -181,7 +181,9 @@ test_csepgm_standalone_semantics() {
    GAS=$4
    STATIC=$5
    shift 5
+   set -x
    krun --definition "$build_dir/csepgm/$PROG" "$repo_root/csepgm/$PROG.evm" -cACCTCODE="$ADDRESS" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC" "$@"
+   set +x
 }
 
 export CGO_LDFLAGS="-lulmkllvm -L$lib_dir/ -lkevm -L${build_dir}/libkevm/"

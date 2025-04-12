@@ -9,7 +9,7 @@ Disassembling and then reassembling this contract will yield `0x6000`.
 
 As such, assembly is not considered part of the semantics of EVM, but is provided merely as a sample implementation to ease readability and make it easier to write inputs to the KEVM semantics.
 
-```k
+```standard
 module EVM-ASSEMBLY
     imports EVM
 
@@ -22,7 +22,7 @@ module EVM-ASSEMBLY
 Cons-lists of opcodes form programs (using cons operator `_;_`).
 Operator `#revOps` can be used to reverse a program.
 
-```k
+```standard
     syntax OpCodes ::= ".OpCodes" | OpCode ";" OpCodes
  // --------------------------------------------------
 
@@ -35,12 +35,12 @@ Operator `#revOps` can be used to reverse a program.
     rule #revOpsAux( OP ; OPS , OPS' ) => #revOpsAux( OPS , OP ; OPS' )
 ```
 
-```k
+```standard
     syntax Bytes ::= #asmOpCodes ( OpCodes ) [symbol(#asmOpCodes), function]
  // ------------------------------------------------------------------------
 ```
 
-```k
+```standard
     syntax Bytes ::= #asmOpCodes ( OpCodes, StringBuffer ) [function, symbol(#asmOpCodesAux)]
  // -----------------------------------------------------------------------------------------
     rule #asmOpCodes( OPS ) => #asmOpCodes(OPS, .StringBuffer)
@@ -50,7 +50,7 @@ Operator `#revOps` can be used to reverse a program.
     rule #asmOpCodes( .OpCodes, SB ) => String2Bytes(StringBuffer2String(SB))
 ```
 
-```k
+```standard
     syntax Int ::= #asmOpCode ( OpCode ) [symbol(#asmOpCode), function]
  // -------------------------------------------------------------------
     rule #asmOpCode( STOP           ) =>   0

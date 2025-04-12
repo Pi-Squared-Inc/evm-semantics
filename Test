@@ -90,7 +90,7 @@ build_concrete_semantics() {
             --output-definition $build_dir/libkevm                                           \
             --llvm-kompile-output "$lib_dir"/libkevm.so                                      \
             --main-module EVM --syntax-module EVM                                            \
-            --md-selector 'k & ! symbolic'                                                   \
+            --md-selector 'k | standard'                                                     \
             -I kevm-pyk/src/kevm_pyk/kproj/evm-semantics                                     \
             -I kevm-pyk/src/kevm_pyk/kproj/plugin                                            \
             --hook-namespaces 'JSON KRYPTO ULM'                                              \
@@ -116,7 +116,7 @@ build_symbolic_semantics() {
     kompile kevm-pyk/src/kevm_pyk/kproj/evm-semantics/cse.md                                 \
             --output-definition $build_dir/symbolic                                          \
             --main-module CSE --syntax-module CSE                                            \
-            --md-selector 'k'                                                                \
+            --md-selector 'k | standard'                                                     \
             -I kevm-pyk/src/kevm_pyk/kproj/evm-semantics                                     \
             -I kevm-pyk/src/kevm_pyk/kproj/plugin                                            \
             --hook-namespaces 'JSON KRYPTO ULM'                                              \
@@ -127,10 +127,102 @@ build_symbolic_semantics() {
 test_symbolic_backend() {
         kprove kevm-pyk/src/kevm_pyk/kproj/evm-semantics/summaries/sum.k \
                --definition .build/symbolic/                                       \
-               --md-selector k                                                     \
+               --md-selector 'k | standard'                                        \
                -I kevm-pyk/src/kevm_pyk/kproj/evm-semantics                        \
                -I kevm-pyk/src/kevm_pyk/kproj/plugin                               \
                -I deps/ulm/kllvm/ --depth 200
+}
+
+build_concrete_standalone_semantics() {
+    kompile kevm-pyk/src/kevm_pyk/kproj/evm-semantics/evm.md                                 \
+            --output-definition "$build_dir/concrete"                                        \
+            --main-module EVM --syntax-module EVM                                            \
+            --md-selector 'k | standard'                                                     \
+            -I kevm-pyk/src/kevm_pyk/kproj/evm-semantics                                     \
+            -I kevm-pyk/src/kevm_pyk/kproj/plugin                                            \
+            --hook-namespaces 'JSON KRYPTO'                                                  \
+            --backend llvm  -O3                                                              \
+            -ccopt -std=c++20  -ccopt -lssl    -ccopt -lcrypto    -ccopt -lsecp256k1         \
+            -ccopt $(poetry -C kevm-pyk run kdist which evm-semantics.plugin)/krypto.a       \
+            -ccopt -Wno-deprecated-declarations                                              \
+            --type-inference-mode simplesub --verbose -I "$ulm_kllvm_dir"                    \
+            -ccopt -L"$build_dir/lib"                                                        \
+            -ccopt -g --llvm-mutable-bytes
+}
+
+build_csepgm_standalone_semantics() {
+    [ $# -ne 1 ] && die "Building CSE[Pgm] requires a program argument"
+    PROG=$1
+    mkdir -p ".build/csepgm/$PROG"
+    kompile "csepgm/$PROG.k"                                                                 \
+            --output-definition "$build_dir/csepgm/$PROG"                                    \
+            --main-module "$PROG" --syntax-module EVM                                        \
+            --md-selector 'k | csepgm'                                                       \
+            -I kevm-pyk/src/kevm_pyk/kproj/evm-semantics                                     \
+            -I kevm-pyk/src/kevm_pyk/kproj/plugin                                            \
+            --hook-namespaces 'JSON KRYPTO'                                                  \
+            --backend llvm  -O3                                                              \
+            -ccopt -std=c++20  -ccopt -lssl    -ccopt -lcrypto    -ccopt -lsecp256k1         \
+            -ccopt $(poetry -C kevm-pyk run kdist which evm-semantics.plugin)/krypto.a       \
+            -ccopt -Wno-deprecated-declarations                                              \
+            --type-inference-mode simplesub --verbose -I "$ulm_kllvm_dir"                    \
+            -ccopt -L"$build_dir/lib"                                                        \
+            -ccopt -g --llvm-mutable-bytes
+}
+
+encode_schedule() {
+    [ $# -ne 1 ] && die "usage: $0 <schedule-string>"
+    case "$1" in
+        "FRONTIER"         ) echo  0  ;;
+        "HOMESTEAD"        ) echo  1  ;;
+        "TANGERINE_WHISTLE") echo  2  ;;
+        "SPURIOUS_DRAGON"  ) echo  3  ;;
+        "BYZANTIUM"        ) echo  4  ;;
+        "CONSTANTINOPLE"   ) echo  5  ;;
+        "PETERSBURG"       ) echo  6  ;;
+        "ISTANBUL"         ) echo  7  ;;
+        "BERLIN"           ) echo  8  ;;
+        "LONDON"           ) echo  9  ;;
+        "MERGE"            ) echo  10 ;;
+        "SHANGHAI"         ) echo  11 ;;
+        "CANCUN"           ) echo  12 ;;
+        *)  die "Invalid schedule integer $1" ;;
+    esac
+}
+
+test_concrete_standalone_semantics() {
+   [ $# -lt 6 ] && die "usage: $0 <timeit:bool> <program_name> <address:uint160> <schedule:string> <gas:uint256> <static:bool> [krun_extra_args...]"
+   TIMEIT=$1
+   shift
+   test_standalone_semantics "$TIMEIT" "$build_dir/concrete" "$@"
+}
+
+test_csepgm_standalone_semantics() {
+   [ $# -lt 6 ] && die "usage: $0 <timeit:bool> <program_name> <address:uint160> <schedule:string> <gas:uint256> <static:bool> [krun_extra_args...]"
+   TIMEIT=$1
+   PROG=$2
+   shift 2
+   test_standalone_semantics "$TIMEIT" "$build_dir/csepgm/$PROG" "$repo_root/csepgm/$PROG.evm" "$@"
+}
+
+test_standalone_semantics() {
+   [ $# -lt 7 ] && die "usage: $0 <timeit:bool> <definition_dir> <program_name> <address:uint160> <schedule:string> <gas:uint256> <static:bool> [krun_extra_args...]"
+   TIMEIT=$1
+   DEF_DIR=$2
+   PROG=$3
+   ADDRESS=$4
+   SCHEDULE=$(encode_schedule $5)
+   GAS=$6
+   STATIC=$7
+   shift 7
+   if "$TIMEIT"; then
+       set -x
+       config=$(krun --definition "$DEF_DIR" "$PROG" -cACCTCODE="$ADDRESS" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC" --depth 0 -o kore)
+       time $DEF_DIR/interpreter /dev/stdin -1 /dev/null <<< "$config"
+       set +x
+   else
+       krun --definition "$DEF_DIR" "$PROG" -cACCTCODE="$ADDRESS" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC"
+   fi
 }
 
 export CGO_LDFLAGS="-lulmkllvm -L$lib_dir/ -lkevm -L${build_dir}/libkevm/"
@@ -162,12 +254,18 @@ check_k
 check_clang_version
 check_go_version
 
-announce 'Setting up Python dependencies';   make -s poetry
-announce 'Building Blockchain Plugin';       build_with_kdist "evm-semantics.plugin"
-announce 'Building ULM Hooks';               build_ulm_hooks
-announce 'Building Concrete Semantics';      build_concrete_semantics
-announce 'Building Symbolic Semantics';      build_symbolic_semantics
-announce 'Build ULM Server';                 build_ulm_server
+announce 'Setting up Python dependencies';         make -s poetry
+announce 'Building Blockchain Plugin';             build_with_kdist "evm-semantics.plugin"
+announce 'Building ULM Hooks';                     build_ulm_hooks
+announce 'Building Concrete Semantics';            build_concrete_semantics
+announce 'Building Symbolic Semantics';            build_symbolic_semantics
+announce 'Build ULM Server';                       build_ulm_server
 
-announce 'Testing Symbolic Backend';         test_symbolic_backend
-announce 'Testing ULM';                test_ulm
+announce 'Testing Symbolic Backend';               test_symbolic_backend
+
+announce 'Building Standalone Concrete Semantics'; build_concrete_standalone_semantics SUM_TO_N
+announce 'Building CSE[SumToN] Semantics';         build_csepgm_standalone_semantics SUM_TO_N
+announce 'Testing Standalone Concrete Semantics';  test_concrete_standalone_semantics true csepgm/SUM_TO_N.evm 0 CANCUN 380006 false
+announce 'Testing CSE[SumToN] Semantics';          test_csepgm_standalone_semantics true SUM_TO_N 0 CANCUN 380006 false
+
+announce 'Testing ULM';                            test_ulm

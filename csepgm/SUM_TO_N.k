@@ -12,13 +12,13 @@ module SUM_TO_N
                  //  2:       PUSH(2) 10,000            // n = 10000
                  //  5: loop: JUMPDEST
                  //  6:       SWAP; DUP 2; ADD; SWAP    // s = s+n
-                 // 10:       PUSH(1) 1; SUB            // n = n-1
-                 // 13:       DUP;
-                 // 14:       PUSH loop
-                 // 16:       JUMPI
-                 //             00  .   .   .   .   05  .   .   .   .   10  .   .   .   .   15  .   .
-                 <program>   b"\x60\x00\x61\x27\x10\x5b\x90\x81\x01\x90\x60\x01\x03\x80\x60\x05\x57\x00" </program>
-                 <jumpDests> b"\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" </jumpDests>
+                 // 10:       PUSH(1) 1; SWAP; SUB      // n = n-1
+                 // 14:       DUP;
+                 // 15:       PUSH loop
+                 // 17:       JUMPI
+                 //             00  .   .   .   .   05  .   .   .   .   10  .   .   .   .   15  .   .   .
+                 <program>   b"\x60\x00\x61\x27\x10\x5b\x90\x81\x01\x90\x60\x01\x90\x03\x80\x60\x05\x57\x00" </program>
+                 <jumpDests> b"\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" </jumpDests>
                  <wordStack>
                      .List
                   => (ListItem(10000) ListItem(0))
@@ -49,18 +49,18 @@ module SUM_TO_N
                  //  2:       PUSH(2) 10,000            // n = 10000
                  //  5: loop: JUMPDEST
                  //  6:       SWAP; DUP 2; ADD; SWAP    // s = s+n
-                 // 10:       PUSH(1) 1; SUB            // n = n-1
-                 // 13:       DUP;
-                 // 14:       PUSH loop
-                 // 16:       JUMPI
-                 //             00  .   .   .   .   05  .   .   .   .   10  .   .   .   .   15  .   .
-                 <program>   b"\x60\x00\x61\x27\x10\x5b\x90\x81\x01\x90\x60\x01\x03\x80\x60\x05\x57\x00" </program>
-                 <jumpDests> b"\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" </jumpDests>
+                 // 10:       PUSH(1) 1; SWAP; SUB      // n = n-1
+                 // 14:       DUP;
+                 // 15:       PUSH loop
+                 // 17:       JUMPI
+                 //             00  .   .   .   .   05  .   .   .   .   10  .   .   .   .   15  .   .   .
+                 <program>   b"\x60\x00\x61\x27\x10\x5b\x90\x81\x01\x90\x60\x01\x90\x03\x80\x60\x05\x57\x00" </program>
+                 <jumpDests> b"\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" </jumpDests>
 
                  // ------- Dynamic -----------------------------------------------------------------------------
                  <wordStack> (ListItem(N) ListItem(SUM)) => (ListItem(0) ListItem(chop(SUM +Int N))) </wordStack>
                  <pc>        5                           => 17                                       </pc>
-                 <gas>       GAS_CELL:Int                => (GAS_CELL:Int -Int 35)                   </gas>
+                 <gas>       GAS_CELL:Int                => (GAS_CELL:Int -Int 38)                   </gas>
                  // ---------------------------------------------------------------------------------------------
                  ...
                </callState>
@@ -68,8 +68,8 @@ module SUM_TO_N
              </evm>
              ...
            </ethereum>
-       requires 35 <=Int GAS_CELL:Int
-       andBool 0 ==Int chop(1 -Int N)
+       requires 38 <=Int GAS_CELL:Int
+       andBool 0 ==Int chop(N -Int 1)
        andBool SCHEDULE_CELL ==K CANCUN
 
 
@@ -82,18 +82,18 @@ module SUM_TO_N
                  //  2:       PUSH(2) 10,000            // n = 10000
                  //  5: loop: JUMPDEST
                  //  6:       SWAP; DUP 2; ADD; SWAP    // s = s+n
-                 // 10:       PUSH(1) 1; SUB            // n = n-1
-                 // 13:       DUP;
-                 // 14:       PUSH loop
-                 // 16:       JUMPI
-                 //             00  .   .   .   .   05  .   .   .   .   10  .   .   .   .   15  .   .
-                 <program>   b"\x60\x00\x61\x27\x10\x5b\x90\x81\x01\x90\x60\x01\x03\x80\x60\x05\x57\x00" </program>
-                 <jumpDests> b"\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" </jumpDests>
+                 // 10:       PUSH(1) 1; SWAP; SUB      // n = n-1
+                 // 14:       DUP;
+                 // 15:       PUSH loop
+                 // 17:       JUMPI
+                 //             00  .   .   .   .   05  .   .   .   .   10  .   .   .   .   15  .   .   .
+                 <program>   b"\x60\x00\x61\x27\x10\x5b\x90\x81\x01\x90\x60\x01\x90\x03\x80\x60\x05\x57\x00" </program>
+                 <jumpDests> b"\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" </jumpDests>
 
                  // ------- Dynamic -------------------------------------------------------------------------------------------
-                 <wordStack> (ListItem(N) ListItem(SUM)) => (ListItem(chop(1 -Int N)) ListItem(chop(SUM +Int N))) </wordStack>
+                 <wordStack> (ListItem(N) ListItem(SUM)) => (ListItem(chop(N -Int 1)) ListItem(chop(SUM +Int N))) </wordStack>
                  <pc>        5                           => 5                                                     </pc>
-                 <gas>       GAS_CELL:Int                => (GAS_CELL:Int -Int 35)                                </gas>
+                 <gas>       GAS_CELL:Int                => (GAS_CELL:Int -Int 38)                                </gas>
                  // -----------------------------------------------------------------------------------------------------------
                  ...
                </callState>
@@ -101,8 +101,8 @@ module SUM_TO_N
              </evm>
              ...
            </ethereum>
-       requires 35 <=Int GAS_CELL:Int
-       andBool 0 =/=Int chop(1 -Int N)
+       requires 38 <=Int GAS_CELL:Int
+       andBool 0 =/=Int chop(N -Int 1)
        andBool SCHEDULE_CELL ==K CANCUN
 
 endmodule

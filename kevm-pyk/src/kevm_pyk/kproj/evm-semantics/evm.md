@@ -30,10 +30,20 @@ In addition, there are cells for the callstack and execution substate.
 We've broken up the configuration into two components; those parts of the state that mutate during execution of a single transaction and those that are static throughout.
 In the comments next to each cell, we've marked which component of the YellowPaper state corresponds to each cell.
 
+```standard
+  syntax Int ::= #defaultExitCode() [macro]
+  rule #defaultExitCode() => 1
+```
+
+```csepgm
+  syntax Int ::= #defaultExitCode() [macro]
+  rule #defaultExitCode() => 0
+```
+
 ```k
     configuration
         <k> #loadProgram($PGM:Bytes) ~> #precompiled?($ACCTCODE:Int, getSchedule($SCHEDULE:Int)) ~> #execute </k>
-        <exit-code exit=""> 1 </exit-code>
+        <exit-code exit=""> #defaultExitCode() </exit-code>
         <schedule> getSchedule($SCHEDULE:Int) </schedule>
 
         <ethereum>

@@ -259,4 +259,4 @@ announce 'Testing Standalone Concrete Semantics';  test_concrete_standalone_sema
 announce 'Building CSE[SumToN] Semantics';         build_csepgm_standalone_semantics SUM_TO_N
 announce 'Testing CSE[SumToN] Semantics';          test_csepgm_standalone_semantics SUM_TO_N 0 CANCUN 380006 false
 
-announce 'Testing ULM';                      test_ulm
+announce 'Testing ULM';                            test_ulm

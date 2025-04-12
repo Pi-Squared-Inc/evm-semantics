@@ -17,8 +17,8 @@ module SUM_TO_N
                  // 15:       PUSH loop
                  // 17:       JUMPI
                  //             00  .   .   .   .   05  .   .   .   .   10  .   .   .   .   15  .   .   .
-                 <program>   b"\x60\x00\x61\x27\x10\x5b\x90\x81\x01\x90\x60\x01\x90\x03\x80\x60\x05\x57\x00" </program>
-                 <jumpDests> b"\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" </jumpDests>
+                 // <program>   b"\x60\x00\x61\x27\x10\x5b\x90\x81\x01\x90\x60\x01\x90\x03\x80\x60\x05\x57\x00" </program>
+                 // <jumpDests> b"\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" </jumpDests>
                  <wordStack>
                      .List
                   => (ListItem(10000) ListItem(0))

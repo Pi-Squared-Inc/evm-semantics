@@ -191,29 +191,38 @@ encode_schedule() {
 }
 
 test_concrete_standalone_semantics() {
-   [ $# -lt 5 ] && die "usage: $0 <program_name> <address:uint160> <schedule:string> <gas:uint256> <static:bool> [krun_extra_args...]"
-   test_standalone_semantics "$build_dir/concrete" "$@"
+   [ $# -lt 6 ] && die "usage: $0 <timeit:bool> <program_name> <address:uint160> <schedule:string> <gas:uint256> <static:bool> [krun_extra_args...]"
+   TIMEIT=$1
+   shift
+   test_standalone_semantics "$TIMEIT" "$build_dir/concrete" "$@"
 }
 
 test_csepgm_standalone_semantics() {
-   [ $# -lt 5 ] && die "usage: $0 <program_name> <address:uint160> <schedule:string> <gas:uint256> <static:bool> [krun_extra_args...]"
-   PROG=$1
-   shift
-   test_standalone_semantics "$build_dir/csepgm/$PROG" "$repo_root/csepgm/$PROG.evm" "$@"
+   [ $# -lt 6 ] && die "usage: $0 <timeit:bool> <program_name> <address:uint160> <schedule:string> <gas:uint256> <static:bool> [krun_extra_args...]"
+   TIMEIT=$1
+   PROG=$2
+   shift 2
+   test_standalone_semantics "$TIMEIT" "$build_dir/csepgm/$PROG" "$repo_root/csepgm/$PROG.evm" "$@"
 }
 
 test_standalone_semantics() {
-   [ $# -lt 6 ] && die "usage: $0 <definition_dir> <program_name> <address:uint160> <schedule:string> <gas:uint256> <static:bool> [krun_extra_args...]"
-   DEF_DIR=$1
-   PROG=$2
-   ADDRESS=$3
-   SCHEDULE=$(encode_schedule $4)
-   GAS=$5
-   STATIC=$6
-   shift 6
-   set -x
-   time krun --definition "$DEF_DIR" "$PROG" -cACCTCODE="$ADDRESS" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC" "$@"
-   set +x
+   [ $# -lt 7 ] && die "usage: $0 <timeit:bool> <definition_dir> <program_name> <address:uint160> <schedule:string> <gas:uint256> <static:bool> [krun_extra_args...]"
+   TIMEIT=$1
+   DEF_DIR=$2
+   PROG=$3
+   ADDRESS=$4
+   SCHEDULE=$(encode_schedule $5)
+   GAS=$6
+   STATIC=$7
+   shift 7
+   if "$TIMEIT"; then
+       set -x
+       config=$(krun --definition "$DEF_DIR" "$PROG" -cACCTCODE="$ADDRESS" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC" --depth 0 -o kore)
+       time $DEF_DIR/interpreter /dev/stdin -1 /dev/null <<< "$config"
+       set +x
+   else
+       krun --definition "$DEF_DIR" "$PROG" -cACCTCODE="$ADDRESS" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC"
+   fi
 }
 
 export CGO_LDFLAGS="-lulmkllvm -L$lib_dir/ -lkevm -L${build_dir}/libkevm/"

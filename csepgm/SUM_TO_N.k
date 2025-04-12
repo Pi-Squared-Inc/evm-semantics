@@ -23,7 +23,7 @@ module SUM_TO_N
                      .List
                   => (ListItem(10000) ListItem(0))
                  </wordStack>
-                 <pc>   0  => 05 </pc>
+                 <pc>   0  => 5 </pc>
                         // ==========================
                         // Uncomment for other branch
                         // ==========================

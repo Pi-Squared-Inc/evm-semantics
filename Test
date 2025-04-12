@@ -136,7 +136,7 @@ test_symbolic_backend() {
 build_concrete_standalone_semantics() {
     kompile kevm-pyk/src/kevm_pyk/kproj/evm-semantics/evm.md                                 \
             --output-definition "$build_dir/concrete"                                        \
-            --main-module "$PROG" --syntax-module EVM                                        \
+            --main-module EVM --syntax-module EVM                                            \
             --md-selector 'k | standard'                                                     \
             -I kevm-pyk/src/kevm_pyk/kproj/evm-semantics                                     \
             -I kevm-pyk/src/kevm_pyk/kproj/plugin                                            \

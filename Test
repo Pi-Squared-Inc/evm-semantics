@@ -215,15 +215,15 @@ check_k
 check_clang_version
 check_go_version
 
-# announce 'Setting up Python dependencies';   make -s poetry
-# announce 'Building Blockchain Plugin';       build_with_kdist "evm-semantics.plugin"
-# announce 'Building ULM Hooks';               build_ulm_hooks
-# announce 'Building Concrete Semantics';      build_concrete_semantics
-# announce 'Building Symbolic Semantics';      build_symbolic_semantics
-# announce 'Build ULM Server';                 build_ulm_server
+announce 'Setting up Python dependencies';   make -s poetry
+announce 'Building Blockchain Plugin';       build_with_kdist "evm-semantics.plugin"
+announce 'Building ULM Hooks';               build_ulm_hooks
+announce 'Building Concrete Semantics';      build_concrete_semantics
+announce 'Building Symbolic Semantics';      build_symbolic_semantics
+announce 'Build ULM Server';                 build_ulm_server
 
-# announce 'Testing Symbolic Backend';         test_symbolic_backend
-# announce 'Testing ULM';                test_ulm
+announce 'Testing Symbolic Backend';         test_symbolic_backend
+announce 'Testing ULM';                test_ulm
 
 announce 'Building CSE[SumToN] Semantics';     build_csepgm_standalone_semantics SUM_TO_N
 announce 'Testing CSE[SumToN] Semantics';      test_csepgm_standalone_semantics SUM_TO_N 0 CANCUN 100000 false

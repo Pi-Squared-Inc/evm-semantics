@@ -1,6 +1,6 @@
 requires "evm.md"
 
-module SUM_TO_N
+module SUM_TO_1
     imports EVM
 
     rule [STNSTART]:  <k>        #execute               </k>

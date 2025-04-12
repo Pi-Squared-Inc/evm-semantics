@@ -138,7 +138,7 @@ build_csepgm_standalone_semantics() {
     PROG=$1
     mkdir -p ".build/csepgm/$PROG"
     kompile "csepgm/$PROG.k"                                                                 \
-            --definition ".build/csepgm/$PROG"                                               \
+            --output-definition "$build_dir/csepgm/$PROG"                                    \
             --main-module "$PROG" --syntax-module EVM                                        \
             --md-selector 'k | csepgm'                                                       \
             -I kevm-pyk/src/kevm_pyk/kproj/evm-semantics                                     \
@@ -160,7 +160,7 @@ test_csepgm_standalone_semantics() {
    SCHEDULE=$4
    GAS=$5
    STATIC=$6
-   krun --definition ".build/csepgm/$PROG" "$BYTECODE_FILE" -cACCTCODE="$ADDRESS" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC"
+   krun --definition "$build_dir/csepgm/$PROG" "$BYTECODE_FILE" -cACCTCODE="$ADDRESS" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC"
 }
 
 export CGO_LDFLAGS="-lulmkllvm -L$lib_dir/ -lkevm -L${build_dir}/libkevm/"

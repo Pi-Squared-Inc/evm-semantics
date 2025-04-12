@@ -174,13 +174,14 @@ encode_schedule() {
 }
 
 test_csepgm_standalone_semantics() {
-   [ $# -ne 5 ] && die "usage: $0 <program_name> <address:uint160> <schedule:string> <gas:uint256> <static:bool>"
+   [ $# -lt 5 ] && die "usage: $0 <program_name> <address:uint160> <schedule:string> <gas:uint256> <static:bool> [krun_extra_args...]"
    PROG=$1
    ADDRESS=$2
    SCHEDULE=$(encode_schedule $3)
    GAS=$4
    STATIC=$5
-   krun --save-temps --definition "$build_dir/csepgm/$PROG" "$repo_root/csepgm/$PROG.evm" -cACCTCODE="$ADDRESS" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC"
+   shift 5
+   krun --definition "$build_dir/csepgm/$PROG" "$repo_root/csepgm/$PROG.evm" -cACCTCODE="$ADDRESS" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC" "$@"
 }
 
 export CGO_LDFLAGS="-lulmkllvm -L$lib_dir/ -lkevm -L${build_dir}/libkevm/"

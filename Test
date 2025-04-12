@@ -226,4 +226,4 @@ announce 'Testing Symbolic Backend';         test_symbolic_backend
 announce 'Testing ULM';                test_ulm
 
 announce 'Building CSE[SumToN] Semantics';     build_csepgm_standalone_semantics SUM_TO_N
-announce 'Testing CSE[SumToN] Semantics';      test_csepgm_standalone_semantics SUM_TO_N 0 CANCUN 100000 false
+announce 'Testing CSE[SumToN] Semantics';      test_csepgm_standalone_semantics SUM_TO_N 0 CANCUN 380006 false

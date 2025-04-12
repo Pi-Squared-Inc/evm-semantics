@@ -192,27 +192,27 @@ encode_schedule() {
 
 test_concrete_standalone_semantics() {
    [ $# -lt 5 ] && die "usage: $0 <program_name> <address:uint160> <schedule:string> <gas:uint256> <static:bool> [krun_extra_args...]"
-   PROG=$1
-   ADDRESS=$2
-   SCHEDULE=$(encode_schedule $3)
-   GAS=$4
-   STATIC=$5
-   shift 5
-   set -x
-   krun --definition "$build_dir/concrete" "$PROG" -cACCTCODE="$ADDRESS" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC" "$@"
-   set +x
+   test_standalone_semantics "$build_dir/concrete" "$@"
 }
 
 test_csepgm_standalone_semantics() {
    [ $# -lt 5 ] && die "usage: $0 <program_name> <address:uint160> <schedule:string> <gas:uint256> <static:bool> [krun_extra_args...]"
    PROG=$1
-   ADDRESS=$2
-   SCHEDULE=$(encode_schedule $3)
-   GAS=$4
-   STATIC=$5
-   shift 5
+   shift
+   test_standalone_semantics "$build_dir/csepgm/$PROG" "$repo_root/csepgm/$PROG.evm" "$@"
+}
+
+test_standalone_semantics() {
+   [ $# -lt 6 ] && die "usage: $0 <definition_dir> <program_name> <address:uint160> <schedule:string> <gas:uint256> <static:bool> [krun_extra_args...]"
+   DEF_DIR=$1
+   PROG=$2
+   ADDRESS=$3
+   SCHEDULE=$(encode_schedule $4)
+   GAS=$5
+   STATIC=$6
+   shift 6
    set -x
-   krun --definition "$build_dir/csepgm/$PROG" "$repo_root/csepgm/$PROG.evm" -cACCTCODE="$ADDRESS" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC" "$@"
+   time krun --definition "$DEF_DIR" "$PROG" -cACCTCODE="$ADDRESS" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC" "$@"
    set +x
 }
 
@@ -255,8 +255,8 @@ announce 'Build ULM Server';                       build_ulm_server
 announce 'Testing Symbolic Backend';               test_symbolic_backend
 
 announce 'Building Standalone Concrete Semantics'; build_concrete_standalone_semantics SUM_TO_N
-announce 'Testing Standalone Concrete Semantics';  test_concrete_standalone_semantics csepgm/SUM_TO_N.evm 0 CANCUN 380006 false
 announce 'Building CSE[SumToN] Semantics';         build_csepgm_standalone_semantics SUM_TO_N
+announce 'Testing Standalone Concrete Semantics';  test_concrete_standalone_semantics csepgm/SUM_TO_N.evm 0 CANCUN 380006 false
 announce 'Testing CSE[SumToN] Semantics';          test_csepgm_standalone_semantics SUM_TO_N 0 CANCUN 380006 false
 
 announce 'Testing ULM';                            test_ulm

@@ -3,7 +3,7 @@ requires "evm.md"
 module SUM_TO_N
     imports EVM
 
-    rule   <k>        #execute               </k>
+    rule [STNSTART]:  <k>        #execute               </k>
            <schedule> SCHEDULE_CELL:Schedule </schedule>
            <ethereum>
              <evm>
@@ -40,7 +40,7 @@ module SUM_TO_N
        andBool SCHEDULE_CELL ==K CANCUN
 
 
-    rule   <k>        #execute               </k>
+    rule [STNEND]:  <k>        #execute               </k>
            <schedule> SCHEDULE_CELL:Schedule </schedule>
            <ethereum>
              <evm>
@@ -73,7 +73,7 @@ module SUM_TO_N
        andBool SCHEDULE_CELL ==K CANCUN
 
 
-    rule   <k>        #execute               </k>
+    rule [STNCONT]:  <k>        #execute               </k>
            <schedule> SCHEDULE_CELL:Schedule </schedule>
            <ethereum>
              <evm>
@@ -92,10 +92,8 @@ module SUM_TO_N
 
                  // ------- Dynamic -------------------------------------------------------------------------------------------
                  <wordStack> (ListItem(N) ListItem(SUM)) => (ListItem(chop(1 -Int N)) ListItem(chop(SUM +Int N))) </wordStack>
-                 // TODO: Cannot use pc=5, because of error:
-                 // "The configuration's term unifies with the destination's term, but the implication check between the conditions has failed."
-                 <pc>        6                           => 5                                                     </pc>
-                 <gas>       GAS_CELL:Int                => (GAS_CELL:Int -Int 34)                                </gas>
+                 <pc>        5                           => 5                                                     </pc>
+                 <gas>       GAS_CELL:Int                => (GAS_CELL:Int -Int 35)                                </gas>
                  // -----------------------------------------------------------------------------------------------------------
                  ...
                </callState>
@@ -103,7 +101,7 @@ module SUM_TO_N
              </evm>
              ...
            </ethereum>
-       requires 34 <=Int GAS_CELL:Int
+       requires 35 <=Int GAS_CELL:Int
        andBool 0 =/=Int chop(1 -Int N)
        andBool SCHEDULE_CELL ==K CANCUN
 

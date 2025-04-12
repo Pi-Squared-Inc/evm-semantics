@@ -221,7 +221,9 @@ test_standalone_semantics() {
        time $DEF_DIR/interpreter /dev/stdin -1 /dev/null <<< "$config"
        set +x
    else
+       set -x
        krun --definition "$DEF_DIR" "$PROG" -cACCTCODE="$ADDRESS" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC"
+       set +x
    fi
 }
 

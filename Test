@@ -127,7 +127,7 @@ build_symbolic_semantics() {
 test_symbolic_backend() {
         kprove kevm-pyk/src/kevm_pyk/kproj/evm-semantics/summaries/sum.k \
                --definition .build/symbolic/                                       \
-               --md-selector k                                                     \
+               --md-selector 'k | standard'                                        \
                -I kevm-pyk/src/kevm_pyk/kproj/evm-semantics                        \
                -I kevm-pyk/src/kevm_pyk/kproj/plugin                               \
                -I deps/ulm/kllvm/ --depth 200
@@ -215,12 +215,12 @@ check_k
 check_clang_version
 check_go_version
 
-announce 'Setting up Python dependencies';   make -s poetry
-announce 'Building Blockchain Plugin';       build_with_kdist "evm-semantics.plugin"
-announce 'Building ULM Hooks';               build_ulm_hooks
-announce 'Building Concrete Semantics';      build_concrete_semantics
-announce 'Building Symbolic Semantics';      build_symbolic_semantics
-announce 'Build ULM Server';                 build_ulm_server
+# announce 'Setting up Python dependencies';   make -s poetry
+# announce 'Building Blockchain Plugin';       build_with_kdist "evm-semantics.plugin"
+# announce 'Building ULM Hooks';               build_ulm_hooks
+# announce 'Building Concrete Semantics';      build_concrete_semantics
+# announce 'Building Symbolic Semantics';      build_symbolic_semantics
+# announce 'Build ULM Server';                 build_ulm_server
 
 announce 'Testing Symbolic Backend';         test_symbolic_backend
 announce 'Testing ULM';                test_ulm

@@ -265,7 +265,7 @@ announce 'Testing Symbolic Backend';               test_symbolic_backend
 
 announce 'Building Standalone Concrete Semantics'; build_concrete_standalone_semantics SUM_TO_N
 announce 'Building CSE[SumToN] Semantics';         build_csepgm_standalone_semantics SUM_TO_N
-announce 'Testing Standalone Concrete Semantics';  test_concrete_standalone_semantics csepgm/SUM_TO_N.evm 0 CANCUN 380006 false
-announce 'Testing CSE[SumToN] Semantics';          test_csepgm_standalone_semantics SUM_TO_N 0 CANCUN 380006 false
+announce 'Testing Standalone Concrete Semantics';  test_concrete_standalone_semantics true csepgm/SUM_TO_N.evm 0 CANCUN 380006 false
+announce 'Testing CSE[SumToN] Semantics';          test_csepgm_standalone_semantics true SUM_TO_N 0 CANCUN 380006 false
 
 announce 'Testing ULM';                            test_ulm

@@ -149,18 +149,38 @@ build_csepgm_standalone_semantics() {
             -ccopt $(poetry -C kevm-pyk run kdist which evm-semantics.plugin)/krypto.a       \
             -ccopt -Wno-deprecated-declarations                                              \
             --type-inference-mode simplesub --verbose -I "$ulm_kllvm_dir"                    \
-            -ccopt -L"$build_dir/lib" -ccopt -lulmkllvm                                      \
+            -ccopt -L"$build_dir/lib"                                                        \
             -ccopt -g --llvm-mutable-bytes
 }
 
+encode_schedule() {
+    [ $# -ne 1 ] && die "usage: $0 <schedule-string>"
+    case "$1" in
+        "FRONTIER"         ) echo  0  ;;
+        "HOMESTEAD"        ) echo  1  ;;
+        "TANGERINE_WHISTLE") echo  2  ;;
+        "SPURIOUS_DRAGON"  ) echo  3  ;;
+        "BYZANTIUM"        ) echo  4  ;;
+        "CONSTANTINOPLE"   ) echo  5  ;;
+        "PETERSBURG"       ) echo  6  ;;
+        "ISTANBUL"         ) echo  7  ;;
+        "BERLIN"           ) echo  8  ;;
+        "LONDON"           ) echo  9  ;;
+        "MERGE"            ) echo  10 ;;
+        "SHANGHAI"         ) echo  11 ;;
+        "CANCUN"           ) echo  12 ;;
+        *)  die "Invalid schedule integer $1" ;;
+    esac
+}
+
 test_csepgm_standalone_semantics() {
-   [ $# -ne 6 ] && die "usage: $0 <program_name> <bytecode_file> <address:uint160> <schedule:string> <gas:uint256> <static:bool>"
+   [ $# -ne 5 ] && die "usage: $0 <program_name> <address:uint160> <schedule:string> <gas:uint256> <static:bool>"
    PROG=$1
-   ADDRESS=$3
-   SCHEDULE=$4
-   GAS=$5
-   STATIC=$6
-   krun --definition "$build_dir/csepgm/$PROG" "$BYTECODE_FILE" -cACCTCODE="$ADDRESS" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC"
+   ADDRESS=$2
+   SCHEDULE=$(encode_schedule $3)
+   GAS=$4
+   STATIC=$5
+   krun --save-temps --definition "$build_dir/csepgm/$PROG" "$repo_root/csepgm/$PROG.evm" -cACCTCODE="$ADDRESS" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC"
 }
 
 export CGO_LDFLAGS="-lulmkllvm -L$lib_dir/ -lkevm -L${build_dir}/libkevm/"
@@ -203,4 +223,4 @@ check_go_version
 # announce 'Testing ULM';                test_ulm
 
 announce 'Building CSE[SumToN] Semantics';     build_csepgm_standalone_semantics SUM_TO_N
-announce 'Testing CSE[SumToN] Semantics';      test_csepgm_standalone_semantics SUM_TO_N
+announce 'Testing CSE[SumToN] Semantics';      test_csepgm_standalone_semantics SUM_TO_N 0 CANCUN 100000 false

@@ -133,6 +133,23 @@ test_symbolic_backend() {
                -I deps/ulm/kllvm/ --depth 200
 }
 
+build_concrete_standalone_semantics() {
+    kompile kevm-pyk/src/kevm_pyk/kproj/evm-semantics/evm.md                                 \
+            --output-definition "$build_dir/concrete"                                        \
+            --main-module "$PROG" --syntax-module EVM                                        \
+            --md-selector 'k | standard'                                                     \
+            -I kevm-pyk/src/kevm_pyk/kproj/evm-semantics                                     \
+            -I kevm-pyk/src/kevm_pyk/kproj/plugin                                            \
+            --hook-namespaces 'JSON KRYPTO'                                                  \
+            --backend llvm  -O3                                                              \
+            -ccopt -std=c++20  -ccopt -lssl    -ccopt -lcrypto    -ccopt -lsecp256k1         \
+            -ccopt $(poetry -C kevm-pyk run kdist which evm-semantics.plugin)/krypto.a       \
+            -ccopt -Wno-deprecated-declarations                                              \
+            --type-inference-mode simplesub --verbose -I "$ulm_kllvm_dir"                    \
+            -ccopt -L"$build_dir/lib"                                                        \
+            -ccopt -g --llvm-mutable-bytes
+}
+
 build_csepgm_standalone_semantics() {
     [ $# -ne 1 ] && die "Building CSE[Pgm] requires a program argument"
     PROG=$1
@@ -171,6 +188,19 @@ encode_schedule() {
         "CANCUN"           ) echo  12 ;;
         *)  die "Invalid schedule integer $1" ;;
     esac
+}
+
+test_concrete_standalone_semantics() {
+   [ $# -lt 5 ] && die "usage: $0 <program_name> <address:uint160> <schedule:string> <gas:uint256> <static:bool> [krun_extra_args...]"
+   PROG=$1
+   ADDRESS=$2
+   SCHEDULE=$(encode_schedule $3)
+   GAS=$4
+   STATIC=$5
+   shift 5
+   set -x
+   krun --definition "$build_dir/concrete" "$PROG" -cACCTCODE="$ADDRESS" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC" "$@"
+   set +x
 }
 
 test_csepgm_standalone_semantics() {
@@ -215,16 +245,18 @@ check_k
 check_clang_version
 check_go_version
 
-announce 'Setting up Python dependencies';   make -s poetry
-announce 'Building Blockchain Plugin';       build_with_kdist "evm-semantics.plugin"
-announce 'Building ULM Hooks';               build_ulm_hooks
-announce 'Building Concrete Semantics';      build_concrete_semantics
-announce 'Building Symbolic Semantics';      build_symbolic_semantics
-announce 'Build ULM Server';                 build_ulm_server
+announce 'Setting up Python dependencies';         make -s poetry
+announce 'Building Blockchain Plugin';             build_with_kdist "evm-semantics.plugin"
+announce 'Building ULM Hooks';                     build_ulm_hooks
+announce 'Building Concrete Semantics';            build_concrete_semantics
+announce 'Building Symbolic Semantics';            build_symbolic_semantics
+announce 'Build ULM Server';                       build_ulm_server
 
-announce 'Testing Symbolic Backend';         test_symbolic_backend
+announce 'Testing Symbolic Backend';               test_symbolic_backend
 
-announce 'Building CSE[SumToN] Semantics';   build_csepgm_standalone_semantics SUM_TO_N
-announce 'Testing CSE[SumToN] Semantics';    test_csepgm_standalone_semantics SUM_TO_N 0 CANCUN 380006 false
+announce 'Building Standalone Concrete Semantics'; build_concrete_standalone_semantics SUM_TO_N
+announce 'Testing Standalone Concrete Semantics';  test_concrete_standalone_semantics csepgm/SUM_TO_N.evm 0 CANCUN 380006 false
+announce 'Building CSE[SumToN] Semantics';         build_csepgm_standalone_semantics SUM_TO_N
+announce 'Testing CSE[SumToN] Semantics';          test_csepgm_standalone_semantics SUM_TO_N 0 CANCUN 380006 false
 
 announce 'Testing ULM';                      test_ulm

@@ -1,0 +1,122 @@
+# Use a compatible base image like Ubuntu or Debian
+FROM --platform=linux/amd64 ubuntu:22.04
+
+# Pre-requisites
+
+## Add necessary repositories for missing packages. Add the packages needed by K, and required at installation time.
+RUN apt-get update && \
+    apt-get install -y \
+    software-properties-common \
+    wget \
+    gnupg \
+    bash \
+    python3 \
+    python3-pip \
+    build-essential \
+    libusb-1.0-0-dev \
+    libssl-dev \
+    curl \
+    nano \
+    iputils-ping \
+    gcc \
+    git \
+    jq \
+    make \
+    lsb-release \
+    openjdk-17-jdk \
+    libboost-dev \
+    libboost-test-dev \
+    libffi-dev \
+    libfmt-dev \
+    libgmp-dev \
+    libjemalloc-dev \
+    libmpfr-dev \
+    libsecp256k1-0 \
+    libtinfo-dev \
+    libunwind-dev \
+    libyaml-dev \
+    libz3-4 \
+    bison \
+    flex \
+    pkg-config \
+    libcrypto++-dev \
+    libsecp256k1-dev \
+    cmake \
+    maven \
+    z3 \
+    xxd \
+    clang \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG HOME
+
+## Define build argument for GitHub Token
+ARG GITHUB_TOKEN
+ENV GITHUB_TOKEN=${GITHUB_TOKEN}
+ARG GITHUB_ACTOR
+ENV GITHUB_ACTOR=${GITHUB_ACTOR}
+
+## Init auxiliary constants: repositories, branches, versions, etc.
+ARG VLM_REPO=github.com/Pi-Squared-Inc/vlm.git
+ARG EVM_SEMANTICS_REPO=github.com/Pi-Squared-Inc/evm-semantics.git
+ARG VLM_BRANCH=main
+ARG VLM_OP_GETH_BRANCH=ulm
+ARG EVM_SEMANTICS_BRANCH=ulm
+ARG LLVM_VERSION=16
+ARG GO_VERSION=1.23.1
+ARG KFRAMEWORK_REPO=github.com/runtimeverification/k.git
+ARG KFRAMEWORK_VERSION=7.1.162
+ARG POETRY_VERSION=1.8.3
+
+## Install LLVM 16: Install version 16 as later versions have a known bug affecting the code generator.
+
+RUN wget https://apt.llvm.org/llvm.sh -O llvm.sh && chmod +x llvm.sh
+RUN ./llvm.sh ${LLVM_VERSION} all && \
+    apt-get install -y --no-install-recommends clang-${LLVM_VERSION} lldb-${LLVM_VERSION} lld-${LLVM_VERSION} && \
+    rm -f llvm.sh
+
+## Install Go
+
+RUN wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz -O go${GO_VERSION}.linux-amd64.tar.gz
+RUN rm -rf /usr/local/go && tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz && \
+    rm go${GO_VERSION}.linux-amd64.tar.gz
+
+### Add Go to the PATH
+ENV PATH=$PATH:/usr/local/go/bin
+
+## Install Poetry
+
+RUN curl -sSL https://install.python-poetry.org -o install-poetry.py
+RUN python3 install-poetry.py --version ${POETRY_VERSION} && rm install-poetry.py
+ENV PATH=$HOME/.local/bin:$PATH
+
+## Setup the base directory
+WORKDIR /app
+ENV WORKDIR=/app
+
+# Setup of base components: K and its derivatives.
+
+## Install K
+
+RUN git clone --depth=1 --branch v${KFRAMEWORK_VERSION} https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${KFRAMEWORK_REPO} k
+RUN cd k && git submodule update --init --recursive
+ENV CXXFLAGS=-fvisibility=hidden
+RUN cd k && mvn package -Dhaskell.backend.skip -DskipTests
+ENV PATH=$WORKDIR/k/k-distribution/target/release/k/bin:$PATH
+
+# Configure Git to use credentials for all GitHub URLs
+RUN git config --global url."https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+
+## Retrieve the KEVM repo
+
+RUN git clone --depth=1 --branch ${EVM_SEMANTICS_BRANCH} https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${EVM_SEMANTICS_REPO} evm-semantics
+RUN cd evm-semantics && git submodule update --init --recursive
+
+## Retrieve the VLM repo
+
+RUN git clone --depth=1 --branch ${VLM_BRANCH} https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${VLM_REPO} vlm
+RUN cd vlm && git submodule update --init --recursive && cd op-geth && git checkout ${VLM_OP_GETH_BRANCH}
+
+# Default command
+CMD ["bash"]

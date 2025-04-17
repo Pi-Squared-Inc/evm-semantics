@@ -1,0 +1,59 @@
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  push:
+    branches: ["ulm"]
+
+concurrency:
+  group: run-tests
+
+jobs:
+  blockchain-tests:
+    runs-on: [self-hosted, aws, us-east-2, m6a.4xlarge]
+
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - uses: actions/create-github-app-token@v1
+        id: temp-token
+        name: Generate temporary GitHub Token
+        with:
+          app-id: ${{ vars.CICD_GITHUB_WEBAPP_ID }}
+          private-key: ${{ secrets.CICD_GITHUB_WEBAPP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - uses: docker/login-action@v3
+        name: Login to GitHub Container Registry
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: .github/workflows/Dockerfile.vlm
+          push: false
+          load: true
+          tags: vlm-test
+          build-args: |
+            GITHUB_TOKEN=${{ steps.temp-token.outputs.token }}
+            GITHUB_ACTOR=${{ github.actor }}
+
+      - name: 'Run the ULM BLockchain Tests: TestULMBlockchain'
+        run: |
+          docker run --rm --workdir /app/evm-semantics vlm-test make test-vlm-blockchain
+
+      - name: 'Run the Blockchain Spec: TestsTestSpecBlockchain'
+        run: |
+          docker run --rm --workdir /app/evm-semantics vlm-test make test-spec-blockchain
+
+      - name: 'Run the Ethereum Conformance Tests: TestBlockchain'
+        run: |
+          docker run --rm --workdir /app/evm-semantics vlm-test make test-blockchain

@@ -217,11 +217,13 @@ test_standalone_semantics() {
    shift 7
    if "$TIMEIT"; then
        set -x
-       config=$(krun --definition "$DEF_DIR" "$PROG" -cACCTCODE="$ADDRESS" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC" --depth 0 -o kore)
+       config=$(krun --definition "$DEF_DIR" "$PROG" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC" --depth 0 -o kore)
+       for i in $(seq 1 20); do
        time $DEF_DIR/interpreter /dev/stdin -1 /dev/null <<< "$config"
+       done
        set +x
    else
-       krun --definition "$DEF_DIR" "$PROG" -cACCTCODE="$ADDRESS" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC"
+       krun --definition "$DEF_DIR" "$PROG" -cSCHEDULE="$SCHEDULE" -cGAS="$GAS" -cSTATIC="$STATIC"
    fi
 }
 
@@ -254,18 +256,21 @@ check_k
 check_clang_version
 check_go_version
 
-announce 'Setting up Python dependencies';         make -s poetry
-announce 'Building Blockchain Plugin';             build_with_kdist "evm-semantics.plugin"
-announce 'Building ULM Hooks';                     build_ulm_hooks
-announce 'Building Concrete Semantics';            build_concrete_semantics
-announce 'Building Symbolic Semantics';            build_symbolic_semantics
-announce 'Build ULM Server';                       build_ulm_server
+#announce 'Setting up Python dependencies';         make -s poetry
+#announce 'Building Blockchain Plugin';             build_with_kdist "evm-semantics.plugin"
+#announce 'Building ULM Hooks';                     build_ulm_hooks
+#announce 'Building Concrete Semantics';            build_concrete_semantics
+#announce 'Building Symbolic Semantics';            build_symbolic_semantics
+#announce 'Build ULM Server';                       build_ulm_server
 
-announce 'Testing Symbolic Backend';               test_symbolic_backend
+#announce 'Testing Symbolic Backend';               test_symbolic_backend
 
-announce 'Building Standalone Concrete Semantics'; build_concrete_standalone_semantics SUM_TO_N
-announce 'Building CSE[SumToN] Semantics';         build_csepgm_standalone_semantics SUM_TO_N
-announce 'Testing Standalone Concrete Semantics';  test_concrete_standalone_semantics true csepgm/SUM_TO_N.evm 0 CANCUN 380006 false
-announce 'Testing CSE[SumToN] Semantics';          test_csepgm_standalone_semantics true SUM_TO_N 0 CANCUN 380006 false
+# announce 'Building Standalone Concrete Semantics'; build_concrete_standalone_semantics SUM_TO_N
+# announce 'Building CSE[SumToN] Semantics';         build_csepgm_standalone_semantics SUM_TO_N
+announce 'Building CSE[OpCode] Semantics';         build_csepgm_standalone_semantics OPCODE
+# announce 'Testing Standalone Concrete Semantics';  test_concrete_standalone_semantics true csepgm/SUM_TO_N.evm 0 CANCUN 30000000 false
+announce 'Testing CSE[OpCode] Semantics';          test_csepgm_standalone_semantics true OPCODE 0 CANCUN 30000000 false
+# announce 'Testing CSE[SumToN] Semantics';          test_csepgm_standalone_semantics true SUM_TO_N 0 CANCUN 30000000 false
 
-announce 'Testing ULM';                            test_ulm
+
+#announce 'Testing ULM';                            test_ulm

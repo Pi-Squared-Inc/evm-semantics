@@ -32,7 +32,7 @@ In the comments next to each cell, we've marked which component of the YellowPap
 
 ```k
     configuration
-        <k> #loadProgram($PGM:Bytes) ~> #precompiled?($ACCTCODE:Int, getSchedule($SCHEDULE:Int)) ~> #execute </k>
+        <k> #execute </k>
         <exit-code exit=""> 0 </exit-code>
         <schedule> getSchedule($SCHEDULE:Int) </schedule>
 
@@ -50,8 +50,8 @@ In the comments next to each cell, we've marked which component of the YellowPap
             <statusCode>      .StatusCode </statusCode>
 
             <callState>
-              <program>   .Bytes </program>
-              <jumpDests> .Bytes </jumpDests>
+              <program> $PGM:Bytes </program>
+              <jumpDests> #computeValidJumpDests($PGM) </jumpDests>
 
               // \mu_*
               <wordStack>   .List  </wordStack>           // \mu_s

@@ -52,6 +52,11 @@ The encoding schemes are applied in `#rlpEcondeTxData`.
 
 ```k
     syntax Bytes ::= #hashTxData ( TxData ) [symbol(hashTxData), function]
+ // ----------------------------------------------------------------------
+    rule #hashTxData( TXDATA ) => Keccak256raw(                #rlpEncodeTxData(TXDATA) ) requires isLegacyTx    (TXDATA)
+    rule #hashTxData( TXDATA ) => Keccak256raw( b"\x01" +Bytes #rlpEncodeTxData(TXDATA) ) requires isAccessListTx(TXDATA)
+    rule #hashTxData( TXDATA ) => Keccak256raw( b"\x02" +Bytes #rlpEncodeTxData(TXDATA) ) requires isDynamicFeeTx(TXDATA)
+    rule #hashTxData( TXDATA ) => Keccak256raw( b"\x03" +Bytes #rlpEncodeTxData(TXDATA) ) requires isBlobTx      (TXDATA)
 ``` 
 
 The EVM test-sets are represented in JSON format with hex-encoding of the data and programs.
@@ -99,6 +104,8 @@ These parsers can interpret hex-encoded strings as `Int`s, `Bytes`s, and `Map`s.
     syntax Map ::= #parseMap ( JSON ) [symbol(#parseMap), function]
  // ---------------------------------------------------------------
     syntax Int ::= #parseAddr ( String ) [symbol(#parseAddr), function]
+
+    syntax Bytes ::= #rlpEncodeTxData ( TxData ) [symbol(rlpEncodeTxData), function]
 
 endmodule
 ```

@@ -1,5 +1,5 @@
 # Use a compatible base image like Ubuntu or Debian
-FROM --platform=linux/amd64 ubuntu:22.04
+FROM --platform=${BUILDPLATFORM} jammy
 
 # Pre-requisites
 

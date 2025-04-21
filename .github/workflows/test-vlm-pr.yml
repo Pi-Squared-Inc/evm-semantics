@@ -45,6 +45,7 @@ jobs:
           build-args: |
             GITHUB_TOKEN=${{ steps.temp-token.outputs.token }}
             GITHUB_ACTOR=${{ github.actor }}
+            BUILDPLATFORM=linux/amd64
 
       - name: 'Run the ULM BLockchain Tests: TestULMBlockchain'
         run: |

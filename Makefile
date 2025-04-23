@@ -308,7 +308,12 @@ run-failed-spec-blockchain: $(VLM_DIR)/op-geth/tests/tests.test $(EXECUTION_SPEC
 # Run the Ethereum Conformance Tests
 .PHONY: test-blockchain
 test-blockchain: $(VLM_DIR)/op-geth/tests/tests.test
-	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestBlockchain -test.parallel 1 -test.v
+	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestBlockchain -test.parallel 1 -test.v --skip-block-tests known-failures.txt
+
+# Run the failing Ethereum Conformance Tests
+.PHONY: test-failed-blockchain
+test-failed-blockchain: $(VLM_DIR)/op-geth/tests/tests.test
+	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestBlockchain -test.parallel 1 -test.v --run-only-block-tests known-failures.txt
 
 # Run all Ethereum Blockchain Tests
 .PHONY: test-all-blockchain

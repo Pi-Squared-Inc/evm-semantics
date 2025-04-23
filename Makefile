@@ -293,22 +293,22 @@ $(EXECUTION_SPEC_TESTS_DIR)/timestamp: $(EXECUTION_SPEC_TESTS_SRCS)
 # Run the ULM BLockchain Tests
 .PHONY: test-vlm-blockchain
 test-vlm-blockchain: $(VLM_DIR)/op-geth/tests/tests.test
-	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestULMBlockchain -test.parallel 8 -test.v
+	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestULMBlockchain -test.parallel 1 -test.v
 
 # Run the Blockchain Spec Tests
 .PHONY: test-spec-blockchain
 test-spec-blockchain: $(VLM_DIR)/op-geth/tests/tests.test $(EXECUTION_SPEC_TESTS_DIR)/timestamp
-	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestExecutionSpecBlocktests -test.parallel 8 -test.v --skip-spec-block-tests spec-failing.llvm
+	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestExecutionSpecBlocktests -test.parallel 1 -test.v --skip-spec-block-tests spec-failing.llvm
 
 # Run the failing Blockchain Spec Tests
 .PHONY: run-failed-spec-blockchain
 run-failed-spec-blockchain: $(VLM_DIR)/op-geth/tests/tests.test $(EXECUTION_SPEC_TESTS_DIR)/timestamp
-	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestExecutionSpecBlocktests -test.parallel 8 -test.v --run-only-spec-block-tests spec-failing.llvm
+	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestExecutionSpecBlocktests -test.parallel 1 -test.v --run-only-spec-block-tests spec-failing.llvm
 
 # Run the Ethereum Conformance Tests
 .PHONY: test-blockchain
 test-blockchain: $(VLM_DIR)/op-geth/tests/tests.test
-	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestBlockchain -test.parallel 8 -test.v
+	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestBlockchain -test.parallel 1 -test.v
 
 # Run all Ethereum Blockchain Tests
 .PHONY: test-all-blockchain

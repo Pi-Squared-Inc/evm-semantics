@@ -60,7 +60,8 @@ ENV GITHUB_ACTOR=${GITHUB_ACTOR}
 ## Init auxiliary constants: repositories, branches, versions, etc.
 ARG VLM_REPO=github.com/Pi-Squared-Inc/vlm.git
 ARG EVM_SEMANTICS_REPO=github.com/Pi-Squared-Inc/evm-semantics.git
-ARG VLM_BRANCH=main
+#ARG VLM_BRANCH=main
+ARG VLM_BRANCH=fix-self-destruct-eip2780-prague
 ARG VLM_OP_GETH_BRANCH=ulm
 ARG EVM_SEMANTICS_BRANCH=dmitry/etherium_conformance_tests_CI
 ARG LLVM_VERSION=16

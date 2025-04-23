@@ -102,7 +102,7 @@ ENV WORKDIR=/app
 RUN git clone --depth=1 --branch v${KFRAMEWORK_VERSION} https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${KFRAMEWORK_REPO} k
 RUN cd k && git submodule update --init --recursive
 ENV CXXFLAGS=-fvisibility=hidden
-RUN cd k && mvn package -Dhaskell.backend.skip -DskipTests
+RUN cd k && mvn package -Dhaskell.backend.skip -DskipTests -Dllvm.backend.hyperblock.size.mult=128
 ENV PATH=$WORKDIR/k/k-distribution/target/release/k/bin:$PATH
 
 # Configure Git to use credentials for all GitHub URLs

@@ -51,6 +51,16 @@ RUN apt-get update && \
 
 ARG HOME
 
+ARG USER=test-user
+ARG GROUP=test-group
+
+RUN echo ${USER}:${GROUP}
+
+# Create a non-root user for running commands
+RUN groupadd ${GROUP}
+RUN useradd -g ${GROUP} -m -s /bin/bash ${USER}
+RUN echo "${USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
 ## Define build argument for GitHub Token
 ARG GITHUB_TOKEN
 ENV GITHUB_TOKEN=${GITHUB_TOKEN}
@@ -61,13 +71,17 @@ ENV GITHUB_ACTOR=${GITHUB_ACTOR}
 ARG VLM_REPO=github.com/Pi-Squared-Inc/vlm.git
 ARG EVM_SEMANTICS_REPO=github.com/Pi-Squared-Inc/evm-semantics.git
 
-#ARG VLM_BRANCH=main
-#ARG VLM_BRANCH=fix-self-destruct-eip2780-prague
 ARG VLM_BRANCH
 ENV VLM_BRANCH=${VLM_BRANCH}
 
+RUN echo "VLM_BRANCH=${VLM_BRANCH}"
+
+ARG EVM_BRANCH
+ENV EVM_BRANCH=${EVM_BRANCH}
+
+RUN echo "EVM_BRANCH=${EVM_BRANCH}"
+
 ARG VLM_OP_GETH_BRANCH=ulm
-ARG EVM_SEMANTICS_BRANCH=dmitry/etherium_conformance_tests_CI
 ARG LLVM_VERSION=16
 ARG GO_VERSION=1.22.2
 ARG KFRAMEWORK_REPO=github.com/runtimeverification/k.git
@@ -99,6 +113,8 @@ ENV PATH=$HOME/.local/bin:$PATH
 ## Setup the base directory
 WORKDIR /app
 ENV WORKDIR=/app
+RUN chown -R ${USER}:${GROUP} /app
+USER ${USER}:${GROUP}
 
 # Setup of base components: K and its derivatives.
 
@@ -115,13 +131,14 @@ RUN git config --global url."https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/
 
 ## Retrieve the KEVM repo
 
-RUN git clone --depth=1 --branch ${EVM_SEMANTICS_BRANCH} https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${EVM_SEMANTICS_REPO} evm-semantics
+RUN git clone --depth=1 --branch ${EVM_BRANCH} https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${EVM_SEMANTICS_REPO} evm-semantics
 RUN cd evm-semantics && git submodule update --init --recursive
 
 ## Retrieve the VLM repo
 
 RUN git clone --depth=1 --branch ${VLM_BRANCH} https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${VLM_REPO} vlm
 RUN cd vlm && git submodule update --init --recursive && cd op-geth && git checkout ${VLM_OP_GETH_BRANCH}
+#RUN chown -R test-user:test-user /app/vlm
 
 # Default command
 CMD ["bash"]

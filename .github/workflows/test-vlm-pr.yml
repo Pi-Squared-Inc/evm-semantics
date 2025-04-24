@@ -16,14 +16,6 @@ jobs:
       packages: read
 
     steps:
-      - uses: actions/create-github-app-token@v1
-        id: temp-token
-        name: Generate temporary GitHub Token
-        with:
-          app-id: ${{ vars.CICD_GITHUB_WEBAPP_ID }}
-          private-key: ${{ secrets.CICD_GITHUB_WEBAPP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
-
       - uses: docker/login-action@v3
         name: Login to GitHub Container Registry
         with:
@@ -38,28 +30,34 @@ jobs:
         uses: ./.github/actions/with-docker
         with:
           container-name: kevm-ci-concrete-${{ github.sha }}
+          github-app-id: ${{ vars.CICD_GITHUB_WEBAPP_ID }}
+          github-app-private-key: ${{ secrets.CICD_GITHUB_WEBAPP_PRIVATE_KEY }}
 
-      #- name: Build Docker image
-      #  uses: docker/build-push-action@v4
-      #  with:
-      #    context: .
-      #    file: .github/workflows/Dockerfile.vlm
-      #    push: false
-      #    load: true
-      #    tags: vlm-test
-      #    build-args: |
-      #      GITHUB_TOKEN=${{ steps.temp-token.outputs.token }}
-      #      GITHUB_ACTOR=${{ github.actor }}
-      #      VLM_BRANCH=${{ github.head_ref || github.ref_name }}
+      - name: 'Debug environment'
+        run: |
+          docker exec -u test-user kevm-ci-concrete-${{ github.sha }} \
+            /bin/bash -c 'ls -la /app/vlm/kllvm && whoami && id && pwd'
 
       - name: 'Run the ULM BLockchain Tests: TestULMBlockchain'
         run: |
-          docker exec -u github-user kevm-ci-concrete-${{ github.sha }} /bin/bash -c 'make test-vlm-blockchain'
+          docker exec \
+            -u test-user \
+            --workdir /app/evm-semantics \
+            kevm-ci-concrete-${{ github.sha }} \
+            /bin/bash -c 'make test-vlm-blockchain'
 
       - name: 'Run the Blockchain Spec: TestsTestSpecBlockchain'
         run: |
-          docker exec -u github-user kevm-ci-concrete-${{ github.sha }} /bin/bash -c 'make test-spec-blockchain'
+          docker exec \
+            -u test-user \
+            --workdir /app/evm-semantics\
+            kevm-ci-concrete-${{ github.sha }} \
+            /bin/bash -c 'make test-spec-blockchain'
 
       - name: 'Run the Ethereum Conformance Tests: TestBlockchain'
         run: |
-          docker exec -u github-user kevm-ci-concrete-${{ github.sha }} /bin/bash -c 'make test-blockchain'
+          docker exec \
+            -u test-user \
+            --workdir /app/evm-semantics\
+            kevm-ci-concrete-${{ github.sha }} \
+            /bin/bash -c 'make test-blockchain'

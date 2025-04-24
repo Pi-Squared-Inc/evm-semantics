@@ -293,7 +293,7 @@ $(EXECUTION_SPEC_TESTS_DIR)/timestamp: $(EXECUTION_SPEC_TESTS_SRCS)
 # Run the ULM BLockchain Tests
 .PHONY: test-vlm-blockchain
 test-vlm-blockchain: $(VLM_DIR)/op-geth/tests/tests.test
-	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestULMBlockchain -test.parallel 1 
+	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestULMBlockchain -test.parallel 4 
 
 # Run the Blockchain Spec Tests
 .PHONY: test-spec-blockchain

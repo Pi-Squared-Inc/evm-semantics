@@ -29,7 +29,7 @@ inputs:
     description: 'LLVM version to use.'
     required: false
     type: number
-    default: 14
+    default: 16
   dockerfile:
     description: 'Hardcode the path of the dockerfile to use.'
     required: false
@@ -57,27 +57,31 @@ runs:
       K_VERSION=$(cat deps/k_release)
       USER_ID=1000
       GROUP_ID=${USER_ID}
+      #VLM_BRANCH=
 
       docker build . --file ${DOCKERFILE}        \
         --tag ${TAG_NAME}                        \
-        --build-arg USER_ID=${USER_ID}           \
-        --build-arg GROUP_ID=${GROUP_ID}         \
-        --build-arg USER=${USER}                 \
-        --build-arg GROUP=${GROUP}               \
-        --build-arg BASE_DISTRO=${BASE_DISTRO}   \
-        --build-arg K_VERSION=${K_VERSION}       \
-        --build-arg Z3_VERSION=${Z3_VERSION}     \
-        --build-arg LLVM_VERSION=${LLVM_VERSION}
+      #  --build-arg USER_ID=${USER_ID}           \
+      #  --build-arg GROUP_ID=${GROUP_ID}         \
+      #  --build-arg USER=${USER}                 \
+      #  --build-arg GROUP=${GROUP}               \
+      #  --build-arg BASE_DISTRO=${BASE_DISTRO}   \
+      #  --build-arg K_VERSION=${K_VERSION}       \
+      #  --build-arg Z3_VERSION=${Z3_VERSION}     \
+      #  --build-arg LLVM_VERSION=${LLVM_VERSION} \
+        --build-arg GITHUB_TOKEN=${{ steps.temp-token.outputs.token }} \
+        --build-arg GITHUB_ACTOR=${{ github.actor }} \
+        --build-arg VLM_BRANCH=${{ github.head_ref || github.ref_name }}
 
-      docker run                          \
-        --name ${CONTAINER_NAME}          \
-        --rm                              \
-        --interactive                     \
-        --tty                             \
-        --detach                          \
-        --user root                       \
-        --workdir /home/${USER}/workspace \
-        ${TAG_NAME}
+      #docker run                          \
+      #  --name ${CONTAINER_NAME}          \
+      #  --rm                              \
+      #  --interactive                     \
+      #  --tty                             \
+      #  --detach                          \
+      #  --user root                       \
+      #  --workdir /home/${USER}/workspace \
+      #  ${TAG_NAME}
 
-      docker cp . ${CONTAINER_NAME}:/home/${USER}/workspace
-      docker exec ${CONTAINER_NAME} chown -R ${USER}:${GROUP} /home/${USER}
+      #docker cp . ${CONTAINER_NAME}:/home/${USER}/workspace
+      #docker exec ${CONTAINER_NAME} chown -R ${USER}:${GROUP} /home/${USER}

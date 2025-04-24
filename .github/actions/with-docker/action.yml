@@ -51,13 +51,18 @@ runs:
       LLVM_VERSION=${{ inputs.llvm }}
       TAG_NAME=${{ inputs.tag-name }}
 
+      echo "GITHUB_ACTOR=${{ github.actor }}"
+      echo "VLM_BRANCH=${{ github.head_ref || github.ref_name }}"
+
       USER=github-user
       GROUP=${USER}
       Z3_VERSION=$(cat deps/z3)
       K_VERSION=$(cat deps/k_release)
       USER_ID=1000
       GROUP_ID=${USER_ID}
-      #VLM_BRANCH=
+      GITHUB_ACTOR=${{ github.actor }}
+      GITHUB_TOKEN=${{ steps.temp-token.outputs.token }}
+      VLM_BRANCH=${{ github.head_ref || github.ref_name }}
 
       docker build . --file ${DOCKERFILE}        \
         --tag ${TAG_NAME}                        \
@@ -69,9 +74,9 @@ runs:
       #  --build-arg K_VERSION=${K_VERSION}       \
       #  --build-arg Z3_VERSION=${Z3_VERSION}     \
       #  --build-arg LLVM_VERSION=${LLVM_VERSION} \
-        --build-arg GITHUB_TOKEN=${{ steps.temp-token.outputs.token }} \
-        --build-arg GITHUB_ACTOR=${{ github.actor }} \
-        --build-arg VLM_BRANCH=${{ github.head_ref || github.ref_name }}
+        --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} \
+        --build-arg GITHUB_ACTOR=${GITHUB_ACTOR} \
+        --build-arg VLM_BRANCH=${VLM_BRANCH}
 
       #docker run                          \
       #  --name ${CONTAINER_NAME}          \

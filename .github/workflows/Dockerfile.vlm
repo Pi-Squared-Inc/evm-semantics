@@ -69,9 +69,9 @@ ENV VLM_BRANCH=${VLM_BRANCH}
 ARG VLM_OP_GETH_BRANCH=ulm
 ARG EVM_SEMANTICS_BRANCH=dmitry/etherium_conformance_tests_CI
 ARG LLVM_VERSION=16
-ARG GO_VERSION=1.23.1
+ARG GO_VERSION=1.22.2
 ARG KFRAMEWORK_REPO=github.com/runtimeverification/k.git
-ARG KFRAMEWORK_VERSION=7.1.235
+ARG KFRAMEWORK_VERSION=7.1.241
 ARG POETRY_VERSION=1.8.3
 
 ## Install LLVM 16: Install version 16 as later versions have a known bug affecting the code generator.

@@ -34,7 +34,7 @@ inputs:
     description: 'Hardcode the path of the dockerfile to use.'
     required: false
     type: string
-    default: '.github/workflows/Dockerfile'
+    default: '.github/workflows/Dockerfile.vlm'
 runs:
   using: 'composite'
   steps:

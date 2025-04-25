@@ -24,7 +24,7 @@ module SUM_TO_N
                  // <jumpDests> b"\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" </jumpDests>
                  <wordStack>
                      .List
-                  => (ListItem(65535) ListItem(0))
+                  => (ListItem(1000000000) ListItem(0))
                  </wordStack>
                  <pc>   0  => 5 </pc>
                         // ==========================

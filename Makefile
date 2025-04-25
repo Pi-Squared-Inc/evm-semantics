@@ -1,4 +1,4 @@
-all: evm-semantics
+all: test-all-blockchain
 
 
 # Building
@@ -204,7 +204,8 @@ EVM_SEMANTICS_DIR := $(EVM_PROJ_DIR)/evm-semantics
 CRYPTO_PLUGIN_DIR := $(EVM_PROJ_DIR)/plugin
 CRYPTO_PLUGIN_LIB := $(CRYPTO_PLUGIN_DIR)/build/krypto/lib/krypto.a
 EVM_K_SOURCES     := $(shell find $(EVM_SEMANTICS_DIR) \( -name \*.md -o -name \*.k \) -print)
-VLM_KLLVM_DIR     := ../vlm/kllvm
+VLM_DIR           := ../vlm
+VLM_KLLVM_DIR     := $(VLM_DIR)/kllvm
 VLM_KLLVM_LIB     := $(VLM_KLLVM_DIR)/libulmkllvm.so
 KEVM_LIB_DIR      := ./libkevm
 KEVM_LIB          := libkevm.so
@@ -267,3 +268,48 @@ clean:
 	if [ -d $(CRYPTO_PLUGIN_DIR) ]; then rm -fr $(CRYPTO_PLUGIN_DIR)/build/*; fi
 	if [ -d $(KEVM_LIB_DIR) ]; then rm -fr $(KEVM_LIB_DIR)/*; fi
 	$(MAKE) -C $(VLM_KLLVM_DIR) clean
+
+
+# CI integration tests.
+# ---------------------
+
+EVM_REPOSITORY_DIR := $(shell pwd)
+LD_LIBRARY_PATH := $(EVM_REPOSITORY_DIR)/$(VLM_KLLVM_DIR):$(EVM_REPOSITORY_DIR)/$(KEVM_LIB_DIR)
+
+# Build OP-geth
+$(VLM_DIR)/op-geth/tests/tests.test: evm-semantics
+	cd $(VLM_DIR)/op-geth && $(MAKE) geth && cd tests && go test -c
+
+EXECUTION_SPEC_TESTS_VER  := 1.0.0
+EXECUTION_SPEC_TESTS_DIR  := $(VLM_DIR)/op-geth/tests/spec-tests
+EXECUTION_SPEC_TESTS_URL  := https://github.com/ethereum/execution-spec-tests/releases/download/pectra-devnet-6%40v$(EXECUTION_SPEC_TESTS_VER)/fixtures_pectra-devnet-6.tar.gz
+EXECUTION_SPEC_TESTS_SRCS := $(shell find $(EXECUTION_SPEC_TESTS_DIR) -name \*.json -print)
+
+# Download `execution-spec-tests`
+$(EXECUTION_SPEC_TESTS_DIR)/timestamp: $(EXECUTION_SPEC_TESTS_SRCS)
+	mkdir -p $(EXECUTION_SPEC_TESTS_DIR) && curl -L $(EXECUTION_SPEC_TESTS_URL) | tar -xz --directory=$(EXECUTION_SPEC_TESTS_DIR)
+	touch $@
+
+# Run the ULM BLockchain Tests
+.PHONY: test-vlm-blockchain
+test-vlm-blockchain: $(VLM_DIR)/op-geth/tests/tests.test
+	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestULMBlockchain -test.parallel 8 -test.v
+
+# Run the Blockchain Spec Tests
+.PHONY: test-spec-blockchain
+test-spec-blockchain: $(VLM_DIR)/op-geth/tests/tests.test $(EXECUTION_SPEC_TESTS_DIR)/timestamp
+	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestExecutionSpecBlocktests -test.parallel 8 -test.v --skip-spec-block-tests spec-failing.llvm
+
+# Run the failing Blockchain Spec Tests
+.PHONY: run-failed-spec-blockchain
+run-failed-spec-blockchain: $(VLM_DIR)/op-geth/tests/tests.test $(EXECUTION_SPEC_TESTS_DIR)/timestamp
+	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestExecutionSpecBlocktests -test.parallel 8 -test.v --run-only-spec-block-tests spec-failing.llvm
+
+# Run the Ethereum Conformance Tests
+.PHONY: test-blockchain
+test-blockchain: $(VLM_DIR)/op-geth/tests/tests.test
+	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) && cd $(VLM_DIR)/op-geth/tests && ./tests.test -test.run TestBlockchain -test.parallel 8 -test.v
+
+# Run all Ethereum Blockchain Tests
+.PHONY: test-all-blockchain
+test-all-blockchain: test-vlm-blockchain test-spec-blockchain test-blockchain

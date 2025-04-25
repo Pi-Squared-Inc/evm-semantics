@@ -37,8 +37,8 @@ set -euo pipefail
 # 3. --attach|--tty without --interactive  - if cmd reads stdin, creates a zombie container that is waiting for input but cannot read any
 # 4. --interactive  without --attach|--tty - allows container to receive stdin through pipe but not from shell
 
-TAG_NAME=evm-cse
-CONTAINER_NAME=evm-cse-dev
+TAG_NAME=evm-semantics
+CONTAINER_NAME=evm-semantics-dev
 
 usage() { echo >&2 -e "Usage: $0 [build|create|enter|stop|clean|run] <args>\n\nNote that create also enters the container"   "$@"; exit 1; }
 

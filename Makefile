@@ -5,7 +5,7 @@ all: poetry
 # --------
 
 ifeq ($(shell command -v k-which-python),)
-    PYTHON_BIN := python3.10
+    PYTHON_BIN := python3
 else
     PYTHON_BIN := $(shell k-which-python)
 endif

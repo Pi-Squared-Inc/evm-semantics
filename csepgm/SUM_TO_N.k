@@ -3,6 +3,9 @@ requires "evm.md"
 module SUM_TO_N
     imports EVM
 
+    syntax Int ::= Get(List, Int) [alias]
+    rule Get(L:List, I:Int) => {`List:get`(L,I)}:>Int
+
     rule [STNSTART]:  <k>        #execute               </k>
            <schedule> CANCUN </schedule>
            <ethereum>
@@ -89,7 +92,8 @@ module SUM_TO_N
                  // <jumpDests> b"\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" </jumpDests>
 
                  // ------- Dynamic -------------------------------------------------------------------------------------------
-                 <wordStack> (ListItem(N) ListItem(SUM)) => (ListItem(chop(N -Int 1)) ListItem(chop(SUM +Int N))) </wordStack>
+                 // <wordStack> (ListItem(N) ListItem(SUM)) => (ListItem(chop(N -Int 1)) ListItem(chop(SUM +Int N))) </wordStack>
+                 <wordStack> S:List => S [ 0 <- chop( Get(S, 0) -Int 1 ) ] [ 1 <- chop( Get(S,0) +Int Get(S,1) ) ]   </wordStack>
                  <pc>        5                           => 5                                                     </pc>
                  <gas>       GAS_CELL:Int                => (GAS_CELL:Int -Int 38)                                </gas>
                  // -----------------------------------------------------------------------------------------------------------
@@ -100,6 +104,6 @@ module SUM_TO_N
              ...
            </ethereum>
        requires 38 <=Int GAS_CELL:Int
-       andBool 0 =/=Int chop(N -Int 1)
+       andBool 0 =/=Int chop(Get(S,0) -Int 1)
 
 endmodule

@@ -3,20 +3,44 @@
 set -euo pipefail
 
 # This script commandeers the CI Dockerfile to build dependencies
-# It depends on the pip package `dent`, that allows you to enter
-# the same docker image from different terminals.
 #
-# 1. Install `dent` using pip, or preferably pipx
-# 2. Build the Docker image: `./dockerShell build`
-# 3. Create and enter the first container:
+# 1. Build the Docker image: `./dockerShell build`
+# 2. Create and enter the container: `./dockerShell create`
+# 3. Enter the container from additional terminals: `./dockerShell enter`
+# 4. Once all container terminals have closed, gracefully stop the container with `./dockerShell stop`
+# 5. If need be, force stop the container with `./dockerShell stop -f`
+# 6. To clean up the container storage entirely, run `./dockerShell clean`
+
+# Docker container command rosetta stone
 #
-#       ./dockerShell create
+# 1. docker build  [args] <dockerfile>           - takes dockerfile and creates a container image (optionally with --tag <tag>)
+# 2. docker create [args] <image_name> [cmd]     - takes image and creates container instance (with default name or --name <name>) that runs passed cmd (or image cmd)
+# 3. docker start  [args] <container_name>       - takes an offline container instance and starts it
+# 4. docker exec   [args] <container_name> <cmd> - takes an online container instance and runs another command in it
+# 5. docker kill          <container_name>       - takes a named online container instance and shuts it down
+# 6. docker rm            <container_name>       - takes a named offline container instance and deletes it
+# 7. docker run    [args] <image_name> <cmd>     - is an alias for docker create ... <temp_name> && docker exec <cmd> (and optionally docker rm <temp_name>)
 #
-# 4. Use `./dockerShell enter` to enter the existing container from additional terminals
+# Here we describe the important arguments that show up in these commands:
+#
+# 1. --interactive     - keeps container process stdin open so that the container command can receive input
+# 2. --attach|--tty    - allocates psuedo-tty for the container
+#                        sends shell input to container stdin
+#                        sends container stdout/stderr to shell stdout/stderr
+# 3. --attach [stream] - like (2) but only attach the specified stream
+# 4. --volume [arg]    - mounts a host-container shared volume; must be specified at container create time
+#
+# Note that:
+#
+# 1. when executing docker create, --attach|--tty|--interactive describe the capabilities of the created container
+# 2. when executing docker start, --attach|--tty|--interactive can only take effect if the create command also used them
+# 3. --attach|--tty without --interactive  - if cmd reads stdin, creates a zombie container that is waiting for input but cannot read any
+# 4. --interactive  without --attach|--tty - allows container to receive stdin through pipe but not from shell
 
 TAG_NAME=evm-cse
+CONTAINER_NAME=evm-cse-dev
 
-usage() { echo >&2 -e "Usage: $0 [build|create|enter|clean]\n\nNote that create also enters the container"   "$@"; exit 1; }
+usage() { echo >&2 -e "Usage: $0 [build|create|enter|stop|clean|run] <args>\n\nNote that create also enters the container"   "$@"; exit 1; }
 
 build_docker_image() {
 
@@ -28,47 +52,108 @@ build_docker_image() {
     GROUP=$(    id -g -n)
     GROUP_ID=$( id -g   )
 
-    BASE_DISTRO=jammy
     K_VERSION=$(cat deps/k_release)
     Z3_VERSION=$(cat deps/z3)
     LLVM_VERSION=16
+    POETRY_VERSION=2.1.2
 
     DOCKERFILE=./Dockerfile
 
-    docker build . --file ${DOCKERFILE}        \
-      --tag ${TAG_NAME}                        \
-      --build-arg USER_ID=${USER_ID}           \
-      --build-arg GROUP_ID=${GROUP_ID}         \
-      --build-arg USER=${USER}                 \
-      --build-arg GROUP=${GROUP}               \
-      --build-arg BASE_DISTRO=${BASE_DISTRO}   \
-      --build-arg K_VERSION=${K_VERSION}       \
-      --build-arg Z3_VERSION=${Z3_VERSION}     \
-      --build-arg LLVM_VERSION=${LLVM_VERSION}
+    docker build . --file ${DOCKERFILE}           \
+      --tag ${TAG_NAME}                           \
+      --build-arg USER_ID=${USER_ID}              \
+      --build-arg GROUP_ID=${GROUP_ID}            \
+      --build-arg USER=${USER}                    \
+      --build-arg GROUP=${GROUP}                  \
+      --build-arg K_VERSION=${K_VERSION}          \
+      --build-arg Z3_VERSION=${Z3_VERSION}        \
+      --build-arg LLVM_VERSION=${LLVM_VERSION}    \
+      --build-arg POETRY_VERSION=${POETRY_VERSION}
 }
 
-dent_create_and_enter_container() {
-    dent -i "$TAG_NAME"                       \
-         "-r=-v=$(pwd):/home/$USER/workspace" \
-         evm-cse-dent
+docker_container_running() {
+    [[ -n "$(docker ps --quiet --filter name="$CONTAINER_NAME" )" ]]
 }
 
-dent_enter_container() { dent evm-cse-dent ; }
-dent_clean() {
-    docker container kill evm-cse-dent  || true
-    docker container rm   evm-cse-dent  || true
+docker_container_exists() {
+    # --all prints containers which are offline
+    [[ -n "$(docker ps --quiet --all --filter name="$CONTAINER_NAME")" ]]
 }
 
+docker_create_and_enter_container() {
+    if ! docker_container_exists; then
+        # on docker create command, ignore stdout to keep quiet, but preserve stderr for errors
+        # container is customized to run a no-op command
+        # since command does not need stdin/stdout, we do not need --interactive|--tty
+        cmd=(/bin/sleep 1073741824) # sleep 2^30
+        docker create --volume="$(pwd):/home/$USER/workspace" --name="$CONTAINER_NAME" "$TAG_NAME" "${cmd[@]}" >/dev/null && \
+        docker_start_and_enter_container
+    else
+        usage "\n\nCan only run '$0 create' to create a container once"
+    fi
+}
+
+docker_start_and_enter_container() {
+    if docker_container_running; then
+        docker_enter_container
+    elif docker_container_exists; then
+        # ignore stdout to keep quiet, but preserve stderr for errors
+        # since container does not need --interactive|--tty, it will run in the background once started
+        docker start "$CONTAINER_NAME" >/dev/null
+        docker_enter_container
+    else
+        usage "\n\nMust run '$0 create' before '$0 enter'"
+    fi
+}
+
+docker_enter_container() {
+    # ensure that we start bash in an interactive shell session
+    docker exec --interactive --tty "$CONTAINER_NAME" /bin/bash
+}
+
+docker_run() {
+    # --rm deletes the temporarily created container once it exits
+    docker run --interactive --attach stdout --attach stderr --rm --volume="$(pwd):/home/$USER/workspace" "$TAG_NAME" "$@"
+}
+
+docker_stop() {
+    # parse args
+    cmd=${1:-}
+    force=false
+    case "$cmd" in
+        "") ;;
+        -f) force=true ;;
+         *) usage "\n\nUsage: '$0 stop [-f]' --- pass -f flag to force" ;;
+    esac
+
+    ! docker_container_running && usage "\n\nAlready stopped"
+
+    # top prints a header line and then one line for each running process in the container
+    # if there is only one process left, it must be our no-op process 'tail -f /dev/null'
+    procs=$(docker container top "$CONTAINER_NAME" | tail -n+2 | wc -l)
+    if "$force" || [[ $procs -eq 1 ]]; then
+        docker kill "$CONTAINER_NAME" >/dev/null
+    else
+        usage "\n\nCannot run '$0 stop'  if there are open shells\nPlease run '$0 stop -f' to force kill"
+    fi
+}
+
+docker_clean() {
+    # ignore stdout to keep quiet, but preserve stderr for errors
+    ( ! docker_container_running || docker container kill "$CONTAINER_NAME" >/dev/null ) && \
+    ( ! docker_container_exists  || docker container rm   "$CONTAINER_NAME" >/dev/null )
+}
 
 # Main
 # ----
 
-[[ "$#" = 1 ]]  || usage
-
-case "$1" in
+subcommand="$1"; shift
+case "$subcommand" in
     build)      build_docker_image;;
-    create)     dent_create_and_enter_container;;
-    enter)      dent_enter_container;;
-    clean)      dent_clean;;
+    create)     docker_create_and_enter_container;;
+    enter)      docker_start_and_enter_container;;
+    run)        docker_run "$@";;
+    stop)       docker_stop "$@";;
+    clean)      docker_clean;;
     *)          usage;;
 esac

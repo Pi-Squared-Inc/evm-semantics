@@ -5,18 +5,12 @@
 
 ARG Z3_VERSION
 ARG K_VERSION
-ARG BASE_DISTRO
-ARG LLVM_VERSION
 
-ARG Z3_VERSION
-FROM runtimeverificationinc/z3:ubuntu-jammy-${Z3_VERSION} as Z3
+FROM runtimeverificationinc/z3:ubuntu-noble-${Z3_VERSION} as Z3
 
-ARG K_VERSION
-FROM runtimeverificationinc/kframework-k:ubuntu-jammy-${K_VERSION}
+FROM runtimeverificationinc/kframework-k:ubuntu-noble-${K_VERSION}
 
 COPY --from=Z3 /usr/bin/z3 /usr/bin/z3
-
-ARG LLVM_VERSION
 
 RUN    apt-get update                  \
     && apt-get upgrade --yes           \
@@ -32,6 +26,7 @@ RUN    apt-get update                  \
             libyaml-dev                \
             lsb-release                \
             maven                      \
+            ninja-build                \
             python3                    \
             python3-pip                \
             software-properties-common \
@@ -42,10 +37,7 @@ RUN    apt-get update                  \
 ## Install LLVM 16: Install version 16 as later versions have a known bug affecting the code generator.
 ARG LLVM_VERSION=16
 ARG GO_VERSION=1.23.1
-RUN wget https://apt.llvm.org/llvm.sh -O llvm.sh && chmod +x llvm.sh
-RUN ./llvm.sh ${LLVM_VERSION} all && \
-    apt-get install -y --no-install-recommends clang-${LLVM_VERSION} lldb-${LLVM_VERSION} lld-${LLVM_VERSION} && \
-    rm -f llvm.sh
+RUN apt-get install -y --no-install-recommends clang-${LLVM_VERSION} lldb-${LLVM_VERSION} lld-${LLVM_VERSION}
 # Install Go
 RUN wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz -O go${GO_VERSION}.linux-amd64.tar.gz
 RUN rm -rf /usr/local/go && tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz && \
@@ -56,8 +48,12 @@ ARG USER=user
 ARG GROUP
 ARG USER_ID
 ARG GROUP_ID
-RUN groupadd -g ${GROUP_ID} ${GROUP} && useradd -m -u ${USER_ID} -s /bin/sh -g ${GROUP} ${USER}
-
+# if our desired group or user id is already taken, try to rename
+RUN ( groupadd -g ${GROUP_ID} ${GROUP} || \
+      groupmod -n ${GROUP} $(getent group ${GROUP_ID} | cut -d: -f1) \
+    ) && \
+    useradd -m -u ${USER_ID} -s /bin/sh -g ${GROUP_ID} -d /home/${USER} ${USER} || \
+    usermod -m -u ${USER_ID} -s /bin/sh -g ${GROUP_ID} -d /home/${USER} -l ${USER} $(getent passwd ${USER_ID} | cut -d: -f1)
 
 USER ${USER}:${GROUP}
 RUN mkdir /home/${USER}/workspace
@@ -65,6 +61,7 @@ WORKDIR /home/${USER}/workspace
 
 ENV PATH=/home/${USER}/.local/bin:${PATH}
 
-RUN    curl -sSL https://install.python-poetry.org | python3 - --version 1.8.3 \
+ARG POETRY_VERSION
+RUN    curl -sSL https://install.python-poetry.org | python3 - --version ${POETRY_VERSION} \
     && poetry --version
 

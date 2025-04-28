@@ -85,7 +85,7 @@ ARG VLM_OP_GETH_BRANCH=ulm
 ARG LLVM_VERSION=16
 ARG GO_VERSION=1.22.2
 ARG KFRAMEWORK_REPO=github.com/runtimeverification/k.git
-ARG KFRAMEWORK_VERSION=7.1.241
+ARG KFRAMEWORK_VERSION=7.1.244
 ARG POETRY_VERSION=1.8.3
 
 ## Install LLVM 16: Install version 16 as later versions have a known bug affecting the code generator.

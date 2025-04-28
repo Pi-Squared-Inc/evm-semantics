@@ -16,6 +16,14 @@ jobs:
       packages: read
 
     steps:
+      - uses: actions/create-github-app-token@v1
+        id: temp-token
+        name: Generate temporary GitHub Token
+        with:
+          app-id: ${{ vars.CICD_GITHUB_WEBAPP_ID }}
+          private-key: ${{ secrets.CICD_GITHUB_WEBAPP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
       - uses: docker/login-action@v3
         name: Login to GitHub Container Registry
         with:
@@ -33,7 +41,7 @@ jobs:
           github-app-id: ${{ vars.CICD_GITHUB_WEBAPP_ID }}
           github-app-private-key: ${{ secrets.CICD_GITHUB_WEBAPP_PRIVATE_KEY }}
 
-      - name: 'Debug environment'
+      - name: 'Check environment'
         run: |
           docker exec -u test-user kevm-ci-concrete-${{ github.sha }} \
             /bin/bash -c 'ls -la /app/vlm/kllvm && whoami && id && pwd'

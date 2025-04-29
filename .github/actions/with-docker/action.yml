@@ -90,6 +90,4 @@ runs:
       # Give the container a moment to start
       sleep 2
 
-      docker exec ${CONTAINER_NAME} \
-        /bin/bash -c 'ls -la /app/vlm/kllvm && whoami && id && pwd'
 

@@ -123,7 +123,7 @@ USER ${USER}:${GROUP}
 RUN git clone --depth=1 --branch v${KFRAMEWORK_VERSION} https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${KFRAMEWORK_REPO} k
 RUN cd k && git submodule update --init --recursive
 ENV CXXFLAGS=-fvisibility=hidden
-RUN cd k && mvn package -Dhaskell.backend.skip -DskipTests -Dllvm.backend.hyperblock.size.mult=32
+RUN cd k && mvn package -Dhaskell.backend.skip -DskipTests -Dllvm.backend.hyperblock.size.mult=512
 ENV PATH=$WORKDIR/k/k-distribution/target/release/k/bin:$PATH
 
 # Configure Git to use credentials for all GitHub URLs
@@ -138,7 +138,6 @@ RUN cd evm-semantics && git submodule update --init --recursive
 
 RUN git clone --depth=1 --branch ${VLM_BRANCH} https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${VLM_REPO} vlm
 RUN cd vlm && git submodule update --init --recursive && cd op-geth && git checkout ${VLM_OP_GETH_BRANCH}
-#RUN chown -R test-user:test-user /app/vlm
 
 # Default command
 CMD ["bash"]

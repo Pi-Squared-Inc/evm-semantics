@@ -211,12 +211,13 @@ KEVM_LIB_DIR      := ./libkevm
 KEVM_LIB          := libkevm.so
 KEVM_TARGET_LIB   := $(KEVM_LIB_DIR)/$(KEVM_LIB)
 CXX               := clang++-16
+CC                := clang-16
 
 $(VLM_KLLVM_LIB):
-	$(MAKE) -C $(VLM_KLLVM_DIR) CPPFLAGS=-DEVM_ONLY
+	CC=$(CC) CXX=$(CXX) $(MAKE) -C $(VLM_KLLVM_DIR) CPPFLAGS=-DEVM_ONLY
 
 $(CRYPTO_PLUGIN_LIB):
-	$(MAKE) -C $(CRYPTO_PLUGIN_DIR)
+	CC=$(CC) CXX=$(CXX) $(MAKE) -C $(CRYPTO_PLUGIN_DIR)
 
 $(KEVM_TARGET_LIB): $(VLM_KLLVM_LIB) $(EVM_K_SOURCES) $(CRYPTO_PLUGIN_LIB)
 	kompile \

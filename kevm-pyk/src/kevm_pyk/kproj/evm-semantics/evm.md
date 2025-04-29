@@ -761,7 +761,7 @@ Operators that require access to the rest of the Ethereum network world-state ca
 
     syntax UnStackOp ::= "EXTCODEHASH"
  // ----------------------------------
-    rule <k> EXTCODEHASH ACCT => keccak(GetAccountCode(ACCT)) ~> #push ... </k>
+    rule <k> EXTCODEHASH ACCT => GetCodeHash(ACCT) ~> #push ... </k>
       requires notBool IsAccountEmpty(ACCT)
 
     rule <k> EXTCODEHASH ACCT => AccessAccount(ACCT) ~> 0 ~> #push ... </k> [owise]

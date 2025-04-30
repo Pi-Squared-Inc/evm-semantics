@@ -49,7 +49,7 @@ jobs:
             kevm-ci-concrete-${{ github.sha }} \
             /bin/bash -c 'make test-vlm-blockchain'
 
-      - name: 'Run the Blockchain Spec: TestsTestSpecBlockchain'
+      - name: 'Run the Blockchain Spec Tests: TestSpecBlockchain'
         run: |
           docker exec \
             -u test-user \

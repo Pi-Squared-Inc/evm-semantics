@@ -44,7 +44,6 @@ jobs:
       - name: 'Run the ULM BLockchain Tests: TestULMBlockchain'
         uses: nick-invision/retry@v3
         with:
-          timeout_minutes: 10
           max_attempts: 3
           retry_on: error
           command: |
@@ -57,7 +56,6 @@ jobs:
       - name: 'Run the Blockchain Spec Tests: TestSpecBlockchain'
         uses: nick-invision/retry@v3
         with:
-          timeout_minutes: 10
           max_attempts: 3
           retry_on: error
           command: |
@@ -70,7 +68,6 @@ jobs:
       - name: 'Run the Ethereum Conformance Tests: TestBlockchain'
         uses: nick-invision/retry@v3
         with:
-          timeout_minutes: 10
           max_attempts: 3
           retry_on: error
           command: |

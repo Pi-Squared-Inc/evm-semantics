@@ -1455,6 +1455,7 @@ Precompiled Contracts
 
     syntax Bool ::= validBls12G1PairingPoints(List)  [function, total]
     syntax Bool ::= validBls12G1PairingPoint(G1Point)  [function, total]
+// ------------------------------------------------------------------
     rule validBls12G1PairingPoints(.List) => true
     rule validBls12G1PairingPoints(ListItem(P:G1Point) L:List) => validBls12G1PairingPoints(L)
       requires validBls12G1PairingPoint(P)

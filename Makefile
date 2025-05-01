@@ -298,7 +298,7 @@ test-vlm-blockchain: $(VLM_DIR)/op-geth/tests/tests.test
 	&& cd $(VLM_DIR)/op-geth/tests \
 	&& ./tests.test \
 		-test.run TestULMBlockchain \
-		-test.parallel 1 \
+		-test.parallel 4 \
 		-test.v
 
 # Run the Blockchain Spec Tests
@@ -307,7 +307,7 @@ test-spec-blockchain: $(VLM_DIR)/op-geth/tests/tests.test $(EXECUTION_SPEC_TESTS
 	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) \
 	&& cd $(VLM_DIR)/op-geth/tests \
 	&& ./tests.test -test.run TestExecutionSpecBlocktests \
-		-test.parallel 1 \
+		-test.parallel 4 \
 		--skip-spec-block-tests spec-failing.llvm \
 		-test.v
 
@@ -318,7 +318,7 @@ run-failed-spec-blockchain: $(VLM_DIR)/op-geth/tests/tests.test $(EXECUTION_SPEC
 	&& cd $(VLM_DIR)/op-geth/tests \
 	&& ./tests.test \
 		-test.run TestExecutionSpecBlocktests \
-		-test.parallel 1 \
+		-test.parallel 4 \
 		--run-only-spec-block-tests spec-failing.llvm \
 		-test.v
 
@@ -329,7 +329,7 @@ test-blockchain: $(VLM_DIR)/op-geth/tests/tests.test
 	&& cd $(VLM_DIR)/op-geth/tests \
 	&& ./tests.test \
 		-test.run TestBlockchain \
-		-test.parallel 1 \
+		-test.parallel 4 \
 		--skip-block-tests known-failures.txt \
 		-test.v
 
@@ -340,7 +340,7 @@ test-failed-blockchain: $(VLM_DIR)/op-geth/tests/tests.test
 	&& cd $(VLM_DIR)/op-geth/tests && \
 	./tests.test \
 		-test.run TestBlockchain \
-		-test.parallel 1 \
+		-test.parallel 4 \
 		--run-only-block-tests known-failures.txt \
 		-test.v
 

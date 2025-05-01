@@ -1426,8 +1426,9 @@ Precompiled Contracts
     rule <k> bls12PairingError => #end EVMC_PRECOMPILE_FAILURE ... </k>
 
     syntax Bls12PairingResult ::= "bls12PairingError" | bls12PairingResult(Bool)
- // ----------------------------------------------------------------------------
+ // --------------------------------------------------------------------------
     syntax Bls12PairingResult ::= bls12PairingCheck(Bytes, List, List) [symbol(bls12PairingCheck), function, total]
+ // -------------------------------------------------------------------------------------------------------------
     rule bls12PairingCheck(B:Bytes, L1:List, L2:List) => bls12PairingResult(BLS12PairingCheck(L1, L2))
         requires lengthBytes(B) ==Int 0
           andBool validBls12G1PairingPoints(L1)

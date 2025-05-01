@@ -55,39 +55,44 @@ runs:
       owner: "${{ github.repository_owner }}"
 
   - name: 'Set up Docker'
+    uses: nick-invision/retry@v3
     shell: bash
-    run: |
-      set -euxo pipefail
+    with:
+      timeout_minutes: 10
+      max_attempts: 3
+      retry_on: error
+      command: |
+        set -euxo pipefail
 
-      CONTAINER_NAME=${{ inputs.container-name }}
-      DOCKERFILE=${{ inputs.dockerfile }}
-      LLVM_VERSION=${{ inputs.llvm }}
-      TAG_NAME=${{ inputs.tag-name }}
+        CONTAINER_NAME=${{ inputs.container-name }}
+        DOCKERFILE=${{ inputs.dockerfile }}
+        LLVM_VERSION=${{ inputs.llvm }}
+        TAG_NAME=${{ inputs.tag-name }}
 
-      GITHUB_ACTOR=${{ github.actor }}
-      GITHUB_TOKEN=${{ steps.temp-token.outputs.token }}
-      EVM_BRANCH=${{ github.head_ref || github.ref_name }}
-      VLM_BRANCH=main
-      WORKSPACE=${{ github.workspace }}
-      USER=test-user
-      GROUP=test-user
+        GITHUB_ACTOR=${{ github.actor }}
+        GITHUB_TOKEN=${{ steps.temp-token.outputs.token }}
+        EVM_BRANCH=${{ github.head_ref || github.ref_name }}
+        VLM_BRANCH=main
+        WORKSPACE=${{ github.workspace }}
+        USER=test-user
+        GROUP=test-user
 
-      docker build . --file ${DOCKERFILE}          \
-        --tag ${TAG_NAME}                          \
-        --build-arg USER="${USER}"                 \
-        --build-arg GROUP="${GROUP}"               \
-        --build-arg GITHUB_TOKEN="${GITHUB_TOKEN}" \
-        --build-arg GITHUB_ACTOR="${GITHUB_ACTOR}" \
-        --build-arg EVM_BRANCH="${EVM_BRANCH}"     \
-        --build-arg VLM_BRANCH="${VLM_BRANCH}"     \
+        docker build . --file ${DOCKERFILE}          \
+          --tag ${TAG_NAME}                          \
+          --build-arg USER="${USER}"                 \
+          --build-arg GROUP="${GROUP}"               \
+          --build-arg GITHUB_TOKEN="${GITHUB_TOKEN}" \
+          --build-arg GITHUB_ACTOR="${GITHUB_ACTOR}" \
+          --build-arg EVM_BRANCH="${EVM_BRANCH}"     \
+          --build-arg VLM_BRANCH="${VLM_BRANCH}"     \
 
-      docker run -d --name ${CONTAINER_NAME} \
-        --user ${USER} \
-        -v ${WORKSPACE}:/workspace \
-        ${TAG_NAME} \
-        tail -f /dev/null  # Keep container running
+        docker run -d --name ${CONTAINER_NAME} \
+          --user ${USER} \
+          -v ${WORKSPACE}:/workspace \
+          ${TAG_NAME} \
+          tail -f /dev/null  # Keep container running
 
-      # Give the container a moment to start
-      sleep 2
+        # Give the container a moment to start
+        sleep 2
 
 

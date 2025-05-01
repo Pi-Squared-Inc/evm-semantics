@@ -110,6 +110,12 @@ RUN curl -sSL https://install.python-poetry.org -o install-poetry.py
 RUN python3 install-poetry.py --version ${POETRY_VERSION} && rm install-poetry.py
 ENV PATH=$HOME/.local/bin:$PATH
 
+# Add retry logic specifically for Maven
+RUN echo '#!/bin/bash\n\
+mvn "$@" || mvn "$@" -o || mvn "$@" -U\n\
+' > /usr/local/bin/mvn-retry \
+    && chmod +x /usr/local/bin/mvn-retry
+
 ## Setup the base directory
 WORKDIR /app
 ENV WORKDIR=/app
@@ -123,7 +129,7 @@ USER ${USER}:${GROUP}
 RUN git clone --depth=1 --branch v${KFRAMEWORK_VERSION} https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${KFRAMEWORK_REPO} k
 RUN cd k && git submodule update --init --recursive
 ENV CXXFLAGS=-fvisibility=hidden
-RUN cd k && mvn package -Dhaskell.backend.skip -DskipTests -Dllvm.backend.hyperblock.size.mult=32
+RUN cd k && mvn-retry package -Dhaskell.backend.skip -DskipTests -Dllvm.backend.hyperblock.size.mult=32
 ENV PATH=$WORKDIR/k/k-distribution/target/release/k/bin:$PATH
 
 # Configure Git to use credentials for all GitHub URLs

@@ -1290,6 +1290,7 @@ Precompiled Contracts
     syntax G1MsmResult ::= bls12G1Msm(Bytes) [symbol(bls12G1Msm), function, total]
     syntax G1MsmResult ::= #bls12G1Msm(G1MsmResult, G1MsmResult) [function, total]
     syntax G1MsmResult ::= #bls12G1MsmMulCheck(Int, Int, Int) [function, total]
+ // ----------------------------------------------------------------------------
     rule bls12G1Msm(B:Bytes) => g1MsmError requires lengthBytes(B) <Int 160
     rule bls12G1Msm(B:Bytes)
         => #bls12G1MsmMulCheck

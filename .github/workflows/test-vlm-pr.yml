@@ -34,27 +34,33 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Build Docker image
-        uses: docker/build-push-action@v4
+      - name: 'Set up Docker'
+        uses: ./.github/actions/with-docker
         with:
-          context: .
-          file: .github/workflows/Dockerfile.vlm
-          push: false
-          load: true
-          tags: vlm-test
-          build-args: |
-            GITHUB_TOKEN=${{ steps.temp-token.outputs.token }}
-            GITHUB_ACTOR=${{ github.actor }}
-            BUILDPLATFORM=linux/amd64
+          container-name: kevm-ci-concrete-${{ github.sha }}
+          github-app-id: ${{ vars.CICD_GITHUB_WEBAPP_ID }}
+          github-app-private-key: ${{ secrets.CICD_GITHUB_WEBAPP_PRIVATE_KEY }}
 
       - name: 'Run the ULM BLockchain Tests: TestULMBlockchain'
         run: |
-          docker run --rm --workdir /app/evm-semantics vlm-test make test-vlm-blockchain
+          docker exec \
+            -u test-user \
+            --workdir /app/evm-semantics \
+            kevm-ci-concrete-${{ github.sha }} \
+            /bin/bash -c 'make test-vlm-blockchain'
 
-      - name: 'Run the Blockchain Spec: TestsTestSpecBlockchain'
+      - name: 'Run the Blockchain Spec Tests: TestSpecBlockchain'
         run: |
-          docker run --rm --workdir /app/evm-semantics vlm-test make test-spec-blockchain
+          docker exec \
+            -u test-user \
+            --workdir /app/evm-semantics\
+            kevm-ci-concrete-${{ github.sha }} \
+            /bin/bash -c 'make test-spec-blockchain'
 
       - name: 'Run the Ethereum Conformance Tests: TestBlockchain'
         run: |
-          docker run --rm --workdir /app/evm-semantics vlm-test make test-blockchain
+          docker exec \
+            -u test-user \
+            --workdir /app/evm-semantics\
+            kevm-ci-concrete-${{ github.sha }} \
+            /bin/bash -c 'make test-blockchain'

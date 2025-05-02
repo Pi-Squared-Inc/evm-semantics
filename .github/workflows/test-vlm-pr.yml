@@ -42,25 +42,42 @@ jobs:
           github-app-private-key: ${{ secrets.CICD_GITHUB_WEBAPP_PRIVATE_KEY }}
 
       - name: 'Run the ULM BLockchain Tests: TestULMBlockchain'
-        run: |
-          docker exec \
-            -u test-user \
-            --workdir /app/evm-semantics \
-            kevm-ci-concrete-${{ github.sha }} \
-            /bin/bash -c 'make test-vlm-blockchain'
+        uses: nick-invision/retry@v3
+        with:
+          timeout_minutes: 30
+          # Attempts are done because CI sometimes fail due to external reasons,
+          # and instead of just failing, we may give tests a second chance.
+          max_attempts: 2
+          retry_on: error
+          command: |
+            docker exec \
+              -u test-user \
+              --workdir /app/evm-semantics \
+              kevm-ci-concrete-${{ github.sha }} \
+              /bin/bash -c 'make test-vlm-blockchain'
 
       - name: 'Run the Blockchain Spec Tests: TestSpecBlockchain'
-        run: |
-          docker exec \
-            -u test-user \
-            --workdir /app/evm-semantics\
-            kevm-ci-concrete-${{ github.sha }} \
-            /bin/bash -c 'make test-spec-blockchain'
+        uses: nick-invision/retry@v3
+        with:
+          timeout_minutes: 30
+          max_attempts: 2
+          retry_on: error
+          command: |
+            docker exec \
+              -u test-user \
+              --workdir /app/evm-semantics\
+              kevm-ci-concrete-${{ github.sha }} \
+              /bin/bash -c 'make test-spec-blockchain'
 
       - name: 'Run the Ethereum Conformance Tests: TestBlockchain'
-        run: |
-          docker exec \
-            -u test-user \
-            --workdir /app/evm-semantics\
-            kevm-ci-concrete-${{ github.sha }} \
-            /bin/bash -c 'make test-blockchain'
+        uses: nick-invision/retry@v3
+        with:
+          timeout_minutes: 180
+          max_attempts: 2
+          retry_on: error
+          command: |
+            docker exec \
+              -u test-user \
+              --workdir /app/evm-semantics\
+              kevm-ci-concrete-${{ github.sha }} \
+              /bin/bash -c 'make test-blockchain'

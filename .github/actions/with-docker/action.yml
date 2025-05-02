@@ -58,6 +58,8 @@ runs:
     uses: nick-invision/retry@v3
     with:
       timeout_minutes: 30
+      # Attempts are done because CI sometimes fail due to external reasons,
+      # and instead of just failing, we may give building a docker image a second chance.
       max_attempts: 2
       retry_on: error
       command: |

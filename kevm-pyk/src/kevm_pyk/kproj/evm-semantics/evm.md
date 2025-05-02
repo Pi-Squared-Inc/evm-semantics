@@ -1267,9 +1267,7 @@ Precompiled Contracts
 
     syntax PrecompiledOp ::= "BLS12G1MSM"
  // -------------------------------------
-    // TODO: implement `bls12G1Msm` as a hook, using Pippenger's algorithm (blst_p1s_mult_pippenger)
-    // However, note that the implementation of `g1_lincomb_fast` has the
-    // following comment:
+    // Note that the implementation of `g1_lincomb_fast` has the following comment:
     //
     //  * @remark While this function is significantly faster than g1_lincomb_naive(), we refrain from
     //  * using it in security-critical places (like verification) because the blst Pippenger code has not
@@ -1288,32 +1286,31 @@ Precompiled Contracts
     syntax G1MsmResult ::= "g1MsmError" | g1MsmResult(G1Point)
  // ----------------------------------------------------------
     syntax G1MsmResult ::= bls12G1Msm(Bytes) [symbol(bls12G1Msm), function, total]
-    syntax G1MsmResult ::= #bls12G1Msm(G1MsmResult, G1MsmResult) [function, total]
-    syntax G1MsmResult ::= #bls12G1MsmMulCheck(Int, Int, Int) [function, total]
+    syntax G1MsmResult ::= #bls12G1Msm(Bytes, List, List) [function, total]
+    syntax G1MsmResult ::= #bls12G1MsmCheck(Bytes, List, List, Int, Int, Int) [function, total]
  // ----------------------------------------------------------------------------
-    rule bls12G1Msm(B:Bytes) => g1MsmError requires lengthBytes(B) <Int 160
-    rule bls12G1Msm(B:Bytes)
-        => #bls12G1MsmMulCheck
-            ( Bytes2Int(substrBytes(B, 0, 64), BE, Unsigned)
-            , Bytes2Int(substrBytes(B, 64, 128), BE, Unsigned)
-            , Bytes2Int(substrBytes(B, 128, 160), BE, Unsigned)
-            )
-      requires lengthBytes( B ) ==Int 160
-    rule bls12G1Msm(B:Bytes)
-        => #bls12G1Msm(bls12G1Msm(substrBytes(B, 0, 160)), bls12G1Msm(substrBytes(B, 160, lengthBytes(B))))
-      requires lengthBytes(B) >Int 160
-    rule bls12G1Msm(_) => g1MsmError  [owise]
+    rule bls12G1Msm(B:Bytes) => g1MsmError requires lengthBytes(B) ==Int 0
+    rule bls12G1Msm(B:Bytes) => #bls12G1Msm(B, .List, .List) requires lengthBytes(B) >Int 0
 
-    rule #bls12G1MsmMulCheck(X:Int, Y:Int, N:Int)
-        => g1MsmResult(BLS12G1Mul( ( X , Y ), N ))
+    rule #bls12G1Msm(B:Bytes, Ps:List, Ss:List) => g1MsmResult(BLS12G1Msm(... scalars: Ss, points: Ps))
+        requires lengthBytes(B) ==Int 0
+    rule #bls12G1Msm(B:Bytes, _:List, _:List) => g1MsmError
+        requires 0 <Int lengthBytes(B) andBool lengthBytes(B) <Int 160
+    rule #bls12G1Msm(B:Bytes, Ps:List, Ss:List)
+        => #bls12G1MsmCheck
+                ( substrBytes(B, 160, lengthBytes(B)), Ps, Ss
+                , Bytes2Int(substrBytes(B, 0, 64), BE, Unsigned)
+                , Bytes2Int(substrBytes(B, 64, 128), BE, Unsigned)
+                , Bytes2Int(substrBytes(B, 128, 160), BE, Unsigned)
+                )
+        requires 160 <=Int lengthBytes(B)
+
+    rule #bls12G1MsmCheck(B:Bytes, Ps:List, Ss:List, X:Int, Y:Int, N:Int)
+        => #bls12G1Msm(B, Ps ListItem( ( X , Y ) ), Ss ListItem( N ))
       requires isValidBLS12Coordinate(X) andBool isValidBLS12Coordinate(Y)
         andBool isValidBLS12Scalar(N)
         andBool BLS12G1InSubgroup((X, Y))
-    rule #bls12G1MsmMulCheck(_, _, _) => g1MsmError  [owise]
-
-    rule #bls12G1Msm(g1MsmResult(P1:G1Point), g1MsmResult(P2:G1Point))
-        => g1MsmResult(BLS12G1Add(P1, P2))
-    rule #bls12G1Msm(_, _) => g1MsmError  [owise]
+    rule #bls12G1MsmCheck(_, _, _, _, _, _) => g1MsmError  [owise]
 
     syntax PrecompiledOp ::= "BLS12G2ADD"
  // -------------------------------------
@@ -1374,8 +1371,6 @@ Precompiled Contracts
 
     syntax PrecompiledOp ::= "BLS12G2MSM"
  // -------------------------------------
-    // TODO: implement this as a hook, using pippenger's algorithm (blst_p1s_mult_pippenger)
-    // (see the similar comment for `BLS12G1MSM` for details)
     rule BLS12G2MSM => bls12G2Msm(CallData())
 
     rule <k> g2MsmResult(P:G2Point) => #end EVMC_SUCCESS ... </k>
@@ -1387,35 +1382,34 @@ Precompiled Contracts
     syntax G2MsmResult ::= "g2MsmError" | g2MsmResult(G2Point)
  // ----------------------------------------------------------
     syntax G2MsmResult ::= bls12G2Msm(Bytes) [symbol(bls12G2Msm), function, total]
-    syntax G2MsmResult ::= #bls12G2Msm(G2MsmResult, G2MsmResult) [function, total]
-    syntax G2MsmResult ::= #bls12G2MsmMulCheck(Int, Int, Int, Int, Int) [function, total]
+    syntax G2MsmResult ::= #bls12G2Msm(Bytes, List, List) [function, total]
+    syntax G2MsmResult ::= #bls12G2MsmCheck(Bytes, List, List, Int, Int, Int, Int, Int) [function, total]
  // ------------------------------------------------------------------------------------
-    rule bls12G2Msm(B:Bytes) => g2MsmError requires lengthBytes(B) <Int 288
-    rule bls12G2Msm(B:Bytes)
-        => #bls12G2MsmMulCheck
-            ( Bytes2Int(substrBytes(B, 0, 64), BE, Unsigned)
-            , Bytes2Int(substrBytes(B, 64, 128), BE, Unsigned)
-            , Bytes2Int(substrBytes(B, 128, 192), BE, Unsigned)
-            , Bytes2Int(substrBytes(B, 192, 256), BE, Unsigned)
-            , Bytes2Int(substrBytes(B, 256, 288), BE, Unsigned)
-            )
-      requires lengthBytes( B ) ==Int 288
-    rule bls12G2Msm(B:Bytes)
-        => #bls12G2Msm(bls12G2Msm(substrBytes(B, 0, 288)), bls12G2Msm(substrBytes(B, 288, lengthBytes(B))))
-      requires lengthBytes(B) >Int 288
-    rule bls12G2Msm(_) => g2MsmError  [owise]
+    rule bls12G2Msm(B:Bytes) => g2MsmError requires lengthBytes(B) ==Int 0
+    rule bls12G2Msm(B:Bytes) => #bls12G2Msm(B, .List, .List) requires lengthBytes(B) >Int 0
 
-    rule #bls12G2MsmMulCheck(X0:Int, X1:Int, Y0:Int, Y1:Int, N:Int)
-        => g2MsmResult(BLS12G2Mul( ( X0 x X1, Y0 x Y1 ), N ))
+    rule #bls12G2Msm(B:Bytes, Ps:List, Ss:List) => g2MsmResult(BLS12G2Msm(... scalars: Ss, points: Ps))
+        requires lengthBytes(B) ==Int 0
+    rule #bls12G2Msm(B:Bytes, _:List, _:List) => g2MsmError
+        requires 0 <Int lengthBytes(B) andBool lengthBytes(B) <Int 288
+    rule #bls12G2Msm(B:Bytes, Ps:List, Ss:List)
+        => #bls12G2MsmCheck
+                ( substrBytes(B, 288, lengthBytes(B)), Ps, Ss
+                , Bytes2Int(substrBytes(B, 0, 64), BE, Unsigned)
+                , Bytes2Int(substrBytes(B, 64, 128), BE, Unsigned)
+                , Bytes2Int(substrBytes(B, 128, 192), BE, Unsigned)
+                , Bytes2Int(substrBytes(B, 192, 256), BE, Unsigned)
+                , Bytes2Int(substrBytes(B, 256, 288), BE, Unsigned)
+                )
+        requires 288 <=Int lengthBytes(B)
+
+    rule #bls12G2MsmCheck(B:Bytes, Ps:List, Ss:List, X0:Int, X1:Int, Y0:Int, Y1:Int, N:Int)
+        => #bls12G2Msm(B, Ps ListItem( ( X0 x X1, Y0 x Y1 ) ), Ss ListItem( N ))
       requires isValidBLS12Coordinate(X0) andBool isValidBLS12Coordinate(X1)
         andBool isValidBLS12Coordinate(Y0) andBool isValidBLS12Coordinate(Y1)
         andBool isValidBLS12Scalar(N)
         andBool BLS12G2InSubgroup(( X0 x X1, Y0 x Y1 ))
-    rule #bls12G2MsmMulCheck(_, _, _, _, _) => g2MsmError  [owise]
-
-    rule #bls12G2Msm(g2MsmResult(P1:G2Point), g2MsmResult(P2:G2Point))
-        => g2MsmResult(BLS12G2Add(P1, P2))
-    rule #bls12G2Msm(_, _) => g2MsmError  [owise]
+    rule #bls12G2MsmCheck(_, _, _, _, _, _, _, _) => g2MsmError  [owise]
 
     syntax PrecompiledOp ::= "BLS12PAIRING_CHECK"
  // ---------------------------------------------

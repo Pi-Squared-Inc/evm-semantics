@@ -57,7 +57,8 @@ runs:
   - name: 'Set up Docker'
     uses: nick-invision/retry@v3
     with:
-      max_attempts: 3
+      timeout_minutes: 30
+      max_attempts: 2
       retry_on: error
       command: |
         set -euxo pipefail

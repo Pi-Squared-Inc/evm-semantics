@@ -31,10 +31,6 @@ We've broken up the configuration into two components; those parts of the state 
 In the comments next to each cell, we've marked which component of the YellowPaper state corresponds to each cell.
 
 ```k
-   // TODO: Make CallValue and Caller a config cell
-      syntax CallValue ::= ".CallValue" | Int
-   // ------------------------------------------------
-
     configuration
         <k> #loadProgram($PGM:Bytes) ~> #precompiled?($ACCTCODE:Int, getSchedule($SCHEDULE:Int)) ~> #execute </k>
         <exit-code exit=""> 1 </exit-code>
@@ -60,9 +56,9 @@ In the comments next to each cell, we've marked which component of the YellowPap
 
               // I_*
               <id>        $ID:Int    </id>                    // I_a
-              <caller>    .Account   </caller>                // I_s
+              <caller>    $CALLER:Account   </caller>         // I_s
               <callData>  $CALLDATA:Bytes  </callData>        // I_d
-              <callValue> .CallValue </callValue>             // I_v
+              <callValue> $CALLVALUE:Int </callValue>         // I_v
 
               // \mu_*
               <wordStack>   .List  </wordStack>           // \mu_s
@@ -654,17 +650,12 @@ These operators make queries about the current execution state.
 
     syntax NullStackOp ::= "ADDRESS" | "ORIGIN" | "CALLER" | "CALLVALUE" | "CHAINID" | "SELFBALANCE"
  // ------------------------------------------------------------------------------------------------
- // TODO: Modify these rules so we only depend from the config K cell
-    rule <k> ADDRESS     => #if ACCT ==K .Account #then Address() #else ACCT #fi ~> #push ... </k>
-         <id> ACCT </id>
-    rule <k> ORIGIN      => Origin()    ~> #push ... </k>
-    rule <k> CALLER      => #if CL ==K .Account #then Caller() #else CL #fi ~> #push ... </k>
-         <caller> CL </caller>
-    rule <k> CALLVALUE   => #if CV ==K .CallValue #then CallValue() #else CV #fi ~> #push ... </k>
-         <callValue> CV </callValue>
-    rule <k> CHAINID     => ChainId()   ~> #push ... </k>
-    rule <k> SELFBALANCE => GetAccountBalance(ACCT) ~> #push ... </k>
-         <id> ACCT </id>
+    rule <k> ADDRESS     => ACCT                    ~> #push ... </k> <id> ACCT </id>
+    rule <k> ORIGIN      => Origin()                ~> #push ... </k>
+    rule <k> CALLER      => CL                      ~> #push ... </k> <caller> CL </caller>
+    rule <k> CALLVALUE   => CV                      ~> #push ... </k> <callValue> CV </callValue>
+    rule <k> CHAINID     => ChainId()               ~> #push ... </k>
+    rule <k> SELFBALANCE => GetAccountBalance(ACCT) ~> #push ... </k> <id> ACCT </id>
 
     syntax NullStackOp ::= "MSIZE" | "CODESIZE"
  // -------------------------------------------
@@ -1122,23 +1113,6 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
          <caller> ACCTAPPFROM </caller>
          <callValue> VALUE </callValue>
          <localMem> LM </localMem>
-        requires ACCTAPPFROM =/=K .Account andBool VALUE =/=K .CallValue
-
-      // This rule is necessary to handle the case where we didn't set the caller and the call value yet
-      // TODO: remove this when we start using caller and call value from the config cell
-       rule [delegatecall.firsttime]:
-         <k> DELEGATECALL _GCAP ACCTTO ARGSTART ARGWIDTH RETSTART RETWIDTH
-          => AccessAccount(ACCTTO)
-          ~> #checkCall ACCTFROM 0
-          ~> #call Caller() ACCTFROM ACCTTO 0 CallValue() #range(LM, ARGSTART, ARGWIDTH) false
-          ~> #return RETSTART RETWIDTH
-         ...
-         </k>
-         <id> ACCTFROM </id>
-         <caller> ACCTAPPFROM </caller>
-         <callValue> VALUE </callValue>
-         <localMem> LM </localMem>
-        requires ACCTAPPFROM ==K .Account andBool VALUE ==K .CallValue
 
     syntax CallSixOp ::= "STATICCALL"
  // ---------------------------------

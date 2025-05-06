@@ -19,6 +19,7 @@ module EVM
     imports NETWORK
     imports GAS
     imports ULM
+    imports K-IO
 ```
 
 Configuration
@@ -175,11 +176,13 @@ The `#next [_]` operator initiates execution by:
          <output> _ => .Bytes </output>
 
     rule <k> #next [ OP:OpCode ]
-          => #addr [ OP ]
+          => #traceK(CurrGas ~> OP)
+          ~> #addr [ OP ]
           ~> #exec [ OP ]
           ~> #pc   [ OP ]
          ...
          </k>
+         <gas> CurrGas </gas>
          <wordStack> WS </wordStack>
          <static> STATIC:Bool </static>
       requires notBool ( #stackUnderflow(WS, OP) orBool #stackOverflow(WS, OP) )

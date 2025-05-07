@@ -108,7 +108,7 @@ module GAS-FEES
 
     syntax Int ::= Csstore            ( Schedule , Int , Int , Int )         [symbol(Csstore),             function, total, smtlib(gas_Csstore)            ]
                  | Rsstore            ( Schedule , Int , Int , Int )         [symbol(Rsstore),             function, total, smtlib(gas_Rsstore)            ]
-                 | Cextra             ( Schedule , Bool , Int , Bool )       [symbol(Cextra),              function, total, smtlib(gas_Cextra)             ]
+                 | Cextra             ( Schedule , Bool , Int , Bool, Bool, Bool ) [symbol(Cextra),            function, total, smtlib(gas_Cextra)           ]
                  | Cnew               ( Schedule , Bool , Int )              [symbol(Cnew),                function, total, smtlib(gas_Cnew)               ]
                  | Cxfer              ( Schedule , Int )                     [symbol(Cxfer),               function, total, smtlib(gas_Cxfer)              ]
                  | Cmem               ( Schedule , Int )                     [symbol(Cmem),                function, total, smtlib(gas_Cmem), memo         ]
@@ -124,6 +124,7 @@ module GAS-FEES
                  | Cbls12g1MsmDiscount( Schedule , Int )                     [symbol(Cbls12g1MsmDiscount), function, total, smtlib(gas_Cbls12g1MsmDiscount)]
                  | Cbls12g2MsmDiscount( Schedule , Int )                     [symbol(Cbls12g2MsmDiscount), function, total, smtlib(gas_Cbls12g2MsmDiscount)]
                  | Cdelegationaccess  ( Schedule, Bool, Bool )               [symbol(Cdelegationaccess), function, total, smtlib(gas_Cdelegationaccess)]
+
  // ------------------------------------------------------------------------------------------------------------------------------------------
     rule [Cgascap]:
          Cgascap(SCHED, GCAP:Int, GAVAIL:Int, GEXTRA)
@@ -170,8 +171,8 @@ module GAS-FEES
       requires notBool Ghasdirtysstore << SCHED >>
       [concrete]
 
-    rule [Cextra.delegation]: Cextra(SCHED, ISEMPTY, VALUE, ISWARM ,  ISDELEGATION,  ISWARMDELEGATION) => Cdelegationaccess(SCHED, ISDELEGATION, ISWARMDELEGATION) +Int Caddraccess(SCHED, ISWARM, DELEGATION) +Int Cnew(SCHED, ISEMPTY, VALUE) +Int Cxfer(SCHED, VALUE) requires         Ghasaccesslist << SCHED >> andBool         Ghasdelegation << SCHED >>
-    rule [Cextra.new]:        Cextra(SCHED, ISEMPTY, VALUE, ISWARM , _ISDELEGATION, _ISWARMDELEGATION) => Caddraccess(SCHED, ISWARM, DELEGATION) +Int Cnew(SCHED, ISEMPTY, VALUE) +Int Cxfer(SCHED, VALUE)                                                               requires         Ghasaccesslist << SCHED >> andBool notBool Ghasdelegation << SCHED >>
+    rule [Cextra.delegation]: Cextra(SCHED, ISEMPTY, VALUE, ISWARM ,  ISDELEGATION,  ISWARMDELEGATION) => Cdelegationaccess(SCHED, ISDELEGATION, ISWARMDELEGATION) +Int Caddraccess(SCHED, ISWARM) +Int Cnew(SCHED, ISEMPTY, VALUE) +Int Cxfer(SCHED, VALUE) requires         Ghasaccesslist << SCHED >> andBool         Ghasdelegation << SCHED >>
+    rule [Cextra.new]:        Cextra(SCHED, ISEMPTY, VALUE, ISWARM , _ISDELEGATION, _ISWARMDELEGATION) => Caddraccess(SCHED, ISWARM) +Int Cnew(SCHED, ISEMPTY, VALUE) +Int Cxfer(SCHED, VALUE)                                                               requires         Ghasaccesslist << SCHED >> andBool notBool Ghasdelegation << SCHED >>
     rule [Cextra.old]:        Cextra(SCHED, ISEMPTY, VALUE, _ISWARM, _ISDELEGATION, _ISWARMDELEGATION) => Gcall < SCHED > +Int Cnew(SCHED, ISEMPTY, VALUE) +Int Cxfer(SCHED, VALUE)                                                                                      requires notBool Ghasaccesslist << SCHED >>
 
     rule [Cnew]:

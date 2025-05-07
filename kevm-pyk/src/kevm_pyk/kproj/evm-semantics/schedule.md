@@ -46,6 +46,7 @@ module SCHEDULE
                           | "Ghasrejectedfirstbyte"   | "Ghasprevrandao"   | "Ghasmaxinitcodesize" | "Ghaspushzero"
                           | "Ghaswarmcoinbase"        | "Ghaswithdrawals"  | "Ghastransient"       | "Ghasmcopy"
                           | "Ghasbeaconroot"          | "Ghaseip6780"      | "Ghasblobbasefee"     | "Ghasblobhash"
+                          | "Ghasdelegation"
 ```
 
 ### Schedule Constants
@@ -172,6 +173,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghaseip6780             << FRONTIER >> => false
     rule Ghasblobbasefee         << FRONTIER >> => false
     rule Ghasblobhash            << FRONTIER >> => false
+    rule Ghasdelegation          << FRONTIER >> => false
 ```
 
 ### Homestead Schedule
@@ -278,6 +280,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghaseip6780             << HOMESTEAD >> => false
     rule Ghasblobbasefee         << HOMESTEAD >> => false
     rule Ghasblobhash            << HOMESTEAD >> => false
+    rule Ghasdelegation          << HOMESTEAD >> => false
 ```
 
 ### Tangerine Whistle Schedule
@@ -384,6 +387,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghaseip6780             << TANGERINE_WHISTLE >> => false
     rule Ghasblobbasefee         << TANGERINE_WHISTLE >> => false
     rule Ghasblobhash            << TANGERINE_WHISTLE >> => false
+    rule Ghasdelegation          << TANGERINE_WHISTLE >> => false
 ```
 
 ### Spurious Dragon Schedule
@@ -490,6 +494,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghaseip6780             << SPURIOUS_DRAGON >> => false
     rule Ghasblobbasefee         << SPURIOUS_DRAGON >> => false
     rule Ghasblobhash            << SPURIOUS_DRAGON >> => false
+    rule Ghasdelegation          << SPURIOUS_DRAGON >> => false
 ```
 
 ### Byzantium Schedule
@@ -596,6 +601,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghaseip6780             << BYZANTIUM >> => false
     rule Ghasblobbasefee         << BYZANTIUM >> => false
     rule Ghasblobhash            << BYZANTIUM >> => false
+    rule Ghasdelegation          << BYZANTIUM >> => false
 ```
 
 ### Constantinople Schedule
@@ -702,6 +708,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghaseip6780             << CONSTANTINOPLE >> => false
     rule Ghasblobbasefee         << CONSTANTINOPLE >> => false
     rule Ghasblobhash            << CONSTANTINOPLE >> => false
+    rule Ghasdelegation          << CONSTANTINOPLE >> => false
 ```
 
 ### Petersburg Schedule
@@ -808,6 +815,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghaseip6780             << PETERSBURG >> => false
     rule Ghasblobbasefee         << PETERSBURG >> => false
     rule Ghasblobhash            << PETERSBURG >> => false
+    rule Ghasdelegation          << PETERSBURG >> => false
 ```
 
 ### Istanbul Schedule
@@ -914,6 +922,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghaseip6780             << ISTANBUL >> => false
     rule Ghasblobbasefee         << ISTANBUL >> => false
     rule Ghasblobhash            << ISTANBUL >> => false
+    rule Ghasdelegation          << ISTANBUL >> => false
 ```
 
 ### Berlin Schedule
@@ -1020,6 +1029,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghaseip6780             << BERLIN >> => false
     rule Ghasblobbasefee         << BERLIN >> => false
     rule Ghasblobhash            << BERLIN >> => false
+    rule Ghasdelegation          << BERLIN >> => false
 ```
 
 ### London Schedule
@@ -1126,6 +1136,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghaseip6780             << LONDON >> => false
     rule Ghasblobbasefee         << LONDON >> => false
     rule Ghasblobhash            << LONDON >> => false
+    rule Ghasdelegation          << LONDON >> => false
 ```
 
 ### Merge Schedule
@@ -1232,6 +1243,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghaseip6780             << MERGE >> => false
     rule Ghasblobbasefee         << MERGE >> => false
     rule Ghasblobhash            << MERGE >> => false
+    rule Ghasdelegation          << MERGE >> => false
 ```
 
 ### Shanghai Schedule
@@ -1339,6 +1351,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghaseip6780             << SHANGHAI >> => false
     rule Ghasblobbasefee         << SHANGHAI >> => false
     rule Ghasblobhash            << SHANGHAI >> => false
+    rule Ghasdelegation          << SHANGHAI >> => false
 ```
 
 ### Cancun Schedule
@@ -1446,6 +1459,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghaseip6780             << CANCUN >> => true
     rule Ghasblobbasefee         << CANCUN >> => true
     rule Ghasblobhash            << CANCUN >> => true
+    rule Ghasdelegation          << CANCUN >> => false
 
 ```
 
@@ -1555,6 +1569,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghaseip6780             << PRAGUE >> => true
     rule Ghasblobbasefee         << PRAGUE >> => true
     rule Ghasblobhash            << PRAGUE >> => true
+    rule Ghasdelegation          << PRAGUE >> => true
 
 endmodule
 ```

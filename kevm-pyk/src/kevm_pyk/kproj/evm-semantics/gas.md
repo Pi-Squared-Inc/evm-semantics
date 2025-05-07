@@ -103,24 +103,25 @@ module GAS-FEES
     imports GAS-SYNTAX
     imports SCHEDULE
 
-    syntax Gas ::= Cgascap        ( Schedule , Gas , Gas , Int ) [symbol(Cgascap_Gas), overload(Cgascap), function, total, smtlib(gas_Cgascap_Gas)]
-    syntax Int ::= Cgascap        ( Schedule , Int , Int , Int ) [symbol(Cgascap_Int), overload(Cgascap), function, total, smtlib(gas_Cgascap_Int)]
+    syntax Gas ::= Cgascap           ( Schedule , Gas , Gas , Int ) [symbol(Cgascap_Gas), overload(Cgascap), function, total, smtlib(gas_Cgascap_Gas)]
+    syntax Int ::= Cgascap           ( Schedule , Int , Int , Int ) [symbol(Cgascap_Int), overload(Cgascap), function, total, smtlib(gas_Cgascap_Int)]
 
-    syntax Int ::= Csstore        ( Schedule , Int , Int , Int )         [symbol(Csstore),        function, total, smtlib(gas_Csstore)       ]
-                 | Rsstore        ( Schedule , Int , Int , Int )         [symbol(Rsstore),        function, total, smtlib(gas_Rsstore)       ]
-                 | Cextra         ( Schedule , Bool , Int , Bool )       [symbol(Cextra),         function, total, smtlib(gas_Cextra)        ]
-                 | Cnew           ( Schedule , Bool , Int )              [symbol(Cnew),           function, total, smtlib(gas_Cnew)          ]
-                 | Cxfer          ( Schedule , Int )                     [symbol(Cxfer),          function, total, smtlib(gas_Cxfer)         ]
-                 | Cmem           ( Schedule , Int )                     [symbol(Cmem),           function, total, smtlib(gas_Cmem), memo    ]
-                 | Caddraccess    ( Schedule , Bool )                    [symbol(Caddraccess),    function, total, smtlib(gas_Caddraccess)   ]
-                 | Cstorageaccess ( Schedule , Bool )                    [symbol(Cstorageaccess), function, total, smtlib(gas_Cstorageaccess)]
-                 | Csload         ( Schedule , Bool )                    [symbol(Csload),         function, total, smtlib(gas_Csload)        ]
-                 | Cextcodesize   ( Schedule )                           [symbol(Cextcodesize),   function, total, smtlib(gas_Cextcodesize)  ]
-                 | Cextcodecopy   ( Schedule , Int )                     [symbol(Cextcodecopy),   function, total, smtlib(gas_Cextcodecopy)  ]
-                 | Cextcodehash   ( Schedule )                           [symbol(Cextcodehash),   function, total, smtlib(gas_Cextcodehash)  ]
-                 | Cbalance       ( Schedule )                           [symbol(Cbalance),       function, total, smtlib(gas_Cbalance)      ]
-                 | Cmodexp        ( Schedule , Bytes , Int , Int , Int ) [symbol(Cmodexp),        function, total, smtlib(gas_Cmodexp)       ]
-                 | Cinitcode      ( Schedule , Int )                     [symbol(Cinitcode),      function, total, smtlib(gas_Cinitcode)     ]
+    syntax Int ::= Csstore           ( Schedule , Int , Int , Int )         [symbol(Csstore),           function, total, smtlib(gas_Csstore)          ]
+                 | Rsstore           ( Schedule , Int , Int , Int )         [symbol(Rsstore),           function, total, smtlib(gas_Rsstore)          ]
+                 | Cextra            ( Schedule , Bool , Int , Bool, Bool, Bool, Bool ) [symbol(Cextra),            function, total, smtlib(gas_Cextra)           ]
+                 | Cnew              ( Schedule , Bool , Int )              [symbol(Cnew),              function, total, smtlib(gas_Cnew)             ]
+                 | Cxfer             ( Schedule , Int )                     [symbol(Cxfer),             function, total, smtlib(gas_Cxfer)            ]
+                 | Cmem              ( Schedule , Int )                     [symbol(Cmem),              function, total, smtlib(gas_Cmem), memo       ]
+                 | Caddraccess       ( Schedule , Bool )                    [symbol(Caddraccess),       function, total, smtlib(gas_Caddraccess)      ]
+                 | Cstorageaccess    ( Schedule , Bool )                    [symbol(Cstorageaccess),    function, total, smtlib(gas_Cstorageaccess)   ]
+                 | Csload            ( Schedule , Bool )                    [symbol(Csload),            function, total, smtlib(gas_Csload)           ]
+                 | Cextcodesize      ( Schedule )                           [symbol(Cextcodesize),      function, total, smtlib(gas_Cextcodesize)     ]
+                 | Cextcodecopy      ( Schedule , Int )                     [symbol(Cextcodecopy),      function, total, smtlib(gas_Cextcodecopy)     ]
+                 | Cextcodehash      ( Schedule )                           [symbol(Cextcodehash),      function, total, smtlib(gas_Cextcodehash)     ]
+                 | Cbalance          ( Schedule )                           [symbol(Cbalance),          function, total, smtlib(gas_Cbalance)         ]
+                 | Cmodexp           ( Schedule , Bytes , Int , Int , Int ) [symbol(Cmodexp),           function, total, smtlib(gas_Cmodexp)          ]
+                 | Cinitcode         ( Schedule , Int )                     [symbol(Cinitcode),         function, total, smtlib(gas_Cinitcode)        ]
+                 | Cdelegationaccess ( Schedule, Bool, Bool )               [symbol(Cdelegationaccess), function, total, smtlib(gas_Cdelegationaccess)]
  // ------------------------------------------------------------------------------------------------------------------------------------------
     rule [Cgascap]:
          Cgascap(SCHED, GCAP:Int, GAVAIL:Int, GEXTRA)
@@ -167,8 +168,9 @@ module GAS-FEES
       requires notBool Ghasdirtysstore << SCHED >>
       [concrete]
 
-    rule [Cextra.new]: Cextra(SCHED, ISEMPTY, VALUE, ISWARM)  => Caddraccess(SCHED, ISWARM) +Int Cnew(SCHED, ISEMPTY, VALUE) +Int Cxfer(SCHED, VALUE) requires         Ghasaccesslist << SCHED >>
-    rule [Cextra.old]: Cextra(SCHED, ISEMPTY, VALUE, _ISWARM) => Gcall < SCHED > +Int Cnew(SCHED, ISEMPTY, VALUE) +Int Cxfer(SCHED, VALUE)            requires notBool Ghasaccesslist << SCHED >>
+    rule [Cextra.delegation]: Cextra(SCHED, ISEMPTY, VALUE, ISWARM ,  ISDELEGATION,  ISWARMDELEGATION) => Cdelegationaccess(SCHED, ISDELEGATION, ISWARMDELEGATION) +Int Caddraccess(SCHED, ISWARM, DELEGATION) +Int Cnew(SCHED, ISEMPTY, VALUE) +Int Cxfer(SCHED, VALUE) requires         Ghasaccesslist << SCHED >> andBool         Ghasdelegation << SCHED >>
+    rule [Cextra.new]:        Cextra(SCHED, ISEMPTY, VALUE, ISWARM , _ISDELEGATION, _ISWARMDELEGATION) => Caddraccess(SCHED, ISWARM, DELEGATION) +Int Cnew(SCHED, ISEMPTY, VALUE) +Int Cxfer(SCHED, VALUE)                                                               requires         Ghasaccesslist << SCHED >> andBool notBool Ghasdelegation << SCHED >>
+    rule [Cextra.old]:        Cextra(SCHED, ISEMPTY, VALUE, _ISWARM, _ISDELEGATION, _ISWARMDELEGATION) => Gcall < SCHED > +Int Cnew(SCHED, ISEMPTY, VALUE) +Int Cxfer(SCHED, VALUE)                                                                                      requires notBool Ghasaccesslist << SCHED >>
 
     rule [Cnew]:
          Cnew(SCHED, ISEMPTY:Bool, VALUE)
@@ -179,6 +181,7 @@ module GAS-FEES
 
     rule [Cmem]: Cmem(SCHED, N) => (N *Int Gmemory < SCHED >) +Int ((N *Int N) /Int Gquadcoeff < SCHED >) [concrete]
 
+    rule [Cdelegationaccess]: Cdelegationaccess(SCHED, ISDELEGATION, ISWARM) => #if ISDELEGATION #then Caddraccess(SCHED, ISWARM) #else 0 #fi
     rule [Caddraccess]:    Caddraccess(SCHED, ISWARM)    => #if ISWARM #then Gwarmstorageread < SCHED > #else Gcoldaccountaccess < SCHED > #fi
     rule [Cstorageaccess]: Cstorageaccess(SCHED, ISWARM) => #if ISWARM #then Gwarmstorageread < SCHED > #else Gcoldsload < SCHED >         #fi
 

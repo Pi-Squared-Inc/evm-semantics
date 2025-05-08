@@ -176,8 +176,8 @@ The `#next [_]` operator initiates execution by:
          <output> _ => .Bytes </output>
 
     rule <k> #next [ OP:OpCode ]
-          => #traceK(CurrGas ~> OP)
-          ~> #addr [ OP ]
+          => // #traceK(CurrGas ~> OP) ~> 
+          #addr [ OP ]
           ~> #exec [ OP ]
           ~> #pc   [ OP ]
          ...

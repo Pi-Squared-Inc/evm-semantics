@@ -2120,6 +2120,7 @@ After interpreting the strings representing programs as a `WordStack`, it should
    rule opCodeToNumber(TIMESTAMP) => 66
    rule opCodeToNumber(NUMBER) => 67
    rule opCodeToNumber(PREVRANDAO) => 68
+   rule opCodeToNumber(DIFFICULTY) => 68
    rule opCodeToNumber(GASLIMIT) => 69
    rule opCodeToNumber(CHAINID) => 70
    rule opCodeToNumber(SELFBALANCE) => 71
@@ -2234,5 +2235,29 @@ After interpreting the strings representing programs as a `WordStack`, it should
    rule opCodeToNumber(ECPAIRING) => 307
    rule opCodeToNumber(BLAKE2F)   => 308
    rule opCodeToNumber(KZGPOINTEVAL) => 309
+   rule opCodeToNumber(BLS12G1ADD) => 310
+   rule opCodeToNumber(BLS12G1MSM) => 311
+   rule opCodeToNumber(BLS12G2ADD) => 312
+   rule opCodeToNumber(BLS12G2MSM) => 313
+   rule opCodeToNumber(BLS12PAIRING_CHECK) => 314
+   rule opCodeToNumber(BLS12MAPFPTOG1) => 315
+   rule opCodeToNumber(BLS12MAPFP2TOG2) => 316
+
+
+   rule opCodeToNumber(_:PrecompiledOp) => 1000  [priority(75)]
+
+   rule opCodeToNumber(_:NullStackOp) => 2000  [priority(100)]
+   rule opCodeToNumber(_:UnStackOp) => 2001  [priority(100)]
+   rule opCodeToNumber(_:BinStackOp) => 2002  [priority(100)]
+   rule opCodeToNumber(_:TernStackOp) => 2003  [priority(100)]
+   rule opCodeToNumber(_:QuadStackOp) => 2004  [priority(100)]
+   rule opCodeToNumber(_:InvalidOp) => 2005  [priority(100)]
+   rule opCodeToNumber(_:StackOp) => 2006  [priority(100)]
+   rule opCodeToNumber(_:InternalOp) => 2007  [priority(100)]
+   rule opCodeToNumber(_:CallOp) => 2008  [priority(100)]
+   rule opCodeToNumber(_:CallSixOp) => 2009  [priority(100)]
+   rule opCodeToNumber(_:PushOp) => 2010  [priority(100)]
+   rule opCodeToNumber(_) =>3000 [priority(150)]
+
 endmodule
 ```

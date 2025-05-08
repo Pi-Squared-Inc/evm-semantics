@@ -175,8 +175,8 @@ The `#next [_]` operator initiates execution by:
          <output> _ => .Bytes </output>
 
     rule <k> #next [ OP:OpCode ]
-          => PrintOpcode(opCodeToNumber(OP))
-          ~> #addr [ OP ]
+          => //PrintOpcode(opCodeToNumber(OP)) ~>
+           #addr [ OP ]
           ~> #exec [ OP ]
           ~> #pc   [ OP ]
          ...
@@ -1234,7 +1234,7 @@ Overall Gas
 
     rule <k> _G:Gas ~> (#deductMemoryGas => #deductGas)   ... </k> //Required for verification
     rule <k>  G:Int ~> #deductGas => #end EVMC_OUT_OF_GAS ... </k> <gas> GAVAIL:Int                  </gas> requires GAVAIL <Int G
-    rule <k>  G:Int ~> #deductGas => PrintGas(GAVAIL -Int G) ... </k> <gas> GAVAIL:Int => GAVAIL -Int G </gas> requires G <=Int GAVAIL
+    rule <k>  G:Int ~> #deductGas => .K ... </k> <gas> GAVAIL:Int => GAVAIL -Int G </gas> requires G <=Int GAVAIL
 
     syntax Bool ::= #inStorage     ( Map   , Account , Int ) [symbol(#inStorage), function, total]
                   | #inStorageAux1 ( KItem ,           Int ) [symbol(#inStorageAux1), function, total]

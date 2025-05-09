@@ -175,8 +175,7 @@ The `#next [_]` operator initiates execution by:
          <output> _ => .Bytes </output>
 
     rule <k> #next [ OP:OpCode ]
-          => PrintOpcode(opCodeToNumber(OP))
-          ~> #addr [ OP ]
+          => #addr [ OP ]
           ~> #exec [ OP ]
           ~> #pc   [ OP ]
          ...
@@ -1550,7 +1549,7 @@ Overall Gas
 
     rule <k> _G:Gas ~> (#deductMemoryGas => #deductGas)   ... </k> //Required for verification
     rule <k>  G:Int ~> #deductGas => #end EVMC_OUT_OF_GAS ... </k> <gas> GAVAIL:Int                  </gas> requires GAVAIL <Int G
-    rule <k>  G:Int ~> #deductGas => PrintGas(GAVAIL -Int G) ... </k> <gas> GAVAIL:Int => GAVAIL -Int G </gas> requires G <=Int GAVAIL
+    rule <k>  G:Int ~> #deductGas => .K                   ... </k> <gas> GAVAIL:Int => GAVAIL -Int G </gas> requires G <=Int GAVAIL
 
     syntax Bool ::= #inStorage     ( Map   , Account , Int ) [symbol(#inStorage), function, total]
                   | #inStorageAux1 ( KItem ,           Int ) [symbol(#inStorageAux1), function, total]
@@ -1707,32 +1706,28 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
     rule <k> #gasExec(SCHED, LOG(N) _ WIDTH) => (Glog < SCHED > +Int (Glogdata < SCHED > *Int WIDTH) +Int (N *Int Glogtopic < SCHED >)) ... </k>
 
     rule <k> #gasExec(SCHED, CALL GCAP ACCTTO VALUE _ _ _ _)
-          => MyLog(ListItem("Ccallgas CALL") ListItem("sched") ListItem(SCHED) ListItem("acc_nonexistent") ListItem(#accountNonexistent(ACCTTO)) ListItem("gcap") ListItem(GCAP) ListItem("gavail") ListItem(GAVAIL) ListItem("value") ListItem(VALUE) ListItem("accessed_account") ListItem(AccessedAccount(ACCTTO)) ListItem("delegation_account") ListItem(DelegationAccount(ACCTTO)) ListItem("accessed_delegation_account") ListItem(AccessedDelegationAccount(ACCTTO)))
-          ~> Ccallgas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO)) ~> #allocateCallGas
+          => Ccallgas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO)) ~> #allocateCallGas
           ~> Ccall(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO))
          ...
          </k>
          <gas> GAVAIL </gas>
 
     rule <k> #gasExec(SCHED, CALLCODE GCAP ACCTTO VALUE _ _ _ _)
-          => MyLog(ListItem("Ccallgas CALLCODE") ListItem("sched") ListItem(SCHED) ListItem("acc_nonexistent") ListItem(#accountNonexistent(ACCTTO)) ListItem("gcap") ListItem(GCAP) ListItem("gavail") ListItem(GAVAIL) ListItem("value") ListItem(VALUE) ListItem("accessed_account") ListItem(AccessedAccount(ACCTTO)) ListItem("delegation_account") ListItem(DelegationAccount(ACCTTO)) ListItem("accessed_delegation_account") ListItem(AccessedDelegationAccount(ACCTTO)))
-          ~> Ccallgas(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO)) ~> #allocateCallGas
+          => Ccallgas(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO)) ~> #allocateCallGas
           ~> Ccall(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO))
          ...
          </k>
          <gas> GAVAIL </gas>
 
     rule <k> #gasExec(SCHED, DELEGATECALL GCAP ACCTTO _ _ _ _)
-          => MyLog(ListItem("Ccallgas DELEGATECALL") ListItem("sched") ListItem(SCHED) ListItem("acc_nonexistent") ListItem(#accountNonexistent(ACCTTO)) ListItem("gcap") ListItem(GCAP) ListItem("gavail") ListItem(GAVAIL) ListItem("value") ListItem(0) ListItem("accessed_account") ListItem(AccessedAccount(ACCTTO)) ListItem("delegation_account") ListItem(DelegationAccount(ACCTTO)) ListItem("accessed_delegation_account") ListItem(AccessedDelegationAccount(ACCTTO)))
-          ~> Ccallgas(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO)) ~> #allocateCallGas
+          => Ccallgas(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO)) ~> #allocateCallGas
           ~> Ccall(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO))
          ...
          </k>
          <gas> GAVAIL </gas>
 
     rule <k> #gasExec(SCHED, STATICCALL GCAP ACCTTO _ _ _ _)
-          => MyLog(ListItem("Ccallgas STATICCALL") ListItem("sched") ListItem(SCHED) ListItem("acc_nonexistent") ListItem(#accountNonexistent(ACCTTO)) ListItem("gcap") ListItem(GCAP) ListItem("gavail") ListItem(GAVAIL) ListItem("value") ListItem(0) ListItem("accessed_account") ListItem(AccessedAccount(ACCTTO)) ListItem("delegation_account") ListItem(DelegationAccount(ACCTTO)) ListItem("accessed_delegation_account") ListItem(AccessedDelegationAccount(ACCTTO)))
-          ~> Ccallgas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO)) ~> #allocateCallGas
+          => Ccallgas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO)) ~> #allocateCallGas
           ~> Ccall(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO))
          ...
          </k>
@@ -1880,12 +1875,12 @@ There are several helpers for calculating gas (most of them also specified in th
  // ------------------------------------------------------------------------------------------------------------
     rule <k> Ccall(SCHED, ISEMPTY:Bool, GCAP, GAVAIL, VALUE, ISWARM, ISDELEGATION, ISWARMDELEGATION)
           => Cdelegationaccess(SCHED, ISDELEGATION, ISWARMDELEGATION)
-            +Gas Cextra(SCHED, ISEMPTY, VALUE, ISWARM, ISDELEGATION, ISWARMDELEGATION)
-            +Gas Cgascap(SCHED, GCAP, GAVAIL -Gas Cdelegationaccess(SCHED, ISDELEGATION, ISWARMDELEGATION), Cextra(SCHED, ISEMPTY, VALUE, ISWARM, ISDELEGATION, ISWARMDELEGATION))
+            +Gas Cextra(SCHED, ISEMPTY, VALUE, ISWARM)
+            +Gas Cgascap(SCHED, GCAP, GAVAIL -Gas Cdelegationaccess(SCHED, ISDELEGATION, ISWARMDELEGATION), Cextra(SCHED, ISEMPTY, VALUE, ISWARM))
       ... </k>
 
     rule <k> Ccallgas(SCHED, ISEMPTY:Bool, GCAP, GAVAIL, VALUE, ISWARM, ISDELEGATION, ISWARMDELEGATION)
-          => Cgascap(SCHED, GCAP, GAVAIL -Gas Cdelegationaccess(SCHED, ISDELEGATION, ISWARMDELEGATION), Cextra(SCHED, ISEMPTY, VALUE, ISWARM, ISDELEGATION, ISWARMDELEGATION))
+          => Cgascap(SCHED, GCAP, GAVAIL -Gas Cdelegationaccess(SCHED, ISDELEGATION, ISWARMDELEGATION), Cextra(SCHED, ISEMPTY, VALUE, ISWARM))
             +Gas #if VALUE ==Int 0 #then 0 #else Gcallstipend < SCHED > #fi ... </k>
 
     rule <k> Cselfdestruct(SCHED, ISEMPTY:Bool, BAL)
@@ -2077,195 +2072,6 @@ After interpreting the strings representing programs as a `WordStack`, it should
     rule #dasmOpCode( 254,     _ ) => INVALID
     rule #dasmOpCode( 255,     _ ) => SELFDESTRUCT
     rule #dasmOpCode(   W,     _ ) => UNDEFINED(W) [owise]
-
-   syntax Int ::= opCodeToNumber ( OpCode ) [function]
-   // ------------------------------------------------
-   rule opCodeToNumber(STOP)       => 0
-   rule opCodeToNumber(ADD)        => 1
-   rule opCodeToNumber(MUL)        => 2
-   rule opCodeToNumber(SUB)        => 3
-   rule opCodeToNumber(DIV)        => 4
-   rule opCodeToNumber(SDIV)       => 5
-   rule opCodeToNumber(MOD)        => 6
-   rule opCodeToNumber(SMOD)       => 7
-   rule opCodeToNumber(ADDMOD)     => 8
-   rule opCodeToNumber(MULMOD)     => 9
-   rule opCodeToNumber(EXP)        => 10
-   rule opCodeToNumber(SIGNEXTEND) => 11
-   rule opCodeToNumber(LT)         => 16
-   rule opCodeToNumber(GT)         => 17
-   rule opCodeToNumber(SLT)        => 18
-   rule opCodeToNumber(SGT)        => 19
-   rule opCodeToNumber(EQ)         => 20
-   rule opCodeToNumber(ISZERO)     => 21
-   rule opCodeToNumber(AND)        => 22
-   rule opCodeToNumber(EVMOR)      => 23
-   rule opCodeToNumber(XOR)        => 24
-   rule opCodeToNumber(NOT)        => 25
-   rule opCodeToNumber(BYTE)       => 26
-   rule opCodeToNumber(SHL)        => 27
-   rule opCodeToNumber(SHR)        => 28
-   rule opCodeToNumber(SAR)        => 29
-   rule opCodeToNumber(SHA3)       => 32
-   rule opCodeToNumber(ADDRESS)    => 48
-   rule opCodeToNumber(BALANCE)    => 49
-   rule opCodeToNumber(ORIGIN)     => 50
-   rule opCodeToNumber(CALLER)     => 51
-   rule opCodeToNumber(CALLVALUE)  => 52
-   rule opCodeToNumber(CALLDATALOAD) => 53
-   rule opCodeToNumber(CALLDATASIZE) => 54
-   rule opCodeToNumber(CALLDATACOPY) => 55
-   rule opCodeToNumber(CODESIZE)  => 56
-   rule opCodeToNumber(CODECOPY)  => 57
-   rule opCodeToNumber(GASPRICE)  => 58
-   rule opCodeToNumber(EXTCODESIZE) => 59
-   rule opCodeToNumber(EXTCODECOPY) => 60
-   rule opCodeToNumber(RETURNDATASIZE) => 61
-   rule opCodeToNumber(RETURNDATACOPY) => 62
-   rule opCodeToNumber(EXTCODEHASH) => 63
-   rule opCodeToNumber(BLOCKHASH) => 64
-   rule opCodeToNumber(COINBASE) => 65
-   rule opCodeToNumber(TIMESTAMP) => 66
-   rule opCodeToNumber(NUMBER) => 67
-   rule opCodeToNumber(PREVRANDAO) => 68
-   rule opCodeToNumber(DIFFICULTY) => 68
-   rule opCodeToNumber(GASLIMIT) => 69
-   rule opCodeToNumber(CHAINID) => 70
-   rule opCodeToNumber(SELFBALANCE) => 71
-   rule opCodeToNumber(BASEFEE) => 72
-   rule opCodeToNumber(BLOBHASH) => 73
-   rule opCodeToNumber(BLOBBASEFEE) => 74
-   rule opCodeToNumber(POP)        => 80
-   rule opCodeToNumber(MLOAD)     => 81
-   rule opCodeToNumber(MSTORE)    => 82
-   rule opCodeToNumber(MSTORE8)   => 83
-   rule opCodeToNumber(SLOAD)     => 84
-   rule opCodeToNumber(SSTORE)    => 85
-   rule opCodeToNumber(JUMP)      => 86
-   rule opCodeToNumber(JUMPI)     => 87
-   rule opCodeToNumber(PC)        => 88
-   rule opCodeToNumber(MSIZE)     => 89
-   rule opCodeToNumber(GAS)       => 90
-   rule opCodeToNumber(JUMPDEST)  => 91
-   rule opCodeToNumber(TLOAD)     => 92
-   rule opCodeToNumber(TSTORE)    => 93
-   rule opCodeToNumber(MCOPY)     => 94
-   rule opCodeToNumber(PUSHZERO)  => 95
-   rule opCodeToNumber(PUSH(1))   => 96
-   rule opCodeToNumber(PUSH(2))   => 97
-   rule opCodeToNumber(PUSH(3))   => 98
-   rule opCodeToNumber(PUSH(4))   => 99
-   rule opCodeToNumber(PUSH(5))   => 100
-   rule opCodeToNumber(PUSH(6))   => 101
-   rule opCodeToNumber(PUSH(7))   => 102
-   rule opCodeToNumber(PUSH(8))   => 103
-   rule opCodeToNumber(PUSH(9))   => 104
-   rule opCodeToNumber(PUSH(10))  => 105
-   rule opCodeToNumber(PUSH(11))  => 106
-   rule opCodeToNumber(PUSH(12))  => 107
-   rule opCodeToNumber(PUSH(13))  => 108
-   rule opCodeToNumber(PUSH(14))  => 109
-   rule opCodeToNumber(PUSH(15))  => 110
-   rule opCodeToNumber(PUSH(16))  => 111
-   rule opCodeToNumber(PUSH(17))  => 112
-   rule opCodeToNumber(PUSH(18))  => 113
-   rule opCodeToNumber(PUSH(19))  => 114
-   rule opCodeToNumber(PUSH(20))  => 115
-   rule opCodeToNumber(PUSH(21))  => 116
-   rule opCodeToNumber(PUSH(22))  => 117
-   rule opCodeToNumber(PUSH(23))  => 118
-   rule opCodeToNumber(PUSH(24))  => 119
-   rule opCodeToNumber(PUSH(25))  => 120
-   rule opCodeToNumber(PUSH(26))  => 121
-   rule opCodeToNumber(PUSH(27))  => 122
-   rule opCodeToNumber(PUSH(28))  => 123
-   rule opCodeToNumber(PUSH(29))  => 124
-   rule opCodeToNumber(PUSH(30))  => 125
-   rule opCodeToNumber(PUSH(31))  => 126
-   rule opCodeToNumber(PUSH(32))  => 127
-   rule opCodeToNumber(DUP(1))    => 128
-   rule opCodeToNumber(DUP(2))    => 129
-   rule opCodeToNumber(DUP(3))    => 130
-   rule opCodeToNumber(DUP(4))    => 131
-   rule opCodeToNumber(DUP(5))    => 132
-   rule opCodeToNumber(DUP(6))    => 133
-   rule opCodeToNumber(DUP(7))    => 134
-   rule opCodeToNumber(DUP(8))    => 135
-   rule opCodeToNumber(DUP(9))    => 136
-   rule opCodeToNumber(DUP(10))   => 137
-   rule opCodeToNumber(DUP(11))   => 138
-   rule opCodeToNumber(DUP(12))   => 139
-   rule opCodeToNumber(DUP(13))   => 140
-   rule opCodeToNumber(DUP(14))   => 141
-   rule opCodeToNumber(DUP(15))   => 142
-   rule opCodeToNumber(DUP(16))   => 143
-   rule opCodeToNumber(SWAP(1))    => 144
-   rule opCodeToNumber(SWAP(2))    => 145
-   rule opCodeToNumber(SWAP(3))    => 146
-   rule opCodeToNumber(SWAP(4))    => 147
-   rule opCodeToNumber(SWAP(5))    => 148
-   rule opCodeToNumber(SWAP(6))    => 149
-   rule opCodeToNumber(SWAP(7))    => 150
-   rule opCodeToNumber(SWAP(8))    => 151
-   rule opCodeToNumber(SWAP(9))    => 152
-   rule opCodeToNumber(SWAP(10))   => 153
-   rule opCodeToNumber(SWAP(11))   => 154
-   rule opCodeToNumber(SWAP(12))   => 155
-   rule opCodeToNumber(SWAP(13))   => 156
-   rule opCodeToNumber(SWAP(14))   => 157
-   rule opCodeToNumber(SWAP(15))   => 158
-   rule opCodeToNumber(SWAP(16))   => 159
-   rule opCodeToNumber(LOG(0))     => 160
-   rule opCodeToNumber(LOG(1))     => 161
-   rule opCodeToNumber(LOG(2))     => 162
-   rule opCodeToNumber(LOG(3))     => 163
-   rule opCodeToNumber(LOG(4))     => 164
-   rule opCodeToNumber(CREATE)     => 240
-   rule opCodeToNumber(CALL)       => 241
-   rule opCodeToNumber(CALLCODE)   => 242
-   rule opCodeToNumber(RETURN)     => 243
-   rule opCodeToNumber(DELEGATECALL) => 244
-   rule opCodeToNumber(CREATE2)    => 245
-   rule opCodeToNumber(STATICCALL) => 250
-   rule opCodeToNumber(REVERT)     => 253
-   rule opCodeToNumber(INVALID)    => 254
-   rule opCodeToNumber(SELFDESTRUCT) => 255
-   rule opCodeToNumber(UNDEFINED(W)) => W [owise]
-   // Precompiles
-   // Lets assume they start with 300
-   rule opCodeToNumber(ECREC)     => 300
-   rule opCodeToNumber(SHA256)    => 301
-   rule opCodeToNumber(RIP160)    => 302
-   rule opCodeToNumber(ID)        => 303
-   rule opCodeToNumber(MODEXP)    => 304
-   rule opCodeToNumber(ECADD)     => 305
-   rule opCodeToNumber(ECMUL)     => 306
-   rule opCodeToNumber(ECPAIRING) => 307
-   rule opCodeToNumber(BLAKE2F)   => 308
-   rule opCodeToNumber(KZGPOINTEVAL) => 309
-   rule opCodeToNumber(BLS12G1ADD) => 310
-   rule opCodeToNumber(BLS12G1MSM) => 311
-   rule opCodeToNumber(BLS12G2ADD) => 312
-   rule opCodeToNumber(BLS12G2MSM) => 313
-   rule opCodeToNumber(BLS12PAIRING_CHECK) => 314
-   rule opCodeToNumber(BLS12MAPFPTOG1) => 315
-   rule opCodeToNumber(BLS12MAPFP2TOG2) => 316
-
-
-   rule opCodeToNumber(_:PrecompiledOp) => 1000  [priority(75)]
-
-   rule opCodeToNumber(_:NullStackOp) => 2000  [priority(100)]
-   rule opCodeToNumber(_:UnStackOp) => 2001  [priority(100)]
-   rule opCodeToNumber(_:BinStackOp) => 2002  [priority(100)]
-   rule opCodeToNumber(_:TernStackOp) => 2003  [priority(100)]
-   rule opCodeToNumber(_:QuadStackOp) => 2004  [priority(100)]
-   rule opCodeToNumber(_:InvalidOp) => 2005  [priority(100)]
-   rule opCodeToNumber(_:StackOp) => 2006  [priority(100)]
-   rule opCodeToNumber(_:InternalOp) => 2007  [priority(100)]
-   rule opCodeToNumber(_:CallOp) => 2008  [priority(100)]
-   rule opCodeToNumber(_:CallSixOp) => 2009  [priority(100)]
-   rule opCodeToNumber(_:PushOp) => 2010  [priority(100)]
-   rule opCodeToNumber(_) =>3000 [priority(150)]
 
 endmodule
 ```

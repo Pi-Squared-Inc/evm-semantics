@@ -1707,28 +1707,32 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
     rule <k> #gasExec(SCHED, LOG(N) _ WIDTH) => (Glog < SCHED > +Int (Glogdata < SCHED > *Int WIDTH) +Int (N *Int Glogtopic < SCHED >)) ... </k>
 
     rule <k> #gasExec(SCHED, CALL GCAP ACCTTO VALUE _ _ _ _)
-          => Ccallgas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO)) ~> #allocateCallGas
+          => MyLog(ListItem("Ccallgas CALL") ListItem("sched") ListItem(SCHED) ListItem("acc_nonexistent") ListItem(#accountNonexistent(ACCTTO)) ListItem("gcap") ListItem(GCAP) ListItem("gavail") ListItem(GAVAIL) ListItem("value") ListItem(VALUE) ListItem("accessed_account") ListItem(AccessedAccount(ACCTTO)) ListItem("delegation_account") ListItem(DelegationAccount(ACCTTO)) ListItem("accessed_delegation_account") ListItem(AccessedDelegationAccount(ACCTTO)))
+          ~> Ccallgas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO)) ~> #allocateCallGas
           ~> Ccall(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO))
          ...
          </k>
          <gas> GAVAIL </gas>
 
     rule <k> #gasExec(SCHED, CALLCODE GCAP ACCTTO VALUE _ _ _ _)
-          => Ccallgas(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO)) ~> #allocateCallGas
+          => MyLog(ListItem("Ccallgas CALLCODE") ListItem("sched") ListItem(SCHED) ListItem("acc_nonexistent") ListItem(#accountNonexistent(ACCTTO)) ListItem("gcap") ListItem(GCAP) ListItem("gavail") ListItem(GAVAIL) ListItem("value") ListItem(VALUE) ListItem("accessed_account") ListItem(AccessedAccount(ACCTTO)) ListItem("delegation_account") ListItem(DelegationAccount(ACCTTO)) ListItem("accessed_delegation_account") ListItem(AccessedDelegationAccount(ACCTTO)))
+          ~> Ccallgas(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO)) ~> #allocateCallGas
           ~> Ccall(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO))
          ...
          </k>
          <gas> GAVAIL </gas>
 
     rule <k> #gasExec(SCHED, DELEGATECALL GCAP ACCTTO _ _ _ _)
-          => Ccallgas(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO)) ~> #allocateCallGas
+          => MyLog(ListItem("Ccallgas DELEGATECALL") ListItem("sched") ListItem(SCHED) ListItem("acc_nonexistent") ListItem(#accountNonexistent(ACCTTO)) ListItem("gcap") ListItem(GCAP) ListItem("gavail") ListItem(GAVAIL) ListItem("value") ListItem(0) ListItem("accessed_account") ListItem(AccessedAccount(ACCTTO)) ListItem("delegation_account") ListItem(DelegationAccount(ACCTTO)) ListItem("accessed_delegation_account") ListItem(AccessedDelegationAccount(ACCTTO)))
+          ~> Ccallgas(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO)) ~> #allocateCallGas
           ~> Ccall(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO))
          ...
          </k>
          <gas> GAVAIL </gas>
 
     rule <k> #gasExec(SCHED, STATICCALL GCAP ACCTTO _ _ _ _)
-          => Ccallgas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO)) ~> #allocateCallGas
+          => MyLog(ListItem("Ccallgas STATICCALL") ListItem("sched") ListItem(SCHED) ListItem("acc_nonexistent") ListItem(#accountNonexistent(ACCTTO)) ListItem("gcap") ListItem(GCAP) ListItem("gavail") ListItem(GAVAIL) ListItem("value") ListItem(0) ListItem("accessed_account") ListItem(AccessedAccount(ACCTTO)) ListItem("delegation_account") ListItem(DelegationAccount(ACCTTO)) ListItem("accessed_delegation_account") ListItem(AccessedDelegationAccount(ACCTTO)))
+          ~> Ccallgas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO)) ~> #allocateCallGas
           ~> Ccall(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), DelegationAccount(ACCTTO), AccessedDelegationAccount(ACCTTO))
          ...
          </k>
@@ -1875,10 +1879,14 @@ There are several helpers for calculating gas (most of them also specified in th
                  | Cselfdestruct ( Schedule , BExp , Int )                    [symbol(Cselfdestruct), strict(2)]
  // ------------------------------------------------------------------------------------------------------------
     rule <k> Ccall(SCHED, ISEMPTY:Bool, GCAP, GAVAIL, VALUE, ISWARM, ISDELEGATION, ISWARMDELEGATION)
-          => Cextra(SCHED, ISEMPTY, VALUE, ISWARM, ISDELEGATION, ISWARMDELEGATION) +Gas Cgascap(SCHED, GCAP, GAVAIL, Cextra(SCHED, ISEMPTY, VALUE, ISWARM, ISDELEGATION, ISWARMDELEGATION)) ... </k>
+          => Cdelegationaccess(SCHED, ISDELEGATION, ISWARMDELEGATION)
+            +Gas Cextra(SCHED, ISEMPTY, VALUE, ISWARM, ISDELEGATION, ISWARMDELEGATION)
+            +Gas Cgascap(SCHED, GCAP, GAVAIL -Gas Cdelegationaccess(SCHED, ISDELEGATION, ISWARMDELEGATION), Cextra(SCHED, ISEMPTY, VALUE, ISWARM, ISDELEGATION, ISWARMDELEGATION))
+      ... </k>
 
     rule <k> Ccallgas(SCHED, ISEMPTY:Bool, GCAP, GAVAIL, VALUE, ISWARM, ISDELEGATION, ISWARMDELEGATION)
-          => Cgascap(SCHED, GCAP, GAVAIL, Cextra(SCHED, ISEMPTY, VALUE, ISWARM, ISDELEGATION, ISWARMDELEGATION)) +Gas #if VALUE ==Int 0 #then 0 #else Gcallstipend < SCHED > #fi ... </k>
+          => Cgascap(SCHED, GCAP, GAVAIL -Gas Cdelegationaccess(SCHED, ISDELEGATION, ISWARMDELEGATION), Cextra(SCHED, ISEMPTY, VALUE, ISWARM, ISDELEGATION, ISWARMDELEGATION))
+            +Gas #if VALUE ==Int 0 #then 0 #else Gcallstipend < SCHED > #fi ... </k>
 
     rule <k> Cselfdestruct(SCHED, ISEMPTY:Bool, BAL)
           => Gselfdestruct < SCHED > +Int Cnew(SCHED, ISEMPTY andBool Gselfdestructnewaccount << SCHED >>, BAL) ... </k>

@@ -171,9 +171,9 @@ module GAS-FEES
       requires notBool Ghasdirtysstore << SCHED >>
       [concrete]
 
-    rule [Cextra.delegation]: Cextra(SCHED, ISEMPTY, VALUE, ISWARM ,  ISDELEGATION,  ISWARMDELEGATION) => Cdelegationaccess(SCHED, ISDELEGATION, ISWARMDELEGATION) +Int Caddraccess(SCHED, ISWARM) +Int Cnew(SCHED, ISEMPTY, VALUE) +Int Cxfer(SCHED, VALUE) requires         Ghasaccesslist << SCHED >> andBool         Ghasdelegation << SCHED >>
-    rule [Cextra.new]:        Cextra(SCHED, ISEMPTY, VALUE, ISWARM , _ISDELEGATION, _ISWARMDELEGATION) => Caddraccess(SCHED, ISWARM) +Int Cnew(SCHED, ISEMPTY, VALUE) +Int Cxfer(SCHED, VALUE)                                                               requires         Ghasaccesslist << SCHED >> andBool notBool Ghasdelegation << SCHED >>
-    rule [Cextra.old]:        Cextra(SCHED, ISEMPTY, VALUE, _ISWARM, _ISDELEGATION, _ISWARMDELEGATION) => Gcall < SCHED > +Int Cnew(SCHED, ISEMPTY, VALUE) +Int Cxfer(SCHED, VALUE)                                                                                      requires notBool Ghasaccesslist << SCHED >>
+    // rule [Cextra.delegation]: Cextra(SCHED, ISEMPTY, VALUE, ISWARM ,  ISDELEGATION,  ISWARMDELEGATION) => Cdelegationaccess(SCHED, ISDELEGATION, ISWARMDELEGATION) +Int Caddraccess(SCHED, ISWARM) +Int Cnew(SCHED, ISEMPTY, VALUE) +Int Cxfer(SCHED, VALUE) requires         Ghasaccesslist << SCHED >> andBool         Ghasdelegation << SCHED >>
+    rule [Cextra.new]:        Cextra(SCHED, ISEMPTY, VALUE, ISWARM , _ISDELEGATION, _ISWARMDELEGATION) => Caddraccess(SCHED, ISWARM) +Int Cnew(SCHED, ISEMPTY, VALUE) +Int Cxfer(SCHED, VALUE)                                                               requires         Ghasaccesslist << SCHED >>// andBool notBool Ghasdelegation << SCHED >>
+    rule [Cextra.old]:        Cextra(SCHED, ISEMPTY, VALUE, _ISWARM, _ISDELEGATION, _ISWARMDELEGATION) => Gcall < SCHED > +Int Cnew(SCHED, ISEMPTY, VALUE) +Int Cxfer(SCHED, VALUE)                                                                          requires notBool Ghasaccesslist << SCHED >>
 
     rule [Cnew]:
          Cnew(SCHED, ISEMPTY:Bool, VALUE)

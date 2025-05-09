@@ -57,7 +57,7 @@ In the comments next to each cell, we've marked which component of the YellowPap
               <wordStack>   .List  </wordStack>           // \mu_s
               <localMem>    .Bytes </localMem>            // \mu_m
               <pc>          0      </pc>                  // \mu_pc
-              <gas>         $GAS:Int </gas>                 // \mau_g
+              <gas>         $GAS:Gas </gas>               // \mau_g
               <memoryUsed>  0      </memoryUsed>          // \mu_i
               <callGas>     0:Gas  </callGas>
 

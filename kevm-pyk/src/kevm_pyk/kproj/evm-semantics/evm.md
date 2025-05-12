@@ -1518,31 +1518,33 @@ Precompiled Contracts
     syntax PrecompiledOp ::= "BLS12G1ADD"
  // -------------------------------------
     rule <k> BLS12G1ADD => #end EVMC_SUCCESS ... </k>
+         <callData> CD </callData>
          <output>
             _ => #bls12point(BLS12G1Add
-                    (   ( Bytes2Int(substrBytes(CallData(), 0, 64), BE, Unsigned)
-                        , Bytes2Int(substrBytes(CallData(), 64, 128), BE, Unsigned)
+                    (   ( Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned)
+                        , Bytes2Int(substrBytes(CD, 64, 128), BE, Unsigned)
                         )
-                    ,   ( Bytes2Int(substrBytes(CallData(), 128, 192), BE, Unsigned)
-                        , Bytes2Int(substrBytes(CallData(), 192, 256), BE, Unsigned)
+                    ,   ( Bytes2Int(substrBytes(CD, 128, 192), BE, Unsigned)
+                        , Bytes2Int(substrBytes(CD, 192, 256), BE, Unsigned)
                         )
                     ))
          </output>
-      requires lengthBytes( CallData() ) ==Int 256
+      requires lengthBytes( CD ) ==Int 256
         andBool bls12ValidForAdd
-            ( Bytes2Int(substrBytes(CallData(), 0, 64), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 64, 128), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 128, 192), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 192, 256), BE, Unsigned)
+            ( Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 64, 128), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 128, 192), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 192, 256), BE, Unsigned)
             )
 
     rule <k> BLS12G1ADD => #end EVMC_PRECOMPILE_FAILURE ... </k>
-      requires lengthBytes( CallData() ) =/=Int 256
+         <callData> CD </callData>
+      requires lengthBytes( CD ) =/=Int 256
         orBool notBool bls12ValidForAdd
-            ( Bytes2Int(substrBytes(CallData(), 0, 64), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 64, 128), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 128, 192), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 192, 256), BE, Unsigned)
+            ( Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 64, 128), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 128, 192), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 192, 256), BE, Unsigned)
             )
 
     syntax Bool ::= bls12ValidForAdd(Int, Int, Int, Int)  [function, total]
@@ -1566,7 +1568,8 @@ Precompiled Contracts
     //
     // https://github.com/ethereum/c-kzg-4844/blob/cc33b779cd3a227f51b35ce519a83cf91d81ccea/src/common/lincomb.c#L54-L56
 
-    rule BLS12G1MSM => bls12G1Msm(CallData())
+    rule <k> BLS12G1MSM => bls12G1Msm(CD) ... </k>
+         <callData> CD </callData>
 
     rule <k> g1MsmResult(P:G1Point) => #end EVMC_SUCCESS ... </k>
          <output>
@@ -1606,43 +1609,45 @@ Precompiled Contracts
     syntax PrecompiledOp ::= "BLS12G2ADD"
  // -------------------------------------
     rule <k> BLS12G2ADD => #end EVMC_SUCCESS ... </k>
-         <output>
+        <callData> CD </callData>
+        <output>
             _ => #bls12point(BLS12G2Add
-                    (   ( Bytes2Int(substrBytes(CallData(), 0, 64), BE, Unsigned)
-                        x Bytes2Int(substrBytes(CallData(), 64, 128), BE, Unsigned)
-                        , Bytes2Int(substrBytes(CallData(), 128, 192), BE, Unsigned)
-                        x Bytes2Int(substrBytes(CallData(), 192, 256), BE, Unsigned)
+                    (   ( Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned)
+                        x Bytes2Int(substrBytes(CD, 64, 128), BE, Unsigned)
+                        , Bytes2Int(substrBytes(CD, 128, 192), BE, Unsigned)
+                        x Bytes2Int(substrBytes(CD, 192, 256), BE, Unsigned)
                         )
-                    ,   ( Bytes2Int(substrBytes(CallData(), 256, 320), BE, Unsigned)
-                        x Bytes2Int(substrBytes(CallData(), 320, 384), BE, Unsigned)
-                        , Bytes2Int(substrBytes(CallData(), 384, 448), BE, Unsigned)
-                        x Bytes2Int(substrBytes(CallData(), 448, 512), BE, Unsigned)
+                    ,   ( Bytes2Int(substrBytes(CD, 256, 320), BE, Unsigned)
+                        x Bytes2Int(substrBytes(CD, 320, 384), BE, Unsigned)
+                        , Bytes2Int(substrBytes(CD, 384, 448), BE, Unsigned)
+                        x Bytes2Int(substrBytes(CD, 448, 512), BE, Unsigned)
                         )
                     ))
          </output>
-      requires lengthBytes( CallData() ) ==Int 512
+      requires lengthBytes( CD ) ==Int 512
         andBool bls12ValidForAdd2
-            ( Bytes2Int(substrBytes(CallData(), 0, 64), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 64, 128), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 128, 192), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 192, 256), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 256, 320), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 320, 384), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 384, 448), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 448, 512), BE, Unsigned)
+            ( Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 64, 128), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 128, 192), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 192, 256), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 256, 320), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 320, 384), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 384, 448), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 448, 512), BE, Unsigned)
             )
 
     rule <k> BLS12G2ADD => #end EVMC_PRECOMPILE_FAILURE ... </k>
-      requires lengthBytes( CallData() ) =/=Int 512
+         <callData> CD </callData>
+      requires lengthBytes( CD ) =/=Int 512
         orBool notBool bls12ValidForAdd2
-            ( Bytes2Int(substrBytes(CallData(), 0, 64), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 64, 128), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 128, 192), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 192, 256), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 256, 320), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 320, 384), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 384, 448), BE, Unsigned)
-            , Bytes2Int(substrBytes(CallData(), 448, 512), BE, Unsigned)
+            ( Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 64, 128), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 128, 192), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 192, 256), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 256, 320), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 320, 384), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 384, 448), BE, Unsigned)
+            , Bytes2Int(substrBytes(CD, 448, 512), BE, Unsigned)
             )
 
     syntax Bool ::= bls12ValidForAdd2(Int, Int, Int, Int, Int, Int, Int, Int)  [function, total]
@@ -1662,7 +1667,8 @@ Precompiled Contracts
 
     syntax PrecompiledOp ::= "BLS12G2MSM"
  // -------------------------------------
-    rule BLS12G2MSM => bls12G2Msm(CallData())
+    rule <k> BLS12G2MSM => bls12G2Msm(CD) ... </k>
+         <callData> CD </callData>
 
     rule <k> g2MsmResult(P:G2Point) => #end EVMC_SUCCESS ... </k>
          <output>
@@ -1704,7 +1710,8 @@ Precompiled Contracts
 
     syntax PrecompiledOp ::= "BLS12PAIRING_CHECK"
  // ---------------------------------------------
-    rule BLS12PAIRING_CHECK => bls12PairingCheck(CallData(), .List, .List)
+    rule <k> BLS12PAIRING_CHECK => bls12PairingCheck(CD, .List, .List) ... </k>
+         <callData> CD </callData>
 
     rule <k> bls12PairingResult(B:Bool) => #end EVMC_SUCCESS ... </k>
          <output>
@@ -1772,34 +1779,38 @@ Precompiled Contracts
     syntax PrecompiledOp ::= "BLS12MAPFPTOG1"
  // -----------------------------------------
     rule <k> BLS12MAPFPTOG1 => #end EVMC_SUCCESS ... </k>
+         <callData> CD </callData>
          <output>
-            _ => #bls12point(BLS12MapFpToG1(Bytes2Int(substrBytes(CallData(), 0, 64), BE, Unsigned)))
+            _ => #bls12point(BLS12MapFpToG1(Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned)))
          </output>
-      requires lengthBytes( CallData() ) ==Int 64
-        andBool isValidBLS12Fp(Bytes2Int(substrBytes(CallData(), 0, 64), BE, Unsigned))
+      requires lengthBytes( CD ) ==Int 64
+        andBool isValidBLS12Fp(Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned))
 
     rule <k> BLS12MAPFPTOG1 => #end EVMC_PRECOMPILE_FAILURE ... </k>
-      requires lengthBytes( CallData() ) =/=Int 64
-        orBool notBool isValidBLS12Fp(Bytes2Int(substrBytes(CallData(), 0, 64), BE, Unsigned))
+         <callData> CD </callData>
+      requires lengthBytes( CD ) =/=Int 64
+        orBool notBool isValidBLS12Fp(Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned))
 
 
     syntax PrecompiledOp ::= "BLS12MAPFP2TOG2"
  // ------------------------------------------
     rule <k> BLS12MAPFP2TOG2 => #end EVMC_SUCCESS ... </k>
+         <callData> CD </callData>
          <output>
             _ => #bls12point(BLS12MapFp2ToG2
-                    ( Bytes2Int(substrBytes(CallData(), 0, 64), BE, Unsigned)
-                    , Bytes2Int(substrBytes(CallData(), 64, 128), BE, Unsigned)
+                    ( Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned)
+                    , Bytes2Int(substrBytes(CD, 64, 128), BE, Unsigned)
                     ))
          </output>
-      requires lengthBytes( CallData() ) ==Int 128
-        andBool isValidBLS12Fp(Bytes2Int(substrBytes(CallData(), 0, 64), BE, Unsigned))
-        andBool isValidBLS12Fp(Bytes2Int(substrBytes(CallData(), 64, 128), BE, Unsigned))
+      requires lengthBytes( CD ) ==Int 128
+        andBool isValidBLS12Fp(Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned))
+        andBool isValidBLS12Fp(Bytes2Int(substrBytes(CD, 64, 128), BE, Unsigned))
 
     rule <k> BLS12MAPFP2TOG2 => #end EVMC_PRECOMPILE_FAILURE ... </k>
-      requires lengthBytes( CallData() ) =/=Int 128
-        orBool notBool isValidBLS12Fp(Bytes2Int(substrBytes(CallData(), 0, 64), BE, Unsigned))
-        orBool notBool isValidBLS12Fp(Bytes2Int(substrBytes(CallData(), 64, 128), BE, Unsigned))
+         <callData> CD </callData>
+      requires lengthBytes( CD ) =/=Int 128
+        orBool notBool isValidBLS12Fp(Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned))
+        orBool notBool isValidBLS12Fp(Bytes2Int(substrBytes(CD, 64, 128), BE, Unsigned))
 
 ```
 
@@ -2143,10 +2154,10 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
     rule <k> #gasExec(SCHED, BLAKE2F)   => Gfround < SCHED > *Int #asWord(#range(CD, 0, 4) ) ... </k> <callData> CD </callData>
     rule <k> #gasExec(SCHED, KZGPOINTEVAL)  => Gpointeval < SCHED > ... </k>
     rule <k> #gasExec(SCHED, BLS12G1ADD)    => Gbls12g1add < SCHED > ... </k>
-    rule <k> #gasExec(SCHED, BLS12G1MSM)    => #let N = lengthBytes(CallData()) /Int 160 #in N *Int Gbls12g1mul < SCHED > *Int Cbls12g1MsmDiscount(SCHED, N) /Int 1000 ... </k>
+    rule <k> #gasExec(SCHED, BLS12G1MSM)    => #let N = lengthBytes(CD) /Int 160 #in N *Int Gbls12g1mul < SCHED > *Int Cbls12g1MsmDiscount(SCHED, N) /Int 1000 ... </k> <callData> CD </callData>
     rule <k> #gasExec(SCHED, BLS12G2ADD)    => Gbls12g2add < SCHED > ... </k>
-    rule <k> #gasExec(SCHED, BLS12G2MSM)    => #let N = lengthBytes(CallData()) /Int 288 #in N *Int Gbls12g2mul < SCHED > *Int Cbls12g2MsmDiscount(SCHED, N) /Int 1000 ... </k>
-    rule <k> #gasExec(SCHED, BLS12PAIRING_CHECK)    => #let N = lengthBytes(CallData()) /Int 384 #in N *Int Gbls12PairingCheckMul < SCHED > +Int Gbls12PairingCheckAdd < SCHED > ... </k>
+    rule <k> #gasExec(SCHED, BLS12G2MSM)    => #let N = lengthBytes(CD) /Int 288 #in N *Int Gbls12g2mul < SCHED > *Int Cbls12g2MsmDiscount(SCHED, N) /Int 1000 ... </k> <callData> CD </callData>
+    rule <k> #gasExec(SCHED, BLS12PAIRING_CHECK)    => #let N = lengthBytes(CD) /Int 384 #in N *Int Gbls12PairingCheckMul < SCHED > +Int Gbls12PairingCheckAdd < SCHED > ... </k> <callData> CD </callData>
     rule <k> #gasExec(SCHED, BLS12MAPFPTOG1) => Gbls12mapfptog1 < SCHED > ... </k>
     rule <k> #gasExec(SCHED, BLS12MAPFP2TOG2) => Gbls12mapfp2tog2 < SCHED > ... </k>
     syntax InternalOp ::= "#allocateCallGas"

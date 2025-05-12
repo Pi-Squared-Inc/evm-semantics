@@ -68,7 +68,11 @@ In the comments next to each cell, we've marked which component of the YellowPap
             // -------------------------------------
           </evm>
         </ethereum>
+        <worldState> .WorldState </worldState>
 
+    syntax WorldState ::= ".WorldState"
+    rule <k> WS:WorldState => .K ... </k>
+         <worldState> .WorldState => WS </worldState>
     syntax EthereumSimulation
  // -------------------------
 ```

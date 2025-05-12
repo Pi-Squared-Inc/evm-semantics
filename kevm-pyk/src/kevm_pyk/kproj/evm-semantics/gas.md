@@ -184,7 +184,7 @@ module GAS-FEES
 
     rule [Cmem]: Cmem(SCHED, N) => (N *Int Gmemory < SCHED >) +Int ((N *Int N) /Int Gquadcoeff < SCHED >) [concrete]
 
-    rule [Cdelegationaccess]: Cdelegationaccess(SCHED, ISDELEGATION, ISWARM) => #if ISDELEGATION #then Caddraccess(SCHED, ISWARM) #else 0 #fi
+    rule [Cdelegationaccess]: Cdelegationaccess(SCHED, ISDELEGATION, ISWARMDELEGATION) => #if ISDELEGATION #then Caddraccess(SCHED, ISWARMDELEGATION) #else 0 #fi
     rule [Caddraccess]:    Caddraccess(SCHED, ISWARM)    => #if ISWARM #then Gwarmstorageread < SCHED > #else Gcoldaccountaccess < SCHED > #fi
     rule [Cstorageaccess]: Cstorageaccess(SCHED, ISWARM) => #if ISWARM #then Gwarmstorageread < SCHED > #else Gcoldsload < SCHED >         #fi
 

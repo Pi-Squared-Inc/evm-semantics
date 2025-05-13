@@ -176,8 +176,8 @@ The `#next [_]` operator initiates execution by:
          <output> _ => .Bytes </output>
 
     rule <k> #next [ OP:OpCode ]
-          => #traceK(CurrGas ~> OP)
-          ~> #addr [ OP ]
+          => // #traceK(CurrGas ~> OP) ~> 
+             #addr [ OP ]
           ~> #exec [ OP ]
           ~> #pc   [ OP ]
          ...
@@ -1878,24 +1878,19 @@ There are several helpers for calculating gas (most of them also specified in th
                  | Cselfdestruct ( Schedule , BExp , Int )                    [symbol(Cselfdestruct), strict(2)]
  // ------------------------------------------------------------------------------------------------------------
     rule <k> Ccall(SCHED, ISEMPTY:Bool, GCAP, GAVAIL, VALUE, ISWARM, TGT_ACCT, SELF_DLGT)
-          =>      Cextra(SCHED, ISEMPTY, VALUE, ISWARM, #isDelegated(TGT_ACCT), #isWarmDelegatee(TGT_ACCT, ISWARM, SELF_DLGT))
-             +Gas Cgascap(SCHED, GCAP, GAVAIL, Cextra(SCHED, ISEMPTY, VALUE, ISWARM, #isDelegated(TGT_ACCT), #isWarmDelegatee(TGT_ACCT, ISWARM, SELF_DLGT))) ... </k>
+          =>      Cextra(SCHED, ISEMPTY, VALUE, ISWARM, #isDelegated(TGT_ACCT), #isWarmDelegatee(TGT_ACCT, SELF_DLGT))
+             +Gas Cgascap(SCHED, GCAP, GAVAIL, Cextra(SCHED, ISEMPTY, VALUE, ISWARM, #isDelegated(TGT_ACCT), #isWarmDelegatee(TGT_ACCT, SELF_DLGT))) ... </k>
 
     rule <k> Ccallgas(SCHED, ISEMPTY:Bool, GCAP, GAVAIL, VALUE, ISWARM, TGT_ACCT, SELF_DLGT)
-          => Cgascap(SCHED, GCAP, GAVAIL, Cextra(SCHED, ISEMPTY, VALUE, ISWARM, #isDelegated(TGT_ACCT), #isWarmDelegatee(TGT_ACCT, ISWARM, SELF_DLGT))) +Gas #if VALUE ==Int 0 #then 0 #else Gcallstipend < SCHED > #fi ... </k>
+          => Cgascap(SCHED, GCAP, GAVAIL, Cextra(SCHED, ISEMPTY, VALUE, ISWARM, #isDelegated(TGT_ACCT), #isWarmDelegatee(TGT_ACCT, SELF_DLGT))) +Gas #if VALUE ==Int 0 #then 0 #else Gcallstipend < SCHED > #fi ... </k>
 
     rule <k> Cselfdestruct(SCHED, ISEMPTY:Bool, BAL)
           => Gselfdestruct < SCHED > +Int Cnew(SCHED, ISEMPTY andBool Gselfdestructnewaccount << SCHED >>, BAL) ... </k>
 
-    syntax Bool ::= #isWarmDelegatee(Int, Bool, Bool) [macro]
- // ---------------------------------------------------------
-    rule #isWarmDelegatee(TGT_ACCT, TO_ISWARM, SELF_DLGT)
-      => #if #isDelegated(TGT_ACCT)
-           #then #if SELF_DLGT
-             #then TO_ISWARM
-             #else AccessedAccount(TGT_ACCT)
-           #fi #else false
-         #fi
+    syntax Bool ::= #isWarmDelegatee(Int, Bool) [macro]
+ // ---------------------------------------------------
+    rule #isWarmDelegatee(TGT_ACCT, SELF_DLGT)
+      => #isDelegated(TGT_ACCT) andThenBool (SELF_DLGT orElseBool AccessedAccount(TGT_ACCT))
 
     syntax Bool ::= #isDelegated(Int) [macro]
  // -----------------------------------------

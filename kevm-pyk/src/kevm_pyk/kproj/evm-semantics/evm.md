@@ -14,6 +14,7 @@ requires "gas.md"
 requires "ulm.k"
 
 module EVM
+    imports K-IO
     imports STRING
     imports EVM-DATA
     imports NETWORK
@@ -32,7 +33,7 @@ In the comments next to each cell, we've marked which component of the YellowPap
 
 ```k
     configuration
-        <k> #loadProgram($PGM:Bytes) ~> #precompiled?($ACCTCODE:Int, getSchedule($SCHEDULE:Int)) ~> #execute </k>
+        <k> #traceK("START" ~> $GAS ~> $ACCTCODE ~> $PGM) ~> #loadProgram($PGM:Bytes) ~> #precompiled?($ACCTCODE:Int, getSchedule($SCHEDULE:Int)) ~> #execute </k>
         <exit-code exit=""> 1 </exit-code>
         <schedule> getSchedule($SCHEDULE:Int) </schedule>
 
@@ -118,8 +119,9 @@ Control Flow
                    | "#end" StatusCode [symbol(end) ]
  // -------------------------------------------------
     rule [end]:
-         <k> #end SC => #halt ... </k>
+         <k> #end SC => #traceK("STOP" ~> GAVAIL ~> SC) ~> #halt ... </k>
          <statusCode> _ => SC </statusCode>
+         <gas> GAVAIL </gas>
 
     rule <k> #halt ~> (_:Int    => .K) ... </k>
     rule <k> #halt ~> (_:OpCode => .K) ... </k>
@@ -175,11 +177,12 @@ The `#next [_]` operator initiates execution by:
          <output> _ => .Bytes </output>
 
     rule <k> #next [ OP:OpCode ]
-          => #addr [ OP ]
+          => #traceK("NEXT" ~> GAVAIL ~> OP) ~> #addr [ OP ]
           ~> #exec [ OP ]
           ~> #pc   [ OP ]
          ...
          </k>
+         <gas> GAVAIL </gas>
          <wordStack> WS </wordStack>
          <static> STATIC:Bool </static>
       requires notBool ( #stackUnderflow(WS, OP) orBool #stackOverflow(WS, OP) )
@@ -785,7 +788,7 @@ These rules reach into the network state and load/store from account storage:
     syntax BinStackOp ::= "SSTORE"
  // ------------------------------
     rule [sstore]:
-         <k> SSTORE INDEX NEW => SetAccountStorage(INDEX, NEW) ... </k>
+         <k> SSTORE INDEX NEW => #traceK("SSTORE" ~> INDEX ~> NEW) ~> SetAccountStorage(INDEX, NEW) ... </k>
       [preserves-definedness]
 
     syntax UnStackOp ::= "TLOAD"

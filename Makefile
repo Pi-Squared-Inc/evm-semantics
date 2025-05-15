@@ -329,7 +329,7 @@ test-blockchain: $(VLM_DIR)/op-geth/tests/tests.test
 	&& cd $(VLM_DIR)/op-geth/tests \
 	&& ./tests.test \
 		-test.run TestBlockchain \
-		-test.parallel 4 \
+		-test.parallel 1 \
 		--skip-block-tests known-failures.txt \
 		-test.v
 

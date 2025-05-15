@@ -163,7 +163,7 @@ The `callStack` cell stores a list of previous VM execution states.
 
     syntax InternalOp ::= "#dropWorldState"
  // ---------------------------------------
-    rule <k> #dropWorldState => CommitInsideCall()... </k>
+    rule <k> #dropWorldState => .K ... </k>
          <snapshot> ListItem(_) SS => SS </snapshot>
 ```
 

@@ -81,7 +81,7 @@ ENV EVM_BRANCH=${EVM_BRANCH}
 
 RUN echo "EVM_BRANCH=${EVM_BRANCH}"
 
-ARG VLM_OP_GETH_BRANCH=ulm
+ARG VLM_OP_GETH_BRANCH=moving-call-create-back-to-kevm
 ARG LLVM_VERSION=16
 ARG GO_VERSION=1.22.2
 ARG KFRAMEWORK_REPO=github.com/runtimeverification/k.git
@@ -139,6 +139,7 @@ RUN git config --global url."https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/
 
 RUN git clone --depth=1 --branch ${EVM_BRANCH} https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${EVM_SEMANTICS_REPO} evm-semantics
 RUN cd evm-semantics && git submodule update --init --recursive
+RUN cd evm-semantics/kevm-pyk/src/kevm_pyk/kproj/plugin && git checkout ${KRYPTO_PLUGIN_BRANCH}
 
 ## Retrieve the VLM repo
 

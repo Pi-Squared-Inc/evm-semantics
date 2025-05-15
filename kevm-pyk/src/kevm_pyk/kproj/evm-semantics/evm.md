@@ -80,6 +80,7 @@ Output Extraction
     rule getStatus(<generatedTop>... <statusCode> STATUS:StatusCode </statusCode> ...</generatedTop>) => getStatus(STATUS)
 
     syntax Int ::= getStatus(StatusCode) [function]
+    rule getStatus(.StatusCode) => KEVM_STUCK_ERROR
     rule getStatus(EVMC_REJECTED) => EVMC_REJECTED
     rule getStatus(EVMC_INTERNAL_ERROR) => EVMC_INTERNAL_ERROR
     rule getStatus(EVMC_SUCCESS) => EVMC_SUCCESS

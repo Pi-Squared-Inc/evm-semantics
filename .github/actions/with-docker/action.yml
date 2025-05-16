@@ -73,7 +73,7 @@ runs:
         GITHUB_ACTOR=${{ github.actor }}
         GITHUB_TOKEN=${{ steps.temp-token.outputs.token }}
         EVM_BRANCH=${{ github.head_ref || github.ref_name }}
-        VLM_BRANCH=main
+        VLM_BRANCH=srs/eip-7702
         WORKSPACE=${{ github.workspace }}
         USER=test-user
         GROUP=test-user

@@ -274,6 +274,7 @@ clean:
 # CI integration tests.
 # ---------------------
 
+GETH_TESTS_NCPU ?= 4
 EVM_REPOSITORY_DIR := $(shell pwd)
 LD_LIBRARY_PATH := $(EVM_REPOSITORY_DIR)/$(VLM_KLLVM_DIR):$(EVM_REPOSITORY_DIR)/$(KEVM_LIB_DIR)
 
@@ -298,7 +299,7 @@ test-vlm-blockchain: $(VLM_DIR)/op-geth/tests/tests.test
 	&& cd $(VLM_DIR)/op-geth/tests \
 	&& ./tests.test \
 		-test.run TestULMBlockchain \
-		-test.parallel 4 \
+		-test.parallel $(GETH_TESTS_NCPU) \
 		-test.v
 
 # Run the Blockchain Spec Tests
@@ -307,7 +308,7 @@ test-spec-blockchain: $(VLM_DIR)/op-geth/tests/tests.test $(EXECUTION_SPEC_TESTS
 	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) \
 	&& cd $(VLM_DIR)/op-geth/tests \
 	&& ./tests.test -test.run TestExecutionSpecBlocktests \
-		-test.parallel 4 \
+		-test.parallel $(GETH_TESTS_NCPU) \
 		--skip-spec-block-tests spec-failing.llvm \
 		-test.v
 
@@ -318,7 +319,7 @@ run-failed-spec-blockchain: $(VLM_DIR)/op-geth/tests/tests.test $(EXECUTION_SPEC
 	&& cd $(VLM_DIR)/op-geth/tests \
 	&& ./tests.test \
 		-test.run TestExecutionSpecBlocktests \
-		-test.parallel 4 \
+		-test.parallel $(GETH_TESTS_NCPU) \
 		--run-only-spec-block-tests spec-failing.llvm \
 		-test.v
 
@@ -329,7 +330,7 @@ test-blockchain: $(VLM_DIR)/op-geth/tests/tests.test
 	&& cd $(VLM_DIR)/op-geth/tests \
 	&& ./tests.test \
 		-test.run TestBlockchain \
-		-test.parallel 4 \
+		-test.parallel $(GETH_TESTS_NCPU) \
 		--skip-block-tests known-failures.txt \
 		-test.v
 

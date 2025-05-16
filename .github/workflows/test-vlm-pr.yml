@@ -54,7 +54,7 @@ jobs:
               -u test-user \
               --workdir /app/evm-semantics \
               kevm-ci-concrete-${{ github.sha }} \
-              /bin/bash -c 'make test-vlm-blockchain'
+              /bin/bash -c 'make test-vlm-blockchain GETH_TESTS_NCPU=1'
 
       - name: 'Run the Blockchain Spec Tests: TestSpecBlockchain'
         uses: nick-invision/retry@v3
@@ -67,7 +67,7 @@ jobs:
               -u test-user \
               --workdir /app/evm-semantics\
               kevm-ci-concrete-${{ github.sha }} \
-              /bin/bash -c 'make test-spec-blockchain'
+              /bin/bash -c 'make test-spec-blockchain GETH_TESTS_NCPU=1'
 
       - name: 'Run the Ethereum Conformance Tests: TestBlockchain'
         uses: nick-invision/retry@v3
@@ -80,4 +80,4 @@ jobs:
               -u test-user \
               --workdir /app/evm-semantics\
               kevm-ci-concrete-${{ github.sha }} \
-              /bin/bash -c 'make test-blockchain'
+              /bin/bash -c 'make test-blockchain GETH_TESTS_NCPU=1'

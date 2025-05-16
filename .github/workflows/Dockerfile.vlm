@@ -1,55 +1,10 @@
-# Use a compatible base image like Ubuntu or Debian
-FROM --platform=linux/amd64 ubuntu:22.04
+# Define the build argument for the version
+ARG KFRAMEWORK_VERSION=7.1.254
+
+# Use the prebuilt base image with the specified version
+FROM  ghcr.io/pi-squared-inc/ulm-k:ubuntu-jammy-${KFRAMEWORK_VERSION}
 
 # Pre-requisites
-
-## Add necessary repositories for missing packages. Add the packages needed by K, and required at installation time.
-RUN apt-get update && \
-    apt-get install -y \
-    software-properties-common \
-    wget \
-    gnupg \
-    bash \
-    python3 \
-    python3-pip \
-    build-essential \
-    libusb-1.0-0-dev \
-    libssl-dev \
-    curl \
-    nano \
-    iputils-ping \
-    gcc \
-    git \
-    jq \
-    make \
-    lsb-release \
-    openjdk-17-jdk \
-    libboost-dev \
-    libboost-test-dev \
-    libffi-dev \
-    libfmt-dev \
-    libgmp-dev \
-    libjemalloc-dev \
-    libmpfr-dev \
-    libsecp256k1-0 \
-    libtinfo-dev \
-    libunwind-dev \
-    libyaml-dev \
-    libz3-4 \
-    bison \
-    flex \
-    pkg-config \
-    libcrypto++-dev \
-    libsecp256k1-dev \
-    cmake \
-    maven \
-    z3 \
-    xxd \
-    clang \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-ARG HOME
 
 ARG USER=test-user
 ARG GROUP=test-group
@@ -71,50 +26,18 @@ ENV GITHUB_ACTOR=${GITHUB_ACTOR}
 ARG VLM_REPO=github.com/Pi-Squared-Inc/vlm.git
 ARG EVM_SEMANTICS_REPO=github.com/Pi-Squared-Inc/evm-semantics.git
 
+## Setting up the branches for the repositories
 ARG VLM_BRANCH
 ENV VLM_BRANCH=${VLM_BRANCH}
-
 RUN echo "VLM_BRANCH=${VLM_BRANCH}"
 
 ARG EVM_BRANCH
 ENV EVM_BRANCH=${EVM_BRANCH}
-
 RUN echo "EVM_BRANCH=${EVM_BRANCH}"
 
 ARG VLM_OP_GETH_BRANCH=ulm
-ARG LLVM_VERSION=16
-ARG GO_VERSION=1.22.2
-ARG KFRAMEWORK_REPO=github.com/runtimeverification/k.git
-ARG KFRAMEWORK_VERSION=7.1.254
-ARG POETRY_VERSION=1.8.3
-
-## Install LLVM 16: Install version 16 as later versions have a known bug affecting the code generator.
-
-RUN wget https://apt.llvm.org/llvm.sh -O llvm.sh && chmod +x llvm.sh
-RUN ./llvm.sh ${LLVM_VERSION} all && \
-    apt-get install -y --no-install-recommends clang-${LLVM_VERSION} lldb-${LLVM_VERSION} lld-${LLVM_VERSION} && \
-    rm -f llvm.sh
-
-## Install Go
-
-RUN wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz -O go${GO_VERSION}.linux-amd64.tar.gz
-RUN rm -rf /usr/local/go && tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz && \
-    rm go${GO_VERSION}.linux-amd64.tar.gz
-
-### Add Go to the PATH
-ENV PATH=$PATH:/usr/local/go/bin
-
-## Install Poetry
-
-RUN curl -sSL https://install.python-poetry.org -o install-poetry.py
-RUN python3 install-poetry.py --version ${POETRY_VERSION} && rm install-poetry.py
-ENV PATH=$HOME/.local/bin:$PATH
-
-# Add retry logic specifically for Maven
-RUN echo '#!/bin/bash\n\
-mvn "$@" || mvn "$@" -o || mvn "$@" -U\n\
-' > /usr/local/bin/mvn-retry \
-    && chmod +x /usr/local/bin/mvn-retry
+ENV VLM_OP_GETH_BRANCH=${VLM_OP_GETH_BRANCH}
+RUN echo "VLM_OP_GETH_BRANCH=${VLM_OP_GETH_BRANCH}"
 
 ## Setup the base directory
 WORKDIR /app
@@ -122,15 +45,7 @@ ENV WORKDIR=/app
 RUN chown -R ${USER}:${GROUP} /app
 USER ${USER}:${GROUP}
 
-# Setup of base components: K and its derivatives.
-
-## Install K
-
-RUN git clone --depth=1 --branch v${KFRAMEWORK_VERSION} https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${KFRAMEWORK_REPO} k
-RUN cd k && git submodule update --init --recursive
-ENV CXXFLAGS=-fvisibility=hidden
-RUN cd k && mvn-retry package -Dhaskell.backend.skip -DskipTests -Dllvm.backend.hyperblock.size.mult=512
-ENV PATH=$WORKDIR/k/k-distribution/target/release/k/bin:$PATH
+# Setup of base components: KEVM and VLM.
 
 # Configure Git to use credentials for all GitHub URLs
 RUN git config --global url."https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"

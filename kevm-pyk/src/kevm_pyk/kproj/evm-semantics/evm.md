@@ -830,20 +830,7 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
     rule [program.load]:
          <k> #loadProgram BYTES => .K ... </k>
          <program> _ => BYTES </program>
-         <jumpDests> _ => #computeValidJumpDests(BYTES) </jumpDests>
-
-    syntax Bytes ::= #computeValidJumpDests(Bytes)             [symbol(computeValidJumpDests),    function, memo, total]
-                   | #computeValidJumpDests(Bytes, Int, Bytes) [symbol(computeValidJumpDestsAux), function             ]
- // --------------------------------------------------------------------------------------------------------------------
-    rule #computeValidJumpDests(PGM) => #computeValidJumpDests(PGM, 0, padRightBytes(.Bytes, lengthBytes(PGM), 0))
-
-    syntax Bytes ::= #computeValidJumpDestsWithinBound(Bytes, Int, Bytes) [symbol(computeValidJumpDestsWithinBound), function]
- // --------------------------------------------------------------------------------------------------------------------------
-    rule #computeValidJumpDests(PGM, I, RESULT) => RESULT requires I >=Int lengthBytes(PGM)
-    rule #computeValidJumpDests(PGM, I, RESULT) => #computeValidJumpDestsWithinBound(PGM, I, RESULT) requires I <Int lengthBytes(PGM)
-
-    rule #computeValidJumpDestsWithinBound(PGM, I, RESULT) => #computeValidJumpDests(PGM, I +Int 1, RESULT[I <- 1]) requires PGM [ I ] ==Int 91
-    rule #computeValidJumpDestsWithinBound(PGM, I, RESULT) => #computeValidJumpDests(PGM, I +Int #widthOpCode(PGM [ I ]), RESULT) requires notBool PGM [ I ] ==Int 91
+         <jumpDests> _ => ComputeValidJumpDests(BYTES) </jumpDests>
 ```
 
 ```k

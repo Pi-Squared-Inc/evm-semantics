@@ -1710,30 +1710,31 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
 
     rule <k> #gasExec(SCHED, LOG(N) _ WIDTH) => (Glog < SCHED > +Int (Glogdata < SCHED > *Int WIDTH) +Int (N *Int Glogtopic < SCHED >)) ... </k>
 
+    syntax Exp ::= #handleCallGas(Schedule, acctNonExistent: BExp, cap: Gas, avail: Gas, value: Int, acct:Int, toAccessed: Bool, delegation:Int)  [strict(2)]
+    rule #handleCallGas(SCHED, ISEMPTY:Bool, GCAP, GAVAIL, VALUE, ACCTTO, ISWARM, TGT_ACCT)
+          => Ccallgas(SCHED, ISEMPTY, GCAP, GAVAIL, VALUE, ISWARM, TGT_ACCT, ACCTTO ==Int TGT_ACCT) ~> #allocateCallGas
+          ~> Ccall(SCHED, ISEMPTY, GCAP, GAVAIL, VALUE, ISWARM, TGT_ACCT, ACCTTO ==Int TGT_ACCT)
+
     rule <k> #gasExec(SCHED, CALL GCAP ACCTTO VALUE _ _ _ _)
-          => Ccallgas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO)) ~> #allocateCallGas
-          ~> Ccall(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO))
+          => #handleCallGas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, VALUE, ACCTTO, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO))
          ...
          </k>
          <gas> GAVAIL </gas>
 
     rule <k> #gasExec(SCHED, CALLCODE GCAP ACCTTO VALUE _ _ _ _)
-          => Ccallgas(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO)) ~> #allocateCallGas
-          ~> Ccall(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO))
+          => #handleCallGas(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, VALUE, ACCTTO, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO))
          ...
          </k>
          <gas> GAVAIL </gas>
 
     rule <k> #gasExec(SCHED, DELEGATECALL GCAP ACCTTO _ _ _ _)
-          => Ccallgas(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO)) ~> #allocateCallGas
-          ~> Ccall(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO))
+          => #handleCallGas(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, 0, ACCTTO, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO))
          ...
          </k>
          <gas> GAVAIL </gas>
 
     rule <k> #gasExec(SCHED, STATICCALL GCAP ACCTTO _ _ _ _)
-          => Ccallgas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO)) ~> #allocateCallGas
-          ~> Ccall(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO))
+          => #handleCallGas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, 0, ACCTTO, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO))
          ...
          </k>
          <gas> GAVAIL </gas>

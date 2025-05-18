@@ -58,5 +58,9 @@ RUN cd evm-semantics/kevm-pyk/src/kevm_pyk/kproj/plugin && git submodule update 
 RUN git clone --depth=1 --branch ${VLM_BRANCH} https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${VLM_REPO} vlm
 RUN cd vlm && git submodule update --init --recursive && cd op-geth && git checkout ${VLM_OP_GETH_BRANCH}
 
+
+# Build components
+RUN cd evm-semantics && make ../vlm/op-geth/tests/tests.test
+
 # Default command
 CMD ["bash"]

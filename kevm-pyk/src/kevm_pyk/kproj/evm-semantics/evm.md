@@ -1039,7 +1039,7 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
 
     rule [call.true]:
          <k> #call ACCTFROM ACCTTO ACCTCODE VALUE APPVALUE ARGS STATIC
-          => #callWithCode ACCTFROM ACCTTO ACCTCODE GetAccountCode(ACCTCODE) VALUE APPVALUE ARGS STATIC
+          => #callWithCode ACCTFROM ACCTTO ACCTCODE GetAndResolveCode(ACCTCODE) VALUE APPVALUE ARGS STATIC
          ...
          </k>
 

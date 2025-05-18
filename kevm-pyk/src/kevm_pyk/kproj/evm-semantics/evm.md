@@ -2017,16 +2017,16 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
          <gas> GAVAIL </gas>
 
     rule <k> #gasExec(SCHED, CALLCODE GCAP ACCTTO VALUE _ _ _ _)
-          => Ccallgas(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO)) ~> #allocateCallGas
-          ~> Ccall(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO))
+          => Ccallgas(SCHED, #accountNonexistent(ACCTID), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO)) ~> #allocateCallGas
+          ~> Ccall(SCHED, #accountNonexistent(ACCTID), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO))
          ...
          </k>
          <id> ACCTID </id>
          <gas> GAVAIL </gas>
 
     rule <k> #gasExec(SCHED, DELEGATECALL GCAP ACCTTO _ _ _ _)
-          => Ccallgas(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO)) ~> #allocateCallGas
-          ~> Ccall(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO))
+          => Ccallgas(SCHED, #accountNonexistent(ACCTID), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO)) ~> #allocateCallGas
+          ~> Ccall(SCHED, #accountNonexistent(ACCTID), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO))
          ...
          </k>
          <id> ACCTID </id>

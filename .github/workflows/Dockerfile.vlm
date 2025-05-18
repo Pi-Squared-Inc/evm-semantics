@@ -35,7 +35,7 @@ ARG EVM_BRANCH
 ENV EVM_BRANCH=${EVM_BRANCH}
 RUN echo "EVM_BRANCH=${EVM_BRANCH}"
 
-ARG VLM_OP_GETH_BRANCH=ulm
+ARG VLM_OP_GETH_BRANCH=moving-call-create-back-to-kevm
 ENV VLM_OP_GETH_BRANCH=${VLM_OP_GETH_BRANCH}
 RUN echo "VLM_OP_GETH_BRANCH=${VLM_OP_GETH_BRANCH}"
 
@@ -51,14 +51,12 @@ USER ${USER}:${GROUP}
 RUN git config --global url."https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
 
 ## Retrieve the KEVM repo
-
 RUN git clone --depth=1 --branch ${EVM_BRANCH} https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${EVM_SEMANTICS_REPO} evm-semantics
-RUN cd evm-semantics/kevm-pyk/src/kevm_pyk/kproj/plugin && git submodule update --init --recursive
+RUN cd evm-semantics/kevm-pyk/src/kevm_pyk/kproj/plugin && git submodule update --init --recursive .
 
 ## Retrieve the VLM repo
-
 RUN git clone --depth=1 --branch ${VLM_BRANCH} https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${VLM_REPO} vlm
-RUN cd vlm && git submodule update --init --recursive && cd op-geth && git checkout ${VLM_OP_GETH_BRANCH}
+RUN cd vlm && git submodule update --init --recursive && cd op-geth && git checkout ${VLM_OP_GETH_BRANCH} .
 
 # Default command
 CMD ["bash"]

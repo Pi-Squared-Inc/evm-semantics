@@ -1704,7 +1704,9 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
     rule <k> #gasExec(SCHED, MCOPY           _ _ WIDTH) => Gverylow < SCHED > +Int (Gcopy < SCHED > *Int (WIDTH up/Int 32)) ... </k>
 
     rule <k> #gasExec(SCHED, LOG(N) _ WIDTH) => (Glog < SCHED > +Int (Glogdata < SCHED > *Int WIDTH) +Int (N *Int Glogtopic < SCHED >)) ... </k>
+```
 
+```vlm
     rule <k> #gasExec(SCHED, CALL GCAP ACCTTO VALUE _ _ _ _)
           => Ccallgas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO)) ~> #allocateCallGas
           ~> Ccall(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO))
@@ -1732,7 +1734,9 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
          ...
          </k>
          <gas> GAVAIL </gas>
+```
 
+```k
     rule <k> #gasExec(SCHED, SELFDESTRUCT ACCTTO) => Cselfdestruct(SCHED, #accountNonexistent(ACCTTO), GetAccountBalance(Address())) ... </k>
 
     rule <k> #gasExec(SCHED, CREATE _ _ WIDTH)

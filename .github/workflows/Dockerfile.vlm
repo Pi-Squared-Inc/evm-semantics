@@ -143,7 +143,12 @@ RUN cd evm-semantics && git submodule update --init --recursive
 ## Retrieve the VLM repo
 
 RUN git clone --depth=1 --branch ${VLM_BRANCH} https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${VLM_REPO} vlm
-RUN cd vlm && git submodule update --init --recursive && cd op-geth && git checkout ${VLM_OP_GETH_BRANCH}
+RUN cd vlm && git submodule update --init op-geth && cd op-geth && git checkout ${VLM_OP_GETH_BRANCH}
 
 # Default command
 CMD ["bash"]
+
+## Copy build data
+
+RUN mkdir /app/build-data
+COPY build-data/* /app/build-data/

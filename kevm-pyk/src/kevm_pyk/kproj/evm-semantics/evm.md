@@ -69,6 +69,7 @@ In the comments next to each cell, we've marked which component of the YellowPap
               <pc>          0p256  </pc>                  // \mu_pc
               <gas>         $GAS:Gas </gas>               // \mau_g
               <memoryUsed>  0      </memoryUsed>          // \mu_i
+              <logUsed>     0      </logUsed>
               <callGas>     0:Gas  </callGas>
 
               <static>    $STATIC:Bool </static>
@@ -1809,6 +1810,7 @@ Overall Gas
  // ------------------------------------------------------
     rule <k> #gas [ OP , AOP ]
           => #memory [ OP , AOP ]
+          ~> #log [ OP , AOP ]
           ~> #gas [ AOP ]
           ~> #access [ OP , AOP, #isAccess(ACCT, AOP) ]
          ...
@@ -1822,16 +1824,31 @@ Overall Gas
          <memoryUsed> MU </memoryUsed>
       requires #usesMemory(OP)
 
-   rule <k> #memory [ _ , _ ] => .K ... </k> [owise]
+    rule <k> #memory [ _ , _ ] => .K ... </k> [owise]
 
-    syntax InternalOp ::= "#gas"    "[" OpCode "]" | "#deductGas" | "#deductMemoryGas"
+    rule <k> #log [ OP , AOP ] => #log(AOP, LU) ~> #deductLog ... </k>
+         <logUsed> LU </logUsed>
+      requires #usesLog(OP)
+
+    rule <k> #log [ _ , _ ] => .K ... </k> [owise]
+
+    syntax InternalOp ::= "#gas"    "[" OpCode "]" | "#deductGas" | "#deductMemoryGas" | "#deductLogGas"
                         | "#memory" "[" OpCode "," OpCode "]" | "#deductMemory"
- // ---------------------------------------------------------------------------
+                        | "#log" "[" OpCode "," OpCode "]" | "#deductLog"
+ // ---------------------------------------------------------------------------------------------------
     rule <k> MU':Int ~> #deductMemory => (Cmem(SCHED, MU') -Int Cmem(SCHED, MU)) ~> #deductMemoryGas ... </k>
          <memoryUsed> MU => MU' </memoryUsed> <schedule> SCHED </schedule>
 
+    rule <k> LU':Int ~> #deductLog => (Clog(SCHED, LU') -Int Clog(SCHED, LU)) ~> #deductLogGas ... </k>
+         <logUsed> LU => LU' </logUsed> <schedule> SCHED </schedule>
+
     rule <k> _G:Gas ~> (#deductMemoryGas => #deductGas)   ... </k> //Required for verification
-    rule <k>  G:Gas ~> #deductGas => #end #if ISPREC andBool isOptimismSchedule(SCHED) #then EVMC_PRECOMPILE_OOG #else EVMC_OUT_OF_GAS #fi ... </k> <gas> GAVAIL                  </gas> <isPrecompile> ISPREC </isPrecompile> <schedule> SCHED </schedule> requires GAVAIL <Gas G
+    rule <k> _G:Gas ~> (#deductLogGas    => #deductGas)   ... </k> //Required for verification
+    rule <k>  G:Gas ~> #deductGas => #end #if ISPREC andBool isOptimismSchedule(SCHED) #then EVMC_PRECOMPILE_OOG #else EVMC_OUT_OF_GAS #fi ... </k>
+         <gas> GAVAIL                  </gas>
+         <isPrecompile> ISPREC </isPrecompile>
+         <schedule> SCHED </schedule>
+      requires GAVAIL <Gas G
     rule <k>  G:Gas ~> #deductGas => .K                   ... </k> <gas> GAVAIL => GAVAIL -Gas G </gas> requires G <=Gas GAVAIL
 
     syntax Bool ::= #inStorage     ( Map   , Account , Int ) [symbol(#inStorage), function, total]
@@ -1907,6 +1924,25 @@ In the YellowPaper, each opcode is defined to consume zero gas unless specified 
  // ---------------------------------------------------------------------------------------------------
     rule #memoryUsageUpdate(MU,     _, WIDTH) => MU                                       requires notBool 0 <Int WIDTH [concrete]
     rule #memoryUsageUpdate(MU, START, WIDTH) => maxInt(MU, (START +Int WIDTH) up/Int 32) requires         0 <Int WIDTH [concrete]
+```
+
+Total Log Size
+------------------
+
+The total size of logs written is tracked to determine the appropriate amount of gas to charge for each log operation.
+
+-   `#log` computes the new total log size given the old size and next operator (with its arguments).
+
+```k
+    syntax Int ::= #log ( OpCode , Int ) [symbol(#log), function, total]
+ // --------------------------------------------------------------------
+    rule #log ( LOG(_) _ WIDTH , LU ) => LU +Int WIDTH requires 0 <Int WIDTH
+    rule #log ( _ , LU )              => LU [owise]
+
+    syntax Bool ::= #usesLog ( OpCode ) [symbol(#usesLog), function, total]
+ // -----------------------------------------------------------------------
+    rule #usesLog(_:LogOp) => true
+    rule #usesLog(_)       => false [owise]
 ```
 
 Access List Gas
@@ -1987,7 +2023,7 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
     rule <k> #gasExec(SCHED, CODECOPY        _ _ WIDTH) => Gverylow < SCHED > +Int (Gcopy < SCHED > *Int (MInt2Unsigned(WIDTH) up/Int 32)) ... </k>
     rule <k> #gasExec(SCHED, MCOPY           _ _ WIDTH) => Gverylow < SCHED > +Int (Gcopy < SCHED > *Int (MInt2Unsigned(WIDTH) up/Int 32)) ... </k>
 
-    rule <k> #gasExec(SCHED, LOG(N) _ WIDTH) => (Glog < SCHED > +Int (Glogdata < SCHED > *Int MInt2Unsigned(WIDTH)) +Int (MInt2Unsigned(N) *Int Glogtopic < SCHED >)) ... </k>
+    rule <k> #gasExec(SCHED, LOG(N) _ _) => (Glog < SCHED > +Int (N *Int Glogtopic < SCHED >)) ... </k>
 
     syntax Exp ::= #handleCallGas(Schedule, acctNonExistent: BExp, cap: Gas, avail: Gas, value: Int, acct:Int, AccountInfo)  [strict(2)]
  // ------------------------------------------------------------------------------------------------------------------------------------

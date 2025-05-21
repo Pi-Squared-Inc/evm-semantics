@@ -112,6 +112,7 @@ module GAS-FEES
                  | Cnew               ( Schedule , Bool , Int )              [symbol(Cnew),                function, total, smtlib(gas_Cnew)               ]
                  | Cxfer              ( Schedule , Int )                     [symbol(Cxfer),               function, total, smtlib(gas_Cxfer)              ]
                  | Cmem               ( Schedule , Int )                     [symbol(Cmem),                function, total, smtlib(gas_Cmem), memo         ]
+                 | Clog               ( Schedule , Int )                     [symbol(Clog),                function, total, smtlib(gas_Clog), memo         ]
                  | Caddraccess        ( Schedule , Bool )                    [symbol(Caddraccess),         function, total, smtlib(gas_Caddraccess)        ]
                  | Cstorageaccess     ( Schedule , Bool )                    [symbol(Cstorageaccess),      function, total, smtlib(gas_Cstorageaccess)     ]
                  | Csload             ( Schedule , Bool )                    [symbol(Csload),              function, total, smtlib(gas_Csload)             ]
@@ -183,6 +184,13 @@ module GAS-FEES
     rule [Cxfer.some]: Cxfer( SCHED, N) => Gcallvalue < SCHED > requires N =/=Int 0
 
     rule [Cmem]: Cmem(SCHED, N) => (N *Int Gmemory < SCHED >) +Int ((N *Int N) /Int Gquadcoeff < SCHED >) [concrete]
+
+    rule [Clog.short]: Clog(SCHED, N) => N *Int Glogdata < SCHED >
+      requires (notBool Ghasmip001 << SCHED >>) orBool (N <=Int Gloglimit < SCHED >)
+      [concrete]
+    rule [Clog.long] : Clog(SCHED, N) => (Gloglimit < SCHED > *Int Glogdata < SCHED >) +Int ((N -Int Gloglimit < SCHED >) *Int (N -Int Gloglimit < SCHED >))
+      requires Ghasmip001 <<SCHED >> andBool N >Int  Gloglimit < SCHED >
+      [concrete]
 
     rule [Cdelegationaccess]: Cdelegationaccess(SCHED, ISDELEGATION, ISWARM) => #if ISDELEGATION #then Caddraccess(SCHED, ISWARM) #else 0 #fi
     rule [Caddraccess]:    Caddraccess(SCHED, ISWARM)    => #if ISWARM #then Gwarmstorageread < SCHED > #else Gcoldaccountaccess < SCHED > #fi

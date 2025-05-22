@@ -229,7 +229,7 @@ $(KEVM_TARGET_LIB): $(VLM_KLLVM_LIB) $(EVM_K_SOURCES) $(CRYPTO_PLUGIN_LIB)
 		-I $(CRYPTO_PLUGIN_DIR) \
 		-I $(VLM_KLLVM_DIR) \
 		\
-		--md-selector 'k & ! symbolic' \
+		--md-selector '(k | vlm) & ! symbolic' \
 		--hook-namespaces 'JSON KRYPTO ULM' \
 		--output-definition $(KEVM_LIB_DIR) \
 		--type-inference-mode simplesub \

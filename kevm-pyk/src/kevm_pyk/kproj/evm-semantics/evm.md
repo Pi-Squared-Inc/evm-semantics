@@ -905,20 +905,7 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
     rule [program.load]:
          <k> #loadProgram BYTES => .K ... </k>
          <program> _ => BYTES </program>
-         <jumpDests> _ => #computeValidJumpDests(BYTES) </jumpDests>
-
-    syntax Bytes ::= #computeValidJumpDests(Bytes)             [symbol(computeValidJumpDests),    function, memo, total]
-                   | #computeValidJumpDests(Bytes, Int, Bytes) [symbol(computeValidJumpDestsAux), function             ]
- // --------------------------------------------------------------------------------------------------------------------
-    rule #computeValidJumpDests(PGM) => #computeValidJumpDests(PGM, 0, padRightBytes(.Bytes, lengthBytes(PGM), 0))
-
-    syntax Bytes ::= #computeValidJumpDestsWithinBound(Bytes, Int, Bytes) [symbol(computeValidJumpDestsWithinBound), function]
- // --------------------------------------------------------------------------------------------------------------------------
-    rule #computeValidJumpDests(PGM, I, RESULT) => RESULT requires I >=Int lengthBytes(PGM)
-    rule #computeValidJumpDests(PGM, I, RESULT) => #computeValidJumpDestsWithinBound(PGM, I, RESULT) requires I <Int lengthBytes(PGM)
-
-    rule #computeValidJumpDestsWithinBound(PGM, I, RESULT) => #computeValidJumpDests(PGM, I +Int 1, RESULT[I <- 1]) requires PGM [ I ] ==Int 91
-    rule #computeValidJumpDestsWithinBound(PGM, I, RESULT) => #computeValidJumpDests(PGM, I +Int #widthOpCode(PGM [ I ]), RESULT) requires notBool PGM [ I ] ==Int 91
+         <jumpDests> _ => ComputeValidJumpDests(BYTES) </jumpDests>
 ```
 
 ```k
@@ -2008,7 +1995,40 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
     rule <k> #gasExec(SCHED, MCOPY           _ _ WIDTH) => Gverylow < SCHED > +Int (Gcopy < SCHED > *Int (WIDTH up/Int 32)) ... </k>
 
     rule <k> #gasExec(SCHED, LOG(N) _ WIDTH) => (Glog < SCHED > +Int (Glogdata < SCHED > *Int WIDTH) +Int (N *Int Glogtopic < SCHED >)) ... </k>
+```
 
+```reth
+    syntax Exp ::= #handleCallGas(Schedule, acctNonExistent: BExp, cap: Gas, avail: Gas, value: Int, acct:Int, AccountInfo)  [strict(2)]
+    rule #handleCallGas(SCHED, ISEMPTY:Bool, GCAP, GAVAIL, VALUE, ACCTTO, AccountInfo(ISWARM, TGT_ACCT))
+          => Ccallgas(SCHED, ISEMPTY, GCAP, GAVAIL, VALUE, ISWARM, TGT_ACCT, ACCTTO ==Int TGT_ACCT) ~> #allocateCallGas
+          ~> Ccall(SCHED, ISEMPTY, GCAP, GAVAIL, VALUE, ISWARM, TGT_ACCT, ACCTTO ==Int TGT_ACCT)
+
+    rule <k> #gasExec(SCHED, CALL GCAP ACCTTO VALUE _ _ _ _)
+          => #handleCallGas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, VALUE, ACCTTO, GetAccountInfoAndWarmIt(ACCTTO))
+         ...
+         </k>
+         <gas> GAVAIL </gas>
+
+    rule <k> #gasExec(SCHED, CALLCODE GCAP ACCTTO VALUE _ _ _ _)
+          => #handleCallGas(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, VALUE, ACCTTO, GetAccountInfoAndWarmIt(ACCTTO))
+         ...
+         </k>
+         <gas> GAVAIL </gas>
+
+    rule <k> #gasExec(SCHED, DELEGATECALL GCAP ACCTTO _ _ _ _)
+          => #handleCallGas(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, 0, ACCTTO, GetAccountInfoAndWarmIt(ACCTTO))
+         ...
+         </k>
+         <gas> GAVAIL </gas>
+
+    rule <k> #gasExec(SCHED, STATICCALL GCAP ACCTTO _ _ _ _)
+          => #handleCallGas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, 0, ACCTTO, GetAccountInfoAndWarmIt(ACCTTO))
+         ...
+         </k>
+         <gas> GAVAIL </gas>
+```
+
+```vlm
     rule <k> #gasExec(SCHED, CALL GCAP ACCTTO VALUE _ _ _ _)
           => Ccallgas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO)) ~> #allocateCallGas
           ~> Ccall(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO))
@@ -2038,7 +2058,9 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
          ...
          </k>
          <gas> GAVAIL </gas>
+```
 
+```k
     rule <k> #gasExec(SCHED, SELFDESTRUCT ACCTTO) => Cselfdestruct(SCHED, #accountNonexistent(ACCTTO), GetAccountBalance(ACCT)) ... </k>
          <id> ACCT </id>
 
@@ -2388,5 +2410,6 @@ After interpreting the strings representing programs as a `WordStack`, it should
     rule #dasmOpCode( 254,     _ ) => INVALID
     rule #dasmOpCode( 255,     _ ) => SELFDESTRUCT
     rule #dasmOpCode(   W,     _ ) => UNDEFINED(W) [owise]
+
 endmodule
 ```

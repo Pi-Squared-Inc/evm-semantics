@@ -1186,17 +1186,18 @@ Precompiled Contracts
     rule <k> KZGPOINTEVAL => #end EVMC_SUCCESS ... </k>
          <output> _ => Int2Bytes(32, 4096, BE) +Bytes Int2Bytes(32, blsModulus, BE) </output>
       requires lengthBytes( CallData() ) ==Int 192
-       andBool #kzg2vh(substrBytes(CallData(), 96, 144)) ==K substrBytes(CallData(), 0, 32)
+       andBool #kzg2vh(substrBytes(CallData(), 96, 144)) ==Bytes substrBytes(CallData(), 0, 32)
        andBool Bytes2Int(substrBytes(CallData(), 32, 64), BE, Unsigned) <Int blsModulus
        andBool Bytes2Int(substrBytes(CallData(), 64, 96), BE, Unsigned) <Int blsModulus
        andBool verifyKZGProof(substrBytes(CallData(), 96, 144), substrBytes(CallData(), 32, 64), substrBytes(CallData(), 64, 96), substrBytes(CallData(), 144, 192))
 
     rule <k> KZGPOINTEVAL => #end EVMC_PRECOMPILE_FAILURE ... </k>
-      requires lengthBytes( CallData() ) =/=Int 192
-       orBool #kzg2vh(substrBytes(CallData(), 96, 144)) =/=K substrBytes(CallData(), 0, 32)
-       orBool Bytes2Int(substrBytes(CallData(), 32, 64), BE, Unsigned) >=Int blsModulus
-       orBool Bytes2Int(substrBytes(CallData(), 64, 96), BE, Unsigned) >=Int blsModulus
-       orBool notBool verifyKZGProof(substrBytes(CallData(), 96, 144), substrBytes(CallData(), 32, 64), substrBytes(CallData(), 64, 96), substrBytes(CallData(), 144, 192))
+      requires notBool
+             ( lengthBytes( CallData() ) ==Int 192
+       andBool #kzg2vh(substrBytes(CallData(), 96, 144)) ==Bytes substrBytes(CallData(), 0, 32)
+       andBool Bytes2Int(substrBytes(CallData(), 32, 64), BE, Unsigned) <Int blsModulus
+       andBool Bytes2Int(substrBytes(CallData(), 64, 96), BE, Unsigned) <Int blsModulus
+       andBool verifyKZGProof(substrBytes(CallData(), 96, 144), substrBytes(CallData(), 32, 64), substrBytes(CallData(), 64, 96), substrBytes(CallData(), 144, 192)))
 
     syntax Bytes ::= #kzg2vh ( Bytes ) [symbol(#kzg2vh), function, total]
  // ---------------------------------------------------------------------

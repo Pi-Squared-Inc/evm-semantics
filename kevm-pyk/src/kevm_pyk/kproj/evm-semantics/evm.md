@@ -1126,9 +1126,13 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
     syntax InternalOp ::= "#create"   Int Int Int Bytes
                         | "#mkCreate" Int Int Int Bytes
                         | "#incrementNonce" Int
-                        | "#newAccount" Int
                         | "#checkCreate" Int Int
     // ------------------------------------------------
+```
+```vlm
+    syntax InternalOp ::= "#newAccount" Int
+   // -------------------------------------
+
    rule <k> #create ACCTFROM ACCTTO VALUE INITCODE
           => IncrementNonce(ACCTFROM)
           ~> #pushCallStack ~> #pushWorldState
@@ -1150,8 +1154,33 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
          <callData> _ => .Bytes </callData>
          <callValue> _ => VALUE </callValue>
 
-    rule <k> #incrementNonce ACCT => IncrementNonce(ACCT) ... </k>
     rule <k> #newAccount ACCT => #if NewAccount(ACCT) #then .K #else  #end EVMC_ACCOUNT_ALREADY_EXISTS #fi ... </k>
+```
+```reth
+    syntax InternalOp ::= "#newAccount" Int Int Int
+   // ---------------------------------------------
+
+   rule <k> #create ACCTFROM ACCTTO VALUE INITCODE
+          => IncrementNonce(ACCTFROM)
+          ~> #pushCallStack ~> #pushWorldState
+          ~> #newAccount ACCTTO ACCTFROM VALUE
+          ~> #mkCreate ACCTFROM ACCTTO VALUE INITCODE
+         ...
+         </k>
+
+    rule <k> #mkCreate ACCTFROM ACCTTO VALUE INITCODE  => #loadProgram INITCODE ~> #initVM ~> #execute ... </k>
+         <id> _ => ACCTTO </id>
+         <gas> _GAVAIL => GCALL </gas>
+         <callGas> GCALL => 0 </callGas>
+         <caller> _ => ACCTFROM </caller>
+         <callDepth> CD => CD +Int 1 </callDepth>
+         <callData> _ => .Bytes </callData>
+         <callValue> _ => VALUE </callValue>
+
+    rule <k> #newAccount ACCT ACCTFROM VALUE => #if NewAccount(ACCT, ACCTFROM, VALUE) #then .K #else #end EVMC_ACCOUNT_ALREADY_EXISTS #fi ... </k>
+```
+```k
+    rule <k> #incrementNonce ACCT => IncrementNonce(ACCT) ... </k>
     rule <k> #checkCreate ACCT VALUE => #checkBalanceUnderflow ACCT VALUE ~> #checkDepthExceeded ~> #checkNonceExceeded ACCT ... </k>
 
       syntax Bool ::= #isValidCode ( Bytes , Schedule ) [symbol(#isValidCode), function]
@@ -1205,7 +1234,7 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
          ...
          </k>
          <gas> GAVAIL </gas>
-          <schedule> FRONTIER </schedule>
+         <schedule> FRONTIER </schedule>
 
     rule <statusCode> _:ExceptionalStatusCode </statusCode>
          <k> #halt ~> #finishCodeDeposit _ _ => #popCallStack ~> #popWorldState ~> 0 ~> #push ... </k>
@@ -2010,15 +2039,17 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
          <gas> GAVAIL </gas>
 
     rule <k> #gasExec(SCHED, CALLCODE GCAP ACCTTO VALUE _ _ _ _)
-          => #handleCallGas(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, VALUE, ACCTTO, GetAccountInfoAndWarmIt(ACCTTO))
+          => #handleCallGas(SCHED, #accountNonexistent(ACCTID), GCAP, GAVAIL, VALUE, ACCTTO, GetAccountInfoAndWarmIt(ACCTTO))
          ...
          </k>
+         <id> ACCTID </id>
          <gas> GAVAIL </gas>
 
     rule <k> #gasExec(SCHED, DELEGATECALL GCAP ACCTTO _ _ _ _)
-          => #handleCallGas(SCHED, #accountNonexistent(Address()), GCAP, GAVAIL, 0, ACCTTO, GetAccountInfoAndWarmIt(ACCTTO))
+          => #handleCallGas(SCHED, #accountNonexistent(ACCTID), GCAP, GAVAIL, 0, ACCTTO, GetAccountInfoAndWarmIt(ACCTTO))
          ...
          </k>
+         <id> ACCTID </id>
          <gas> GAVAIL </gas>
 
     rule <k> #gasExec(SCHED, STATICCALL GCAP ACCTTO _ _ _ _)

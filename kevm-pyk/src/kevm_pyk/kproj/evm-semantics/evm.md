@@ -159,14 +159,15 @@ The `callStack` cell stores a list of previous VM execution states.
     syntax InternalOp ::= "#popWorldState"
  // --------------------------------------
     rule <k> #popWorldState => RevertInsideCall(S) ... </k>
+         <snapshotCount> SC => SC -Int 1 </snapshotCount>
          <snapshot> ListItem(S) SS => SS </snapshot>
 
     syntax InternalOp ::= "#dropWorldState"
  // ---------------------------------------
-    rule <k> #dropWorldState => .K ... </k>
+    rule <k> #dropWorldState => Commit() ... </k>
+         <snapshotCount> SC => SC -Int 1 </snapshotCount>
          <snapshot> ListItem(_) SS => SS </snapshot>
 ```
-
 Control Flow
 ------------
 
@@ -1163,7 +1164,7 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
    rule <k> #create ACCTFROM ACCTTO VALUE INITCODE
           => IncrementNonce(ACCTFROM)
           ~> #pushCallStack ~> #pushWorldState
-          ~> #newAccount ACCTTO ACCTFROM VALUE
+          ~> #newAccount ACCTFROM ACCTTO VALUE
           ~> #mkCreate ACCTFROM ACCTTO VALUE INITCODE
          ...
          </k>
@@ -1177,7 +1178,7 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
          <callData> _ => .Bytes </callData>
          <callValue> _ => VALUE </callValue>
 
-    rule <k> #newAccount ACCT ACCTFROM VALUE => #if NewAccount(ACCT, ACCTFROM, VALUE) #then .K #else #end EVMC_ACCOUNT_ALREADY_EXISTS #fi ... </k>
+    rule <k> #newAccount ACCTFROM ACCTTO VALUE => #if NewAccount(ACCTFROM, ACCTTO, VALUE) #then .K #else #end EVMC_ACCOUNT_ALREADY_EXISTS #fi ... </k>
 ```
 ```k
     rule <k> #incrementNonce ACCT => IncrementNonce(ACCT) ... </k>

@@ -149,7 +149,25 @@ The `callStack` cell stores a list of previous VM execution states.
 -   `#popWorldState` restores Nth snapshot of the world state.
 -   `#dropWorldState` removes the last number of snapshots of the world state. It doesn't affect the state jornal. We follow this convention as GETh never decrease the size of its journal orinally.
 
-```k
+```vlm
+    syntax InternalOp ::= "#pushWorldState"
+ // ---------------------------------------
+    rule <k> #pushWorldState => PushInsideCall() ... </k>
+         <snapshotCount> SC => SC +Int 1 </snapshotCount>
+         <snapshot>  SS => pushList(SC +Int 1, SS) </snapshot>
+
+    syntax InternalOp ::= "#popWorldState"
+ // --------------------------------------
+    rule <k> #popWorldState => RevertInsideCall(S) ... </k>
+         <snapshot> ListItem(S) SS => SS </snapshot>
+
+    syntax InternalOp ::= "#dropWorldState"
+ // ---------------------------------------
+    rule <k> #dropWorldState => .K ... </k>
+         <snapshot> ListItem(_) SS => SS </snapshot>
+```
+
+```reth
     syntax InternalOp ::= "#pushWorldState"
  // ---------------------------------------
     rule <k> #pushWorldState => PushInsideCall() ... </k>

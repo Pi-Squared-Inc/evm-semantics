@@ -1126,7 +1126,6 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
 ```k
     syntax InternalOp ::= "#create"   Int Int Int Bytes
                         | "#mkCreate" Int Int Int Bytes
-                        | "#incrementNonce" Int
                         | "#checkCreate" Int Int
     // ------------------------------------------------
 ```
@@ -1181,7 +1180,6 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
     rule <k> #newAccount ACCTFROM ACCTTO VALUE => #if NewAccount(ACCTFROM, ACCTTO, VALUE) #then .K #else #end EVMC_ACCOUNT_ALREADY_EXISTS #fi ... </k>
 ```
 ```k
-    rule <k> #incrementNonce ACCT => IncrementNonce(ACCT) ... </k>
     rule <k> #checkCreate ACCT VALUE => #checkBalanceUnderflow ACCT VALUE ~> #checkDepthExceeded ~> #checkNonceExceeded ACCT ... </k>
 
       syntax Bool ::= #isValidCode ( Bytes , Schedule ) [symbol(#isValidCode), function]

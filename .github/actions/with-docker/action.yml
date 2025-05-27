@@ -73,7 +73,7 @@ runs:
         GITHUB_ACTOR=${{ github.actor }}
         GITHUB_TOKEN=${{ steps.temp-token.outputs.token }}
         EVM_BRANCH=${{ github.head_ref || github.ref_name }}
-        VLM_BRANCH=moving-call-create-back-to-kevm
+        VLM_BRANCH=ulm-rebase
         WORKSPACE=${{ github.workspace }}
         USER=test-user
         GROUP=test-user

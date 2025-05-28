@@ -75,7 +75,13 @@ In the comments next to each cell, we've marked which component of the YellowPap
             // Immutable during a single transaction
             // -------------------------------------
             <snapshotCount> 0 </snapshotCount>
+```
+
+```vlm
             <snapshot> ListItem(0) </snapshot>
+```
+
+```k
           </evm>
         </ethereum>
 
@@ -172,19 +178,16 @@ The `callStack` cell stores a list of previous VM execution states.
  // ---------------------------------------
     rule <k> #pushWorldState => PushInsideCall() ... </k>
          <snapshotCount> SC => SC +Int 1 </snapshotCount>
-         <snapshot>  SS => pushList(SC +Int 1, SS) </snapshot>
 
     syntax InternalOp ::= "#popWorldState"
  // --------------------------------------
-    rule <k> #popWorldState => RevertInsideCall(S) ... </k>
+    rule <k> #popWorldState => RevertInsideCall(SC) ... </k>
          <snapshotCount> SC => SC -Int 1 </snapshotCount>
-         <snapshot> ListItem(S) SS => SS </snapshot>
 
     syntax InternalOp ::= "#dropWorldState"
  // ---------------------------------------
     rule <k> #dropWorldState => Commit() ... </k>
          <snapshotCount> SC => SC -Int 1 </snapshotCount>
-         <snapshot> ListItem(_) SS => SS </snapshot>
 ```
 Control Flow
 ------------

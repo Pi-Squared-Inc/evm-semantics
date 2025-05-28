@@ -75,11 +75,11 @@ In the comments next to each cell, we've marked which component of the YellowPap
             // Immutable during a single transaction
             // -------------------------------------
             <snapshotCount> 0 </snapshotCount>
-         ```
-         ```vlm
+```
+```vlm
             <snapshot> ListItem(0) </snapshot>
-         ```
-         ```k
+```
+```k
           </evm>
         </ethereum>
 

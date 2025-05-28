@@ -71,13 +71,10 @@ In the comments next to each cell, we've marked which component of the YellowPap
               <static>    $STATIC:Bool </static>
               <callDepth> 0     </callDepth>
             </callState>
-
-            // Immutable during a single transaction
-            // -------------------------------------
-            <snapshotCount> 0 </snapshotCount>
 ```
 
 ```vlm
+            <snapshotCount> 0 </snapshotCount>
             <snapshot> ListItem(0) </snapshot>
 ```
 
@@ -176,18 +173,15 @@ The `callStack` cell stores a list of previous VM execution states.
 ```reth
     syntax InternalOp ::= "#pushWorldState"
  // ---------------------------------------
-    rule <k> #pushWorldState => PushInsideCall() ... </k>
-         <snapshotCount> SC => SC +Int 1 </snapshotCount>
+    rule <k> #pushWorldState => PushState() ... </k>
 
     syntax InternalOp ::= "#popWorldState"
  // --------------------------------------
-    rule <k> #popWorldState => RevertInsideCall(SC) ... </k>
-         <snapshotCount> SC => SC -Int 1 </snapshotCount>
+    rule <k> #popWorldState => RollbackState() ... </k>
 
     syntax InternalOp ::= "#dropWorldState"
  // ---------------------------------------
-    rule <k> #dropWorldState => Commit() ... </k>
-         <snapshotCount> SC => SC -Int 1 </snapshotCount>
+    rule <k> #dropWorldState => CommitState() ... </k>
 ```
 Control Flow
 ------------

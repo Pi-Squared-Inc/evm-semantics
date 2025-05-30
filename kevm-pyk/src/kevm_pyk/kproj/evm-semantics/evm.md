@@ -1164,7 +1164,8 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
     syntax InternalOp ::= "#newAccount" Int
    // -------------------------------------
 
-   rule <k> #create ACCTFROM ACCTTO VALUE INITCODE
+   rule [create]:
+         <k> #create ACCTFROM ACCTTO VALUE INITCODE
           => IncrementNonce(ACCTFROM)
           ~> #pushCallStack ~> #pushWorldState
           ~> #newAccount ACCTTO
@@ -1191,7 +1192,8 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
     syntax InternalOp ::= "#newAccount" Int Int Int
    // ---------------------------------------------
 
-   rule <k> #create ACCTFROM ACCTTO VALUE INITCODE
+   rule [create]:
+        <k> #create ACCTFROM ACCTTO VALUE INITCODE
           => IncrementNonce(ACCTFROM)
           ~> #pushCallStack ~> #pushWorldState
           ~> #newAccount ACCTFROM ACCTTO VALUE
@@ -1509,7 +1511,7 @@ Precompiled Contracts
     rule <k> BLAKE2F => #end EVMC_PRECOMPILE_FAILURE ... </k>
          <callData> CD </callData>
       requires lengthBytes( CD ) ==Int 213
-       andBool CD[212] >Int 1
+       andBool notBool (CD[212] <=Int 1)
 
     rule <k> BLAKE2F => #end EVMC_PRECOMPILE_FAILURE ... </k>
          <callData> CD </callData>
@@ -2060,9 +2062,9 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
 
 ```reth
     syntax Exp ::= #handleCallGas(Schedule, acctNonExistent: BExp, cap: Gas, avail: Gas, value: Int, acct:Int, AccountInfo)  [strict(2)]
-    rule #handleCallGas(SCHED, ISEMPTY:Bool, GCAP, GAVAIL, VALUE, ACCTTO, AccountInfo(ISWARM, TGT_ACCT))
-          => Ccallgas(SCHED, ISEMPTY, GCAP, GAVAIL, VALUE, ISWARM, TGT_ACCT, ACCTTO ==Int TGT_ACCT) ~> #allocateCallGas
-          ~> Ccall(SCHED, ISEMPTY, GCAP, GAVAIL, VALUE, ISWARM, TGT_ACCT, ACCTTO ==Int TGT_ACCT)
+    rule #handleCallGas(SCHED, ISEMPTY:Bool, GCAP, GAVAIL, VALUE, ACCTTO, ACCTINFO)
+          => Ccallgas(SCHED, ISEMPTY, GCAP, GAVAIL, VALUE, isWarm(ACCTINFO), delegation(ACCTINFO), ACCTTO ==Int delegation(ACCTINFO)) ~> #allocateCallGas
+          ~> Ccall(SCHED, ISEMPTY, GCAP, GAVAIL, VALUE, isWarm(ACCTINFO), delegation(ACCTINFO), ACCTTO ==Int delegation(ACCTINFO))
 
     rule <k> #gasExec(SCHED, CALL GCAP ACCTTO VALUE _ _ _ _)
           => #handleCallGas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, VALUE, ACCTTO, GetAccountInfoAndWarmIt(ACCTTO))

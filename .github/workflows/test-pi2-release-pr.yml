@@ -1,0 +1,48 @@
+# NOTE: this CI workflow depends on the Pi-Squared-Inc/revm workflow!
+# This workflow only checks whether the pinned evm-semantics commit in revm matches the current master commit.
+# For this to make sense, the revm CI workflow should check out the pinned evm-semantics commit and run tests to demonstrate its correctness.
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  push:
+    branches: ["pi2-release"]
+
+concurrency:
+  group: run-tests
+
+jobs:
+  blockchain-tests:
+    runs-on: [self-hosted, aws, us-east-2, m6a.4xlarge]
+
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - uses: actions/create-github-app-token@v1
+        id: temp-token
+        name: Generate temporary GitHub Token
+        with:
+          app-id: ${{ vars.CICD_GITHUB_WEBAPP_ID }}
+          private-key: ${{ secrets.CICD_GITHUB_WEBAPP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Check out evm-semantics repository
+        uses: actions/checkout@v4
+        with:
+          path: evm-semantics
+
+      - name: Check out revm repository
+        uses: actions/checkout@v4
+        with:
+          path: revm
+          repository: Pi-Squared-Inc/revm
+          token: ${{ steps.temp-token.outputs.token }}
+
+      - name: Check evm-semantics commit matches
+        run: |
+          local_commit=$(cd evm-semantics; git rev-parse HEAD)
+          remote_commit=$(cat revm/deps/evm-semantics | cut -d':' -f2)
+          # uncomment after merging revm CI PR
+          # [ "$local_commit" -ne "$remote_commit" ] && exit 1

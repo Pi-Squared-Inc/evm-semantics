@@ -71,14 +71,6 @@ In the comments next to each cell, we've marked which component of the YellowPap
               <static>    $STATIC:Bool </static>
               <callDepth> 0     </callDepth>
             </callState>
-```
-
-```vlm
-            <snapshotCount> 0 </snapshotCount>
-            <snapshot> ListItem(0) </snapshot>
-```
-
-```k
           </evm>
         </ethereum>
 
@@ -152,25 +144,7 @@ The `callStack` cell stores a list of previous VM execution states.
 -   `#popWorldState` restores Nth snapshot of the world state.
 -   `#dropWorldState` removes the last number of snapshots of the world state. It doesn't affect the state jornal. We follow this convention as GETh never decrease the size of its journal orinally.
 
-```vlm
-    syntax InternalOp ::= "#pushWorldState"
- // ---------------------------------------
-    rule <k> #pushWorldState => PushInsideCall() ... </k>
-         <snapshotCount> SC => SC +Int 1 </snapshotCount>
-         <snapshot>  SS => pushList(SC +Int 1, SS) </snapshot>
-
-    syntax InternalOp ::= "#popWorldState"
- // --------------------------------------
-    rule <k> #popWorldState => RevertInsideCall(S) ... </k>
-         <snapshot> ListItem(S) SS => SS </snapshot>
-
-    syntax InternalOp ::= "#dropWorldState"
- // ---------------------------------------
-    rule <k> #dropWorldState => .K ... </k>
-         <snapshot> ListItem(_) SS => SS </snapshot>
-```
-
-```reth
+```k
     syntax InternalOp ::= "#pushWorldState"
  // ---------------------------------------
     rule <k> #pushWorldState => PushState() ... </k>
@@ -1145,27 +1119,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
          ...
          </k>
 
-```
-``` vlm
-    rule <k> #newAccount ACCTFROM ACCTTO VALUE
-          => #transferFundsFrom ACCTFROM ACCTTO VALUE
-          ~> #if NewAccount(ACCTTO) #then .K #else  #end EVMC_ACCOUNT_ALREADY_EXISTS #fi
-         ...
-         </k>
 
-    rule <k> #mkCreate ACCTFROM ACCTTO VALUE INITCODE
-          => AccessAccount(ACCTFROM) ~> AccessAccount(ACCTTO) ~> IncrementNonceOnCreate(ACCTTO, $SCHEDULE) ~> #loadProgram INITCODE ~> #initVM ~> #execute
-         ...
-         </k>
-         <id> _ => ACCTTO </id>
-         <gas> _GAVAIL => GCALL </gas>
-         <callGas> GCALL => 0 </callGas>
-         <caller> _ => ACCTFROM </caller>
-         <callDepth> CD => CD +Int 1 </callDepth>
-         <callData> _ => .Bytes </callData>
-         <callValue> _ => VALUE </callValue>
-```
-```reth
     rule <k> #newAccount ACCTFROM ACCTTO VALUE
           => #if NewAccount(ACCTFROM, ACCTTO, VALUE) #then .K #else #end EVMC_ACCOUNT_ALREADY_EXISTS #fi
          ...
@@ -2025,10 +1979,9 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
     rule <k> #gasExec(SCHED, MCOPY           _ _ WIDTH) => Gverylow < SCHED > +Int (Gcopy < SCHED > *Int (WIDTH up/Int 32)) ... </k>
 
     rule <k> #gasExec(SCHED, LOG(N) _ WIDTH) => (Glog < SCHED > +Int (Glogdata < SCHED > *Int WIDTH) +Int (N *Int Glogtopic < SCHED >)) ... </k>
-```
 
-```reth
     syntax Exp ::= #handleCallGas(Schedule, acctNonExistent: BExp, cap: Gas, avail: Gas, value: Int, acct:Int, AccountInfo)  [strict(2)]
+ // ------------------------------------------------------------------------------------------------------------------------------------
     rule #handleCallGas(SCHED, ISEMPTY:Bool, GCAP, GAVAIL, VALUE, ACCTTO, AccountInfo(ISWARM, TGT_ACCT))
           => Ccallgas(SCHED, ISEMPTY, GCAP, GAVAIL, VALUE, ISWARM, TGT_ACCT, ACCTTO ==Int TGT_ACCT) ~> #allocateCallGas
           ~> Ccall(SCHED, ISEMPTY, GCAP, GAVAIL, VALUE, ISWARM, TGT_ACCT, ACCTTO ==Int TGT_ACCT)
@@ -2058,41 +2011,7 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
          ...
          </k>
          <gas> GAVAIL </gas>
-```
 
-```vlm
-    rule <k> #gasExec(SCHED, CALL GCAP ACCTTO VALUE _ _ _ _)
-          => Ccallgas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO)) ~> #allocateCallGas
-          ~> Ccall(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO))
-         ...
-         </k>
-         <gas> GAVAIL </gas>
-
-    rule <k> #gasExec(SCHED, CALLCODE GCAP ACCTTO VALUE _ _ _ _)
-          => Ccallgas(SCHED, #accountNonexistent(ACCTID), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO)) ~> #allocateCallGas
-          ~> Ccall(SCHED, #accountNonexistent(ACCTID), GCAP, GAVAIL, VALUE, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO))
-         ...
-         </k>
-         <id> ACCTID </id>
-         <gas> GAVAIL </gas>
-
-    rule <k> #gasExec(SCHED, DELEGATECALL GCAP ACCTTO _ _ _ _)
-          => Ccallgas(SCHED, #accountNonexistent(ACCTID), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO)) ~> #allocateCallGas
-          ~> Ccall(SCHED, #accountNonexistent(ACCTID), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO))
-         ...
-         </k>
-         <id> ACCTID </id>
-         <gas> GAVAIL </gas>
-
-    rule <k> #gasExec(SCHED, STATICCALL GCAP ACCTTO _ _ _ _)
-          => Ccallgas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO)) ~> #allocateCallGas
-          ~> Ccall(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, 0, AccessedAccount(ACCTTO), GetAccountDelegation(ACCTTO), ACCTTO ==Int GetAccountDelegation(ACCTTO))
-         ...
-         </k>
-         <gas> GAVAIL </gas>
-```
-
-```k
     rule <k> #gasExec(SCHED, SELFDESTRUCT ACCTTO) => Cselfdestruct(SCHED, #accountNonexistent(ACCTTO), GetAccountBalance(ACCT)) ... </k>
          <id> ACCT </id>
 

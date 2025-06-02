@@ -891,13 +891,101 @@ These rules reach into the network state and load/store from account storage:
       [preserves-definedness]
 ```
 
+### Transfer Operation
+```k
+    syntax InternalOp ::= "#transferFundsFrom" Int Int Int
+   // -------------------------------------------------------------------------------------------------
+    rule [transferFundsFrom.success]:
+      <k> #transferFundsFrom ACCTFROM ACCTTO VALUE => .K ... </k>
+      requires TransferFrom(ACCTFROM, ACCTTO, VALUE)
+
+    rule [transferFundsFrom.failure]:
+      <k> #transferFundsFrom _ _ _ => #end EVMC_BALANCE_UNDERFLOW ... </k> [owise]
+```
+
 ### Call Operations
 
 The various `CALL*` (and other inter-contract control flow) operations will be desugared into these `InternalOp`s.
 
+-   `#checkCall` takes the calling account and the value of the call and triggers several checks before executing the call.
+-   `#checkBalanceUnderflow` takes the calling account and the value of the call and checks if the call value is greater than the account balance.
+-   `#checkDepthExceeded` checks if the current call depth is greater than or equal to `1024`.
+-   `#checkNonceExceeded` takes the calling account and checks if the nonce is less than `maxUInt64` (`18446744073709551615`).
+-   `#call` takes the calling account, the account to execute as, the account whose code should execute, the gas limit, the amount to transfer, the arguments, and the static flag.
+-   `#callWithCode` takes the calling account, the account to execute as, the code to execute (as a `Bytes`), the gas limit, the amount to transfer, the arguments, and the static flag.
 -   `#return` is a placeholder for the calling program, specifying where to place the returned data in memory.
 
 ```k
+    syntax InternalOp ::= "#checkCall"             Int Int
+                        | "#checkBalanceUnderflow" Int Int
+                        | "#checkNonceExceeded"    Int
+                        | "#checkDepthExceeded"
+                        | "#call"                  Int Int Int Int Int Bytes Bool
+                        | "#callWithCode"          Int Int Int Bytes Int Int Bytes Bool [symbol(callwithcode_check_fork)]
+                        | "#mkCall"                Int Int Int Bytes     Int Bytes Bool
+ // -----------------------------------------------------------------------------------
+     rule <k> #checkBalanceUnderflow ACCT VALUE => #refund GCALL ~> #pushCallStack ~> #pushWorldState ~> #end EVMC_BALANCE_UNDERFLOW ... </k>
+         <output> _ => .Bytes </output>
+         <callGas> GCALL </callGas>
+      requires VALUE >Int GetAccountBalance(ACCT)
+
+    rule <k> #checkBalanceUnderflow ACCT VALUE => .K ... </k>
+      requires VALUE <=Int GetAccountBalance(ACCT)
+
+    rule <k> #checkDepthExceeded => #refund GCALL ~> #pushCallStack ~> #pushWorldState ~> #end EVMC_CALL_DEPTH_EXCEEDED ... </k>
+         <output> _ => .Bytes </output>
+         <callGas> GCALL </callGas>
+         <callDepth> CD </callDepth>
+      requires CD >=Int 1024
+
+    rule <k> #checkDepthExceeded => .K ... </k>
+         <callDepth> CD </callDepth>
+      requires CD <Int 1024
+
+    rule <k> #checkNonceExceeded ACCT => #refund GCALL ~> #pushCallStack ~> #pushWorldState ~> #end EVMC_NONCE_EXCEEDED ... </k>
+         <output> _ => .Bytes </output>
+         <callGas> GCALL </callGas>
+      requires notBool #rangeNonce(GetAccountNonce(ACCT))
+
+    rule <k> #checkNonceExceeded ACCT => .K ... </k>
+      requires #rangeNonce(GetAccountNonce(ACCT))
+
+    rule <k> #checkCall ACCT VALUE => #checkBalanceUnderflow ACCT VALUE ~> #checkDepthExceeded ... </k>
+
+    rule [call.true]:
+         <k> #call ACCTFROM ACCTTO ACCTCODE VALUE APPVALUE ARGS STATIC
+          => #callWithCode ACCTFROM ACCTTO ACCTCODE GetAndResolveCode(ACCTCODE) VALUE APPVALUE ARGS STATIC
+         ...
+         </k>
+        requires AccountExists(ACCTCODE)
+
+    rule [call.false]:
+         <k> #call ACCTFROM ACCTTO ACCTCODE VALUE APPVALUE ARGS STATIC
+          => #callWithCode ACCTFROM ACCTTO ACCTCODE .Bytes VALUE APPVALUE ARGS STATIC
+         ...
+         </k> [owise]
+
+    rule <k> #callWithCode ACCTFROM ACCTTO ACCTCODE BYTES VALUE APPVALUE ARGS STATIC
+          => #pushCallStack ~> #pushWorldState
+          ~> #transferFundsFrom ACCTFROM ACCTTO VALUE
+          ~> #mkCall ACCTFROM ACCTTO ACCTCODE BYTES APPVALUE ARGS STATIC
+         ...
+         </k>
+
+    rule <k> #mkCall ACCTFROM ACCTTO ACCTCODE BYTES APPVALUE ARGS STATIC:Bool
+          => AccessAccount(ACCTFROM) ~> AccessAccount(ACCTTO) ~> #loadProgram BYTES ~> #initVM ~> #precompiled?(ACCTCODE, SCHED) ~> #execute
+         ...
+         </k>
+         <callDepth> CD => CD +Int 1 </callDepth>
+         <callData> _ => ARGS </callData>
+         <callValue> _ => APPVALUE </callValue>
+         <id> _ => ACCTTO </id>
+         <gas> _GAVAIL:Int => GCALL:Int </gas>
+         <callGas> GCALL:Int => 0:Int </callGas>
+         <caller> _ => ACCTFROM </caller>
+         <static> OLDSTATIC:Bool => OLDSTATIC orBool STATIC </static>
+         <schedule> SCHED </schedule>
+
     syntax InternalOp ::= "#precompiled?" "(" Int "," Schedule ")"
  // --------------------------------------------------------------
     rule [precompile.true]:  <k> #precompiled?(ACCTCODE, SCHED) => #next [ #precompiled(ACCTCODE) ] ... </k> requires         #isPrecompiledAccount(ACCTCODE, SCHED) [preserves-definedness]
@@ -974,105 +1062,10 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
 Ethereum Network OpCodes
 ------------------------
 
-// ### Call Operations
-
-// For each `CALL*` operation, we make a corresponding call to `#call` and a state-change to setup the custom parts of the calling environment.
-
-### Transfer Operation
-```k
-    syntax InternalOp ::= "#transferFundsFrom" Int Int Int
-   // -------------------------------------------------------------------------------------------------
-    rule [transferFundsFrom.success]:
-      <k> #transferFundsFrom ACCTFROM ACCTTO VALUE => .K ... </k>
-      requires TransferFrom(ACCTFROM, ACCTTO, VALUE)
-
-    rule [transferFundsFrom.failure]:
-      <k> #transferFundsFrom _ _ _ => #end EVMC_BALANCE_UNDERFLOW ... </k> [owise]
-```
-
-
 ### Call Operations
 
-The various `CALL*` (and other inter-contract control flow) operations will be desugared into these `InternalOp`s.
+For each `CALL*` operation, we make a corresponding call to `#call` and a state-change to setup the custom parts of the calling environment.
 
--   `#checkCall` takes the calling account and the value of the call and triggers several checks before executing the call.
--   `#checkBalanceUnderflow` takes the calling account and the value of the call and checks if the call value is greater than the account balance.
--   `#checkDepthExceeded` checks if the current call depth is greater than or equal to `1024`.
--   `#checkNonceExceeded` takes the calling account and checks if the nonce is less than `maxUInt64` (`18446744073709551615`).
--   `#call` takes the calling account, the account to execute as, the account whose code should execute, the gas limit, the amount to transfer, the arguments, and the static flag.
--   `#callWithCode` takes the calling account, the account to execute as, the code to execute (as a `Bytes`), the gas limit, the amount to transfer, the arguments, and the static flag.
--   `#return` is a placeholder for the calling program, specifying where to place the returned data in memory.
-
-```k
-    syntax InternalOp ::= "#checkCall"             Int Int
-                        | "#checkBalanceUnderflow" Int Int
-                        | "#checkNonceExceeded"    Int
-                        | "#checkDepthExceeded"
-                        | "#call"                  Int Int Int Int Int Bytes Bool
-                        | "#callWithCode"          Int Int Int Bytes Int Int Bytes Bool [symbol(callwithcode_check_fork)]
-                        | "#mkCall"                Int Int Int Bytes     Int Bytes Bool
- // -----------------------------------------------------------------------------------
-     rule <k> #checkBalanceUnderflow ACCT VALUE => #refund GCALL ~> #pushCallStack ~> #pushWorldState ~> #end EVMC_BALANCE_UNDERFLOW ... </k>
-         <output> _ => .Bytes </output>
-         <callGas> GCALL </callGas>
-      requires VALUE >Int GetAccountBalance(ACCT)
-
-    rule <k> #checkBalanceUnderflow ACCT VALUE => .K ... </k>
-      requires VALUE <=Int GetAccountBalance(ACCT)
-
-    rule <k> #checkDepthExceeded => #refund GCALL ~> #pushCallStack ~> #pushWorldState ~> #end EVMC_CALL_DEPTH_EXCEEDED ... </k>
-         <output> _ => .Bytes </output>
-         <callGas> GCALL </callGas>
-         <callDepth> CD </callDepth>
-      requires CD >=Int 1024
-
-    rule <k> #checkDepthExceeded => .K ... </k>
-         <callDepth> CD </callDepth>
-      requires CD <Int 1024
-
-    rule <k> #checkNonceExceeded ACCT => #refund GCALL ~> #pushCallStack ~> #pushWorldState ~> #end EVMC_NONCE_EXCEEDED ... </k>
-         <output> _ => .Bytes </output>
-         <callGas> GCALL </callGas>
-      requires notBool #rangeNonce(GetAccountNonce(ACCT))
-
-    rule <k> #checkNonceExceeded ACCT => .K ... </k>
-      requires #rangeNonce(GetAccountNonce(ACCT))
-
-    rule <k> #checkCall ACCT VALUE => #checkBalanceUnderflow ACCT VALUE ~> #checkDepthExceeded ... </k>
-
-    rule [call.true]:
-         <k> #call ACCTFROM ACCTTO ACCTCODE VALUE APPVALUE ARGS STATIC
-          => #callWithCode ACCTFROM ACCTTO ACCTCODE GetAndResolveCode(ACCTCODE) VALUE APPVALUE ARGS STATIC
-         ...
-         </k>
-
-    rule [call.false]:
-         <k> #call ACCTFROM ACCTTO ACCTCODE VALUE APPVALUE ARGS STATIC
-          => #callWithCode ACCTFROM ACCTTO ACCTCODE .Bytes VALUE APPVALUE ARGS STATIC
-         ...
-         </k> [owise]
-
-    rule <k> #callWithCode ACCTFROM ACCTTO ACCTCODE BYTES VALUE APPVALUE ARGS STATIC
-          => #pushCallStack ~> #pushWorldState
-          ~> #transferFundsFrom ACCTFROM ACCTTO VALUE
-          ~> #mkCall ACCTFROM ACCTTO ACCTCODE BYTES APPVALUE ARGS STATIC
-         ...
-         </k>
-
-    rule <k> #mkCall ACCTFROM ACCTTO ACCTCODE BYTES APPVALUE ARGS STATIC:Bool
-          => AccessAccount(ACCTFROM) ~> AccessAccount(ACCTTO) ~> #loadProgram BYTES ~> #initVM ~> #precompiled?(ACCTCODE, SCHED) ~> #execute
-         ...
-         </k>
-         <callDepth> CD => CD +Int 1 </callDepth>
-         <callData> _ => ARGS </callData>
-         <callValue> _ => APPVALUE </callValue>
-         <id> _ => ACCTTO </id>
-         <gas> _GAVAIL:Int => GCALL:Int </gas>
-         <callGas> GCALL:Int => 0:Int </callGas>
-         <caller> _ => ACCTFROM </caller>
-         <static> OLDSTATIC:Bool => OLDSTATIC orBool STATIC </static>
-         <schedule> SCHED </schedule>
-```
 
 ```k
     syntax CallOp ::= "CALL"

@@ -1132,21 +1132,24 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
 -   `#hasValidInitCode` checks the length of the transaction data in a create transaction. [EIP-3860]
 
 ```k
-    syntax InternalOp ::= "#create"   Int Int Int Bytes
-                        | "#mkCreate" Int Int Int Bytes
+    syntax InternalOp ::= "#create"      Int Int Int Bytes
+                        | "#mkCreate"    Int Int Int Bytes
+                        | "#newAccount"  Int Int Int
                         | "#checkCreate" Int Int
     // ------------------------------------------------
-```
-```vlm
-    syntax InternalOp ::= "#newAccount" Int
-   // -------------------------------------
-
-   rule <k> #create ACCTFROM ACCTTO VALUE INITCODE
+    rule <k> #create ACCTFROM ACCTTO VALUE INITCODE
           => IncrementNonce(ACCTFROM)
           ~> #pushCallStack ~> #pushWorldState
-          ~> #newAccount ACCTTO
-          ~> #transferFundsFrom ACCTFROM ACCTTO VALUE
+          ~> #newAccount ACCTFROM ACCTTO VALUE
           ~> #mkCreate ACCTFROM ACCTTO VALUE INITCODE
+         ...
+         </k>
+
+```
+``` vlm
+    rule <k> #newAccount ACCTFROM ACCTTO VALUE
+          => #transferFundsFrom ACCTFROM ACCTTO VALUE
+          ~> #if NewAccount(ACCTTO) #then .K #else  #end EVMC_ACCOUNT_ALREADY_EXISTS #fi
          ...
          </k>
 
@@ -1161,22 +1164,14 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
          <callDepth> CD => CD +Int 1 </callDepth>
          <callData> _ => .Bytes </callData>
          <callValue> _ => VALUE </callValue>
-
-    rule <k> #newAccount ACCT => #if NewAccount(ACCT) #then .K #else  #end EVMC_ACCOUNT_ALREADY_EXISTS #fi ... </k>
 ```
 ```reth
-    syntax InternalOp ::= "#newAccount" Int Int Int
-   // ---------------------------------------------
-
-   rule <k> #create ACCTFROM ACCTTO VALUE INITCODE
-          => IncrementNonce(ACCTFROM)
-          ~> #pushCallStack ~> #pushWorldState
-          ~> #newAccount ACCTFROM ACCTTO VALUE
-          ~> #mkCreate ACCTFROM ACCTTO VALUE INITCODE
+    rule <k> #newAccount ACCTFROM ACCTTO VALUE
+          => #if NewAccount(ACCTFROM, ACCTTO, VALUE) #then .K #else #end EVMC_ACCOUNT_ALREADY_EXISTS #fi
          ...
          </k>
 
-    rule <k> #mkCreate ACCTFROM ACCTTO VALUE INITCODE  => #loadProgram INITCODE ~> #initVM ~> #execute ... </k>
+    rule <k> #mkCreate ACCTFROM ACCTTO VALUE INITCODE => #loadProgram INITCODE ~> #initVM ~> #execute ... </k>
          <id> _ => ACCTTO </id>
          <gas> _GAVAIL => GCALL </gas>
          <callGas> GCALL => 0 </callGas>
@@ -1184,9 +1179,8 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
          <callDepth> CD => CD +Int 1 </callDepth>
          <callData> _ => .Bytes </callData>
          <callValue> _ => VALUE </callValue>
-
-    rule <k> #newAccount ACCTFROM ACCTTO VALUE => #if NewAccount(ACCTFROM, ACCTTO, VALUE) #then .K #else #end EVMC_ACCOUNT_ALREADY_EXISTS #fi ... </k>
 ```
+
 ```k
     rule <k> #checkCreate ACCT VALUE => #checkBalanceUnderflow ACCT VALUE ~> #checkDepthExceeded ~> #checkNonceExceeded ACCT ... </k>
 

@@ -954,8 +954,8 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
          <callData> _ => ARGS </callData>
          <callValue> _ => APPVALUE </callValue>
          <id> _ => ACCTTO </id>
-         <gas> _GAVAIL:Int => GCALL:Int </gas>
-         <callGas> GCALL:Int => 0:Int </callGas>
+         <gas> _GAVAIL:Gas => GCALL:Gas </gas>
+         <callGas> GCALL:Gas => 0:Gas </callGas>
          <caller> _ => ACCTFROM </caller>
          <static> OLDSTATIC:Bool => OLDSTATIC orBool STATIC </static>
          <schedule> SCHED </schedule>
@@ -1297,7 +1297,6 @@ Precompiled Contracts
     rule #precompiledAccountsUB(MERGE)             => #precompiledAccountsUB(LONDON)
     rule #precompiledAccountsUB(SHANGHAI)          => #precompiledAccountsUB(MERGE)
     rule #precompiledAccountsUB(CANCUN)            => 10
-    rule #precompiledAccountsUB(PRAGUE)            => 17
 
 
     syntax Set ::= #precompiledAccountsSet    ( Schedule ) [symbol(#precompiledAccountsSet),    function, total]

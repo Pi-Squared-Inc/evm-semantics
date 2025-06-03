@@ -46,4 +46,4 @@ jobs:
           local_commit=$(cd evm-semantics; git rev-parse HEAD)
           [ ! -f revm/deps/evm-semantics ] && exit 1
           remote_commit=$(cat revm/deps/evm-semantics | cut -d':' -f2)
-          [ "$local_commit" -ne "$remote_commit" ] && exit 1
+          [ "$local_commit" != "$remote_commit" ] && exit 1

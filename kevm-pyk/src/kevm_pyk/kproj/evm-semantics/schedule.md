@@ -1705,7 +1705,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gecpaircoeff < CANCUN > => 34000
     rule Gfround      < CANCUN > => 1
 
-    rule maxCodeSize < CANCUN > => 24576
+    rule maxCodeSize < CANCUN > => 524288
     rule Rb          < CANCUN > => 0
 
     rule Gcoldsload             < CANCUN > => 2100
@@ -1727,7 +1727,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gaccessliststoragekey < CANCUN > => 1900
     rule Gaccesslistaddress    < CANCUN > => 2400
 
-    rule maxInitCodeSize   < CANCUN > => 49152
+    rule maxInitCodeSize   < CANCUN > => 548864
     rule Ginitcodewordcost < CANCUN > => 2
 
     rule Rmaxquotient < CANCUN > => 5

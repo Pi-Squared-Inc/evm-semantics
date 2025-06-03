@@ -214,7 +214,7 @@ CXX               := clang++-16
 CC                := clang-16
 
 $(VLM_KLLVM_LIB):
-	CC=$(CC) CXX=$(CXX) $(MAKE) -C $(VLM_KLLVM_DIR) CPPFLAGS=-DEVM_ONLY
+	CC=$(CC) CXX=$(CXX) $(MAKE) -C $(VLM_KLLVM_DIR)
 
 $(CRYPTO_PLUGIN_LIB):
 	CC=$(CC) CXX=$(CXX) $(MAKE) -C $(CRYPTO_PLUGIN_DIR)

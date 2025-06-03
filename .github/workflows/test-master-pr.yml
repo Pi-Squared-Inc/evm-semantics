@@ -38,6 +38,7 @@ jobs:
         with:
           path: revm
           repository: Pi-Squared-Inc/revm
+          ref: srs/update_ci_evm_semantics_fixup
           token: ${{ steps.temp-token.outputs.token }}
 
       - name: Check evm-semantics commit matches

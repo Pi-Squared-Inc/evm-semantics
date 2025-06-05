@@ -14,6 +14,41 @@ module EVM-TYPES
     imports K-EQUAL
     imports JSON
     imports WORD
+    imports MINT
+```
+
+Machine Integers
+----------------
+
+We use 256-bit machine integers as our word data type.
+
+```k
+    syntax MInt{256}
+
+    syntax MInt{256} ::= "pow160p256" [macro] /* 2^160 */
+ // -------------------------------------------------------------
+    rule pow160p256 => 1461501637330902918203684832716283019655932542976p256
+
+    syntax MInt{256} ::= #addrAsMInt256 ( MInt{256} ) [symbol(#addrAsMInt256), function, total]
+ // -------------------------------------------------------------------------------------------
+    rule #addrAsMInt256(W)   => W %uMInt pow160p256
+
+    syntax MInt{256} ::= #asMInt256 ( Bytes ) [symbol(#asMInt256), function, total]
+    syntax {Width} MInt{Width} ::= Bytes2MInt(Bytes, Int, Endianness, Signedness) [function, total, hook(MINT.bytes)]
+ // -----------------------------------------------------------------------------------------------------------------
+    rule #asMInt256(WS) => Bytes2MInt(WS, 256, BE, Unsigned)::MInt{256}
+
+    syntax Bytes ::= #asBytesFromMIn256 ( MInt{256} ) [symbol(#asBytesFromMInt256), function, total]
+    syntax {Width} Bytes ::= MInt2Bytes(MInt{Width}, Endianess, Signedness) [function, total, hook(MINT.tobytes)] 
+ // -------------------------------------------------------------------------------------------------------------
+    rule #asBytesFromMInt256(W) => MInt2Bytes(W, BE, Unsigned)
+
+    syntax MInt{256} ::= bool2MInt256 ( Bool ) [symbol(bool2MInt256), function, total, injective]
+ // ---------------------------------------------------------------------------------------------
+    rule bool2MInt256( true  ) => 1p256
+    rule bool2MInt256( false ) => 0p256
+
+    syntax {Width} MInt{Width} ::= MInt{Width} "^uMInt" MInt{Width} [function, hook(MINT.uexp)] 
 ```
 
 Utilities

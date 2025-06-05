@@ -55,10 +55,10 @@ In the comments next to each cell, we've marked which component of the YellowPap
               <jumpDests> .Bytes </jumpDests>
 
               // I_*
-              <id>        $ID:Int    </id>                    // I_a
-              <caller>    $CALLER:Account   </caller>         // I_s
-              <callData>  $CALLDATA:Bytes  </callData>        // I_d
-              <callValue> $CALLVALUE:Int </callValue>         // I_v
+              <id>        Int2MInt($ID:Int)::MInt{256}        </id>        // I_a
+              <caller>    Int2MInt($CALLER:Int)::MInt{256}    </caller>    // I_s
+              <callData>  $CALLDATA:Bytes                     </callData>  // I_d
+              <callValue> Int2MInt($CALLVALUE:Int)::MInt{256} </callValue> // I_v
 
               // \mu_*
               <wordStack>   .List  </wordStack>           // \mu_s
@@ -318,7 +318,7 @@ The `#next [_]` operator initiates execution by:
 ```
 
 ```k
-    rule #changesState(CALL         , ListItem(_) ListItem(_) ListItem(VALUE) _) => true  requires VALUE =/=Int 0
+    rule #changesState(CALL         , ListItem(_) ListItem(_) ListItem(VALUE) _) => true  requires VALUE =/=MInt 0
     rule #changesState(LOG(_)       , _)                 => true
     rule #changesState(SSTORE       , _)                 => true
     rule #changesState(CREATE       , _)                 => true
@@ -348,10 +348,10 @@ Here we load the correct number of arguments from the `wordStack` based on the s
                     | InvalidOp | StackOp | InternalOp | CallOp | CallSixOp | PushOp
  // --------------------------------------------------------------------------------
 
-    syntax InternalOp ::= UnStackOp   Int
-                        | BinStackOp  Int Int
-                        | TernStackOp Int Int Int
-                        | QuadStackOp Int Int Int Int
+    syntax InternalOp ::= UnStackOp   MInt{256}
+                        | BinStackOp  MInt{256} MInt{256}
+                        | TernStackOp MInt{256} MInt{256} MInt{256}
+                        | QuadStackOp MInt{256} MInt{256} MInt{256} MInt{256}
  // -------------------------------------------------
     rule <k> #exec [ UOP:UnStackOp   ] => #gas [ UOP , UOP W0          ] ~> UOP W0          ... </k> <wordStack> ListItem(W0) => .List ...</wordStack>
     rule <k> #exec [ BOP:BinStackOp  ] => #gas [ BOP , BOP W0 W1       ] ~> BOP W0 W1       ... </k> <wordStack> ListItem(W0) ListItem(W1) => .List ...</wordStack>
@@ -370,8 +370,8 @@ Here we load the correct number of arguments from the `wordStack` based on the s
 The `CallOp` opcodes all interpret their second argument as an address.
 
 ```k
-    syntax InternalOp ::= CallSixOp Int Int     Int Int Int Int
-                        | CallOp    Int Int Int Int Int Int Int
+    syntax InternalOp ::= CallSixOp MInt{256} MInt{256}           MInt{256} MInt{256} MInt{256} MInt{256}
+                        | CallOp    MInt{256} MInt{256} MInt{256} MInt{256} MInt{256} MInt{256} MInt{256}
  // -----------------------------------------------------------
     rule <k> #exec [ CSO:CallSixOp ] => #gas [ CSO , CSO W0 W1    W2 W3 W4 W5 ] ~> CSO W0 W1    W2 W3 W4 W5 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) ListItem(W4) ListItem(W5) => .List ...</wordStack>
     rule <k> #exec [ CO:CallOp     ] => #gas [ CO  , CO  W0 W1 W2 W3 W4 W5 W6 ] ~> CO  W0 W1 W2 W3 W4 W5 W6 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) ListItem(W4) ListItem(W5) ListItem(W6) => .List ...</wordStack>
@@ -386,11 +386,11 @@ We make sure the given arguments (to be interpreted as addresses) are with 160 b
     syntax InternalOp ::= "#addr" "[" OpCode "]"
  // --------------------------------------------
     rule <k> #addr [ OP:OpCode ] => .K ... </k>
-         <wordStack> WS => WS [ 0 <- #addr({WS [ 0 ]}:>Int) ] </wordStack>
+         <wordStack> WS => WS [ 0 <- #addrAsMInt256({WS [ 0 ]}:>MInt{256}) ] </wordStack>
       requires isAddr1Op(OP)
 
     rule <k> #addr [ OP:OpCode ] => .K ... </k>
-         <wordStack> WS => WS [ 1 <- #addr({WS [ 1 ]}:>Int) ] </wordStack>
+         <wordStack> WS => WS [ 1 <- #addrAsMInt256({WS [ 1 ]}:>MInt{256}) ] </wordStack>
       requires isAddr2Op(OP)
 
     rule <k> #addr [ OP:OpCode ] => .K ... </k>
@@ -487,8 +487,8 @@ These are just used by the other operators for shuffling local execution state a
 ```k
     syntax InternalOp ::= "#push" | "#setStack" List
  // ------------------------------------------------
-    rule <k> W0:Int ~> #push => .K ... </k> <wordStack> WS => pushList(W0, WS) </wordStack>
-    rule <k> #setStack WS    => .K ... </k> <wordStack> _  => WS      </wordStack>
+    rule <k> W0:MInt{256} ~> #push => .K ... </k> <wordStack> WS => pushList(W0, WS) </wordStack>
+    rule <k> #setStack WS          => .K ... </k> <wordStack> _  => WS      </wordStack>
 ```
 
 ### Invalid Operator
@@ -520,9 +520,9 @@ Some operators don't calculate anything, they just push the stack around a bit.
     syntax PushOp ::= "PUSHZERO"
                     | PUSH ( Int ) [symbol(PUSH)]
  // ---------------------------------------------
-    rule <k> PUSHZERO => 0 ~> #push ... </k>
+    rule <k> PUSHZERO => 0p256 ~> #push ... </k>
 
-    rule <k> PUSH(N) => #asWord(#range(PGM, PCOUNT +Int 1, N)) ~> #push ... </k>
+    rule <k> PUSH(N) => #asMInt256(#range(PGM, PCOUNT +Int 1, N)) ~> #push ... </k>
          <pc> PCOUNT </pc>
          <program> PGM </program>
 ```
@@ -534,21 +534,21 @@ These operations are getters/setters of the local execution memory.
 ```k
     syntax UnStackOp ::= "MLOAD"
  // ----------------------------
-    rule <k> MLOAD INDEX => #asWord(#range(LM, INDEX, 32)) ~> #push ... </k>
+    rule <k> MLOAD INDEX => #asMInt256(#range(LM, MInt2Unsigned(INDEX), 32)) ~> #push ... </k>
          <localMem> LM </localMem>
 
     syntax BinStackOp ::= "MSTORE" | "MSTORE8"
  // ------------------------------------------
     rule <k> MSTORE INDEX VALUE => .K ... </k>
-         <localMem> LM => LM [ INDEX := #padToWidth(32, #asByteStack(VALUE)) ] </localMem>
+         <localMem> LM => LM [ MInt2Unsigned(INDEX) := #padToWidth(32, #asBytesFromMInt(VALUE)) ] </localMem>
 
     rule <k> MSTORE8 INDEX VALUE => .K ... </k>
-         <localMem> LM => #write(LM, INDEX, (VALUE modInt 256)) </localMem>
+         <localMem> LM => #write(LM, MInt2Unsigned(INDEX), MInt2Unsigned(VALUE %uMInt 256p256)) </localMem>
 
     syntax TernStackOp ::= "MCOPY"
  // ------------------------------
      rule <k> MCOPY DST SRC LEN => .K ... </k>
-          <localMem> LM => LM [ DST := #range(LM, SRC, LEN) ] </localMem>
+          <localMem> LM => LM [ MInt2Unsigned(MInt2DST) := #range(LM, MInt2Unsigned(SRC), MInt2Unsigned(LEN)) ] </localMem>
 ```
 
 ### Expressions
@@ -560,27 +560,33 @@ NOTE: We have to call the opcode `OR` by `EVMOR` instead, because K has trouble 
 ```k
     syntax UnStackOp ::= "ISZERO" | "NOT"
  // -------------------------------------
-    rule <k> ISZERO W => W ==Word 0 ~> #push ... </k>
-    rule <k> NOT    W => ~Word W    ~> #push ... </k>
+    rule <k> ISZERO W => bool2MInt256(W ==MInt 0p256) ~> #push ... </k>
+    rule <k> NOT    W => ~MInt W    ~> #push ... </k>
 
     syntax BinStackOp ::= "ADD" | "MUL" | "SUB" | "DIV" | "EXP" | "MOD"
  // -------------------------------------------------------------------
-    rule <k> ADD W0 W1 => W0 +Word W1 ~> #push ... </k>
-    rule <k> MUL W0 W1 => W0 *Word W1 ~> #push ... </k>
-    rule <k> SUB W0 W1 => W0 -Word W1 ~> #push ... </k>
-    rule <k> DIV W0 W1 => W0 /Word W1 ~> #push ... </k>
-    rule <k> EXP W0 W1 => W0 ^Word W1 ~> #push ... </k>
-    rule <k> MOD W0 W1 => W0 %Word W1 ~> #push ... </k>
+    rule <k> ADD W0 W1 => W0 +MInt W1  ~> #push ... </k>
+    rule <k> MUL W0 W1 => W0 *MInt W1  ~> #push ... </k>
+    rule <k> SUB W0 W1 => W0 -MInt W1  ~> #push ... </k>
+    rule <k> DIV  _ W1 => 0p256        ~> #push ... </k> requires W1 ==MInt  0p256
+    rule <k> DIV W0 W1 => W0 /uMInt W1 ~> #push ... </k> requires W1 =/=MInt 0p256
+    rule <k> EXP W0 W1 => W0 ^uMInt W1 ~> #push ... </k>
+    rule <k> MOD  _ W1 => 0p256        ~> #push ... </k> requires W1 ==MInt  0p256
+    rule <k> MOD W0 W1 => W0 %uMInt W1 ~> #push ... </k> requires W1 =/=MInt 0p256
 
     syntax BinStackOp ::= "SDIV" | "SMOD"
  // -------------------------------------
-    rule <k> SDIV W0 W1 => W0 /sWord W1 ~> #push ... </k>
-    rule <k> SMOD W0 W1 => W0 %sWord W1 ~> #push ... </k>
+    rule <k> SDIV _  W1 => 0p256        ~> #push ... </k> requires W1 ==MInt  0p256
+    rule <k> SDIV W0 W1 => W0 /sMInt W1 ~> #push ... </k> requires W1 =/=MInt 0p256
+    rule <k> SMOD _  W1 => 0p256        ~> #push ... </k> requires W1 ==MInt  0p256
+    rule <k> SMOD W0 W1 => W0 %sMInt W1 ~> #push ... </k> requires W1 =/=MInt 0p256
 
     syntax TernStackOp ::= "ADDMOD" | "MULMOD"
  // ------------------------------------------
-    rule <k> ADDMOD W0 W1 W2 => (W0 +Int W1) %Word W2 ~> #push ... </k>
-    rule <k> MULMOD W0 W1 W2 => (W0 *Int W1) %Word W2 ~> #push ... </k>
+    rule <k> ADDMOD  _  _ W2 => 0p256                   ~> #push ... </k> requires W1 ==MInt  0p256
+    rule <k> ADDMOD W0 W1 W2 => (W0 +MInt W1) %uMInt W2 ~> #push ... </k> requires W1 =/=MInt 0p256
+    rule <k> MULMOD  _  _ W2 => 0p256                   ~> #push ... </k> requires W1 ==MInt  0p256
+    rule <k> MULMOD W0 W1 W2 => (W0 *MInt W1) %uMInt W2 ~> #push ... </k> requires W1 =/=MInt 0p256
 
     syntax BinStackOp ::= "BYTE" | "SIGNEXTEND"
  // -------------------------------------------

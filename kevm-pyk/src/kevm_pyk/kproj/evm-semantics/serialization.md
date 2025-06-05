@@ -34,6 +34,12 @@ Address/Hash Helpers
  // --------------------------------------------------------------------------------
     rule [#newAddr]:        #newAddr(ACCT, NONCE) => #addr(#parseHexWord(Keccak256(#rlpEncode([#addrBytes(ACCT), NONCE]))))                                                                        [concrete]
     rule [#newAddrCreate2]: #newAddr(ACCT, SALT, INITCODE) => #addr(#parseHexWord(Keccak256(b"\xff" +Bytes #addrBytes(ACCT) +Bytes #wordBytes(SALT) +Bytes #parseByteStack(Keccak256(INITCODE))))) [concrete]
+
+    syntax MInt{256} ::= #newAddrMInt256 ( MInt{256} , MInt{256} )         [function]
+                       | #newAddrMInt256 ( MInt{256} , MInt{256} , Bytes ) [function]
+ // ---------------------------------------------------------------------------------
+    rule #newAddrMInt256(ACCT, NONCE) => Int2MInt(#newAddr(MInt2Unsigned(ACCT), MInt2Unsigned(NONCE)))::MInt{256}
+    rule #newAddrMInt256(ACCT, SALT, INITCODE) => Int2MInt(#newAddr(MInt2Unsigned(ACCT), MInt2Unsigned(SALT), INITCODE))::MInt{256}
 ```
 
 - `#sender` computes the sender of the transaction from its data and signature.

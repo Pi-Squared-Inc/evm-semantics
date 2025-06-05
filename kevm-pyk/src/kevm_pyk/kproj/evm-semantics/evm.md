@@ -55,15 +55,15 @@ In the comments next to each cell, we've marked which component of the YellowPap
               <jumpDests> .Bytes </jumpDests>
 
               // I_*
-              <id>        $ID:Int    </id>                    // I_a
-              <caller>    $CALLER:Account   </caller>         // I_s
-              <callData>  $CALLDATA:Bytes  </callData>        // I_d
-              <callValue> $CALLVALUE:Int </callValue>         // I_v
+              <id>        Int2MInt($ID:Int)::MInt{256}        </id>        // I_a
+              <caller>    Int2MInt($CALLER:Int)::MInt{256}    </caller>    // I_s
+              <callData>  $CALLDATA:Bytes                     </callData>  // I_d
+              <callValue> Int2MInt($CALLVALUE:Int)::MInt{256} </callValue> // I_v
 
               // \mu_*
               <wordStack>   .List  </wordStack>           // \mu_s
               <localMem>    .Bytes </localMem>            // \mu_m
-              <pc>          0      </pc>                  // \mu_pc
+              <pc>          0p256  </pc>                  // \mu_pc
               <gas>         $GAS:Int </gas>               // \mau_g
               <memoryUsed>  0      </memoryUsed>          // \mu_i
               <callGas>     0:Gas  </callGas>
@@ -189,9 +189,9 @@ OpCode Execution
 ```k
     syntax MaybeOpCode ::= ".NoOpCode" | OpCode
 
-    syntax MaybeOpCode ::= "#lookupOpCode" "(" Bytes "," Int "," Schedule ")" [function, total]
- // -------------------------------------------------------------------------------------------
-    rule #lookupOpCode(BA, I, SCHED) => #dasmOpCode(BA[I], SCHED) requires 0 <=Int I andBool I <Int lengthBytes(BA)
+    syntax MaybeOpCode ::= "#lookupOpCode" "(" Bytes "," MInt{256} "," Schedule ")" [function, total]
+ // -------------------------------------------------------------------------------------------------
+    rule #lookupOpCode(BA, I, SCHED) => #dasmOpCode(BA[roundMInt(I)::MInt{64}], SCHED) requires 0 <=uMInt I andBool I <uMInt roundMInt(lengthBytes(BA))::MInt{64}
     rule #lookupOpCode(_, _, _)  => .NoOpCode [owise]
 ```
 
@@ -318,7 +318,7 @@ The `#next [_]` operator initiates execution by:
 ```
 
 ```k
-    rule #changesState(CALL         , ListItem(_) ListItem(_) ListItem(VALUE) _) => true  requires VALUE =/=Int 0
+    rule #changesState(CALL         , ListItem(_) ListItem(_) ListItem(VALUE) _) => true  requires VALUE =/=MInt 0
     rule #changesState(LOG(_)       , _)                 => true
     rule #changesState(SSTORE       , _)                 => true
     rule #changesState(CREATE       , _)                 => true
@@ -348,10 +348,10 @@ Here we load the correct number of arguments from the `wordStack` based on the s
                     | InvalidOp | StackOp | InternalOp | CallOp | CallSixOp | PushOp
  // --------------------------------------------------------------------------------
 
-    syntax InternalOp ::= UnStackOp   Int
-                        | BinStackOp  Int Int
-                        | TernStackOp Int Int Int
-                        | QuadStackOp Int Int Int Int
+    syntax InternalOp ::= UnStackOp   MInt{256}
+                        | BinStackOp  MInt{256} MInt{256}
+                        | TernStackOp MInt{256} MInt{256} MInt{256}
+                        | QuadStackOp MInt{256} MInt{256} MInt{256} MInt{256}
  // -------------------------------------------------
     rule <k> #exec [ UOP:UnStackOp   ] => #gas [ UOP , UOP W0          ] ~> UOP W0          ... </k> <wordStack> ListItem(W0) => .List ...</wordStack>
     rule <k> #exec [ BOP:BinStackOp  ] => #gas [ BOP , BOP W0 W1       ] ~> BOP W0 W1       ... </k> <wordStack> ListItem(W0) ListItem(W1) => .List ...</wordStack>
@@ -370,8 +370,8 @@ Here we load the correct number of arguments from the `wordStack` based on the s
 The `CallOp` opcodes all interpret their second argument as an address.
 
 ```k
-    syntax InternalOp ::= CallSixOp Int Int     Int Int Int Int
-                        | CallOp    Int Int Int Int Int Int Int
+    syntax InternalOp ::= CallSixOp MInt{256} MInt{256}           MInt{256} MInt{256} MInt{256} MInt{256}
+                        | CallOp    MInt{256} MInt{256} MInt{256} MInt{256} MInt{256} MInt{256} MInt{256}
  // -----------------------------------------------------------
     rule <k> #exec [ CSO:CallSixOp ] => #gas [ CSO , CSO W0 W1    W2 W3 W4 W5 ] ~> CSO W0 W1    W2 W3 W4 W5 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) ListItem(W4) ListItem(W5) => .List ...</wordStack>
     rule <k> #exec [ CO:CallOp     ] => #gas [ CO  , CO  W0 W1 W2 W3 W4 W5 W6 ] ~> CO  W0 W1 W2 W3 W4 W5 W6 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) ListItem(W4) ListItem(W5) ListItem(W6) => .List ...</wordStack>
@@ -386,11 +386,11 @@ We make sure the given arguments (to be interpreted as addresses) are with 160 b
     syntax InternalOp ::= "#addr" "[" OpCode "]"
  // --------------------------------------------
     rule <k> #addr [ OP:OpCode ] => .K ... </k>
-         <wordStack> WS => WS [ 0 <- #addr({WS [ 0 ]}:>Int) ] </wordStack>
+         <wordStack> WS => WS [ 0 <- #addrAsMInt256({WS [ 0 ]}:>MInt{256}) ] </wordStack>
       requires isAddr1Op(OP)
 
     rule <k> #addr [ OP:OpCode ] => .K ... </k>
-         <wordStack> WS => WS [ 1 <- #addr({WS [ 1 ]}:>Int) ] </wordStack>
+         <wordStack> WS => WS [ 1 <- #addrAsMInt256({WS [ 1 ]}:>MInt{256}) ] </wordStack>
       requires isAddr2Op(OP)
 
     rule <k> #addr [ OP:OpCode ] => .K ... </k>
@@ -423,12 +423,12 @@ The arguments to `PUSH` must be skipped over (as they are inline), and the opcod
  // -------------------------------------------------------
     rule [pc.inc]:
          <k> #pc [ OP ] => .K ... </k>
-         <pc> PCOUNT => PCOUNT +Int #widthOp(OP) </pc>
+         <pc> PCOUNT => PCOUNT +MInt #widthOp(OP) </pc>
 
-    syntax Int ::= #widthOp ( OpCode ) [symbol(#widthOp), function, total]
- // ----------------------------------------------------------------------
-    rule #widthOp(PUSH(N)) => 1 +Int N
-    rule #widthOp(_)       => 1        [owise]
+    syntax MInt{256} ::= #widthOp ( OpCode ) [symbol(#widthOp), function, total]
+ // ----------------------------------------------------------------------------
+    rule #widthOp(PUSH(N)) => 1p256 +MInt Int2MInt(N)::MInt{256}
+    rule #widthOp(_)       => 1p256                              [owise]
 ```
 
 ### Block processing
@@ -487,8 +487,8 @@ These are just used by the other operators for shuffling local execution state a
 ```k
     syntax InternalOp ::= "#push" | "#setStack" List
  // ------------------------------------------------
-    rule <k> W0:Int ~> #push => .K ... </k> <wordStack> WS => pushList(W0, WS) </wordStack>
-    rule <k> #setStack WS    => .K ... </k> <wordStack> _  => WS      </wordStack>
+    rule <k> W0:MInt{256} ~> #push => .K ... </k> <wordStack> WS => pushList(W0, WS) </wordStack>
+    rule <k> #setStack WS          => .K ... </k> <wordStack> _  => WS      </wordStack>
 ```
 
 ### Invalid Operator
@@ -520,9 +520,9 @@ Some operators don't calculate anything, they just push the stack around a bit.
     syntax PushOp ::= "PUSHZERO"
                     | PUSH ( Int ) [symbol(PUSH)]
  // ---------------------------------------------
-    rule <k> PUSHZERO => 0 ~> #push ... </k>
+    rule <k> PUSHZERO => 0p256 ~> #push ... </k>
 
-    rule <k> PUSH(N) => #asWord(#range(PGM, PCOUNT +Int 1, N)) ~> #push ... </k>
+    rule <k> PUSH(N) => BytesToMInt(#rangeMInt256(PGM, PCOUNT +MInt 1p256, Int2MInt(N)::MInt{256})) ~> #push ... </k>
          <pc> PCOUNT </pc>
          <program> PGM </program>
 ```
@@ -534,21 +534,21 @@ These operations are getters/setters of the local execution memory.
 ```k
     syntax UnStackOp ::= "MLOAD"
  // ----------------------------
-    rule <k> MLOAD INDEX => #asWord(#range(LM, INDEX, 32)) ~> #push ... </k>
+    rule <k> MLOAD INDEX => BytesToMInt(#rangeMInt256(LM, INDEX, 32p256)) ~> #push ... </k>
          <localMem> LM </localMem>
 
     syntax BinStackOp ::= "MSTORE" | "MSTORE8"
  // ------------------------------------------
     rule <k> MSTORE INDEX VALUE => .K ... </k>
-         <localMem> LM => LM [ INDEX := #padToWidth(32, #asByteStack(VALUE)) ] </localMem>
+         <localMem> LM => LM [ INDEX :=MInt256 #padToWidthMInt256(32p256, MInt2Bytes(VALUE)) ] </localMem>
 
     rule <k> MSTORE8 INDEX VALUE => .K ... </k>
-         <localMem> LM => #write(LM, INDEX, (VALUE modInt 256)) </localMem>
+         <localMem> LM => #writeMInt256(LM, INDEX, VALUE %uMInt 256p256) </localMem>
 
     syntax TernStackOp ::= "MCOPY"
  // ------------------------------
      rule <k> MCOPY DST SRC LEN => .K ... </k>
-          <localMem> LM => LM [ DST := #range(LM, SRC, LEN) ] </localMem>
+          <localMem> LM => LM [ DST :=MInt256 #rangeMInt256(LM, SRC, LEN) ] </localMem>
 ```
 
 ### Expressions
@@ -560,59 +560,65 @@ NOTE: We have to call the opcode `OR` by `EVMOR` instead, because K has trouble 
 ```k
     syntax UnStackOp ::= "ISZERO" | "NOT"
  // -------------------------------------
-    rule <k> ISZERO W => W ==Word 0 ~> #push ... </k>
-    rule <k> NOT    W => ~Word W    ~> #push ... </k>
+    rule <k> ISZERO W => bool2MInt256(W ==MInt 0p256) ~> #push ... </k>
+    rule <k> NOT    W => ~MInt W    ~> #push ... </k>
 
     syntax BinStackOp ::= "ADD" | "MUL" | "SUB" | "DIV" | "EXP" | "MOD"
  // -------------------------------------------------------------------
-    rule <k> ADD W0 W1 => W0 +Word W1 ~> #push ... </k>
-    rule <k> MUL W0 W1 => W0 *Word W1 ~> #push ... </k>
-    rule <k> SUB W0 W1 => W0 -Word W1 ~> #push ... </k>
-    rule <k> DIV W0 W1 => W0 /Word W1 ~> #push ... </k>
-    rule <k> EXP W0 W1 => W0 ^Word W1 ~> #push ... </k>
-    rule <k> MOD W0 W1 => W0 %Word W1 ~> #push ... </k>
+    rule <k> ADD W0 W1 => W0 +MInt W1  ~> #push ... </k>
+    rule <k> MUL W0 W1 => W0 *MInt W1  ~> #push ... </k>
+    rule <k> SUB W0 W1 => W0 -MInt W1  ~> #push ... </k>
+    rule <k> DIV  _ W1 => 0p256        ~> #push ... </k> requires W1  ==MInt 0p256
+    rule <k> DIV W0 W1 => W0 /uMInt W1 ~> #push ... </k> requires W1 =/=MInt 0p256
+    rule <k> EXP W0 W1 => W0 ^uMInt W1 ~> #push ... </k>
+    rule <k> MOD  _ W1 => 0p256        ~> #push ... </k> requires W1  ==MInt 0p256
+    rule <k> MOD W0 W1 => W0 %uMInt W1 ~> #push ... </k> requires W1 =/=MInt 0p256
 
     syntax BinStackOp ::= "SDIV" | "SMOD"
  // -------------------------------------
-    rule <k> SDIV W0 W1 => W0 /sWord W1 ~> #push ... </k>
-    rule <k> SMOD W0 W1 => W0 %sWord W1 ~> #push ... </k>
+    rule <k> SDIV _  W1 => 0p256        ~> #push ... </k> requires W1  ==MInt 0p256
+    rule <k> SDIV W0 W1 => W0 /sMInt W1 ~> #push ... </k> requires W1 =/=MInt 0p256
+    rule <k> SMOD _  W1 => 0p256        ~> #push ... </k> requires W1  ==MInt 0p256
+    rule <k> SMOD W0 W1 => W0 %sMInt W1 ~> #push ... </k> requires W1 =/=MInt 0p256
 
     syntax TernStackOp ::= "ADDMOD" | "MULMOD"
  // ------------------------------------------
-    rule <k> ADDMOD W0 W1 W2 => (W0 +Int W1) %Word W2 ~> #push ... </k>
-    rule <k> MULMOD W0 W1 W2 => (W0 *Int W1) %Word W2 ~> #push ... </k>
+    rule <k> ADDMOD  _  _ W2 => 0p256                   ~> #push ... </k> requires W1 ==MInt  0p256
+    rule <k> ADDMOD W0 W1 W2 => (W0 +MInt W1) %uMInt W2 ~> #push ... </k> requires W1 =/=MInt 0p256
+    rule <k> MULMOD  _  _ W2 => 0p256                   ~> #push ... </k> requires W1 ==MInt  0p256
+    rule <k> MULMOD W0 W1 W2 => (W0 *MInt W1) %uMInt W2 ~> #push ... </k> requires W1 =/=MInt 0p256
 
     syntax BinStackOp ::= "BYTE" | "SIGNEXTEND"
  // -------------------------------------------
-    rule <k> BYTE INDEX W     => byte(INDEX, W)     ~> #push ... </k>
-    rule <k> SIGNEXTEND W0 W1 => signextend(W0, W1) ~> #push ... </k>
+    rule <k> BYTE INDEX W     => byteMInt      (INDEX, W) ~> #push ... </k>
+    rule <k> SIGNEXTEND W0 W1 => signextendMInt(INDEX, W) ~> #push ... </k>
 
     syntax BinStackOp ::= "SHL" | "SHR" | "SAR"
  // -------------------------------------------
-    rule <k> SHL W0 W1 => W1 <<Word  W0 ~> #push ... </k>
-    rule <k> SHR W0 W1 => W1 >>Word  W0 ~> #push ... </k>
-    rule <k> SAR W0 W1 => W1 >>sWord W0 ~> #push ... </k>
+    rule <k> SHL W0 W1 => W1 <<MInt  W0 ~> #push ... </k>
+    rule <k> SHR W0 W1 => W1 >>lMInt W0 ~> #push ... </k>
+    rule <k> SAR W0 W1 => W1 >>aMInt W0 ~> #push ... </k>
 
     syntax BinStackOp ::= "AND" | "EVMOR" | "XOR"
  // ---------------------------------------------
-    rule <k> AND   W0 W1 => W0 &Word W1   ~> #push ... </k>
-    rule <k> EVMOR W0 W1 => W0 |Word W1   ~> #push ... </k>
-    rule <k> XOR   W0 W1 => W0 xorWord W1 ~> #push ... </k>
+    rule <k> AND   W0 W1 => W0 &MInt W1   ~> #push ... </k>
+    rule <k> EVMOR W0 W1 => W0 |MInt W1   ~> #push ... </k>
+    rule <k> XOR   W0 W1 => W0 xorMInt W1 ~> #push ... </k>
 
     syntax BinStackOp ::= "LT" | "GT" | "EQ"
  // ----------------------------------------
-    rule <k> LT W0 W1 => W0 <Word  W1 ~> #push ... </k>
-    rule <k> GT W0 W1 => W0 >Word  W1 ~> #push ... </k>
-    rule <k> EQ W0 W1 => W0 ==Word W1 ~> #push ... </k>
+    rule <k> LT W0 W1 => W0 <uMInt W1 ~> #push ... </k>
+    rule <k> GT W0 W1 => W0 >uMInt W1 ~> #push ... </k>
+    rule <k> EQ W0 W1 => W0 ==MInt W1 ~> #push ... </k>
 
     syntax BinStackOp ::= "SLT" | "SGT"
  // -----------------------------------
-    rule <k> SLT W0 W1 => W0 s<Word W1 ~> #push ... </k>
-    rule <k> SGT W0 W1 => W1 s<Word W0 ~> #push ... </k>
+    rule <k> SLT W0 W1 => W0 <sMInt W1 ~> #push ... </k>
+    rule <k> SGT W0 W1 => W0 >sMInt W1 ~> #push ... </k>
 
     syntax BinStackOp ::= "SHA3"
  // ----------------------------
-    rule <k> SHA3 MEMSTART MEMWIDTH => keccak(#range(LM, MEMSTART, MEMWIDTH)) ~> #push ... </k>
+    rule <k> SHA3 MEMSTART MEMWIDTH => keccak(#rangeMInt256(LM, MEMSTART, MEMWIDTH)) ~> #push ... </k>
          <localMem> LM </localMem>
 ```
 
@@ -624,7 +630,7 @@ These operators make queries about the current execution state.
     syntax NullStackOp ::= "PC" | "GAS" | "GASPRICE" | "GASLIMIT" | "BASEFEE" | "BLOBBASEFEE"
  // -----------------------------------------------------------------------------------------
     rule <k> PC          => PCOUNT          ~> #push ... </k> <pc> PCOUNT </pc>
-    rule <k> GAS         => gas2Int(GAVAIL) ~> #push ... </k> <gas> GAVAIL </gas>
+    rule <k> GAS         => Int2MInt(gas2Int(GAVAIL))::MInt{256} ~> #push ... </k> <gas> GAVAIL </gas>
     rule <k> GASPRICE    => GasPrice()      ~> #push ... </k>
     rule <k> GASLIMIT    => GasLimit()      ~> #push ... </k>
     rule <k> BASEFEE     => BaseFee()       ~> #push ... </k>
@@ -649,14 +655,14 @@ These operators make queries about the current execution state.
 
     syntax NullStackOp ::= "MSIZE" | "CODESIZE"
  // -------------------------------------------
-    rule <k> MSIZE    => 32 *Word MU         ~> #push ... </k> <memoryUsed> MU </memoryUsed>
-    rule <k> CODESIZE => lengthBytes(PGM) ~> #push ... </k> <program> PGM </program>
+    rule <k> MSIZE    => 32p256 *MInt Int2MInt(MU)::MInt{256}   ~> #push ... </k> <memoryUsed> MU </memoryUsed>
+    rule <k> CODESIZE => roundMInt(lengthBytes(PGM))::MInt{256} ~> #push ... </k> <program> PGM </program>
 
     syntax TernStackOp ::= "CODECOPY"
  // ---------------------------------
     rule <k> CODECOPY MEMSTART PGMSTART WIDTH => .K ... </k>
          <program> PGM </program>
-         <localMem> LM =>  LM [ MEMSTART := #range(PGM, PGMSTART, WIDTH) ] </localMem>
+         <localMem> LM =>  LM [ MEMSTART :=MInt256 #rangeMInt256(PGM, PGMSTART, WIDTH) ] </localMem>
 
     syntax UnStackOp ::= "BLOCKHASH"
  // --------------------------------
@@ -672,11 +678,11 @@ The blockhash is calculated here using the "shortcut" formula used for running t
     syntax UnStackOp ::= "BLOBHASH"
  // -------------------------------
 
-    rule <k> BLOBHASH INDEX => 0 ~> #push ... </k>
-       requires INDEX >=Int BlobHashesSize()
+    rule <k> BLOBHASH INDEX => 0p256 ~> #push ... </k>
+       requires INDEX >=uMInt BlobHashesSize()
 
     rule <k> BLOBHASH INDEX => BlobHash(INDEX) ~> #push ... </k>
-       requires INDEX <Int BlobHashesSize()
+       requires INDEX <uMInt BlobHashesSize()
 ```
 
 EVM OpCodes
@@ -697,14 +703,14 @@ The `JUMP*` family of operations affect the current program counter.
          <k> JUMP DEST => #endBasicBlock ... </k>
          <pc> _ => DEST </pc>
          <jumpDests> DESTS </jumpDests>
-      requires DEST <Int lengthBytes(DESTS) andBool DESTS[DEST] ==Int 1
+      requires DEST <uMInt roundMInt(lengthBytes(DESTS))::MInt{256} andBool DESTS[roundMInt(DEST)::MInt{64}] ==MInt 1p64
 
     rule <k> JUMP _ => #end EVMC_BAD_JUMP_DESTINATION ... </k> [owise]
 
     syntax BinStackOp ::= "JUMPI"
  // -----------------------------
-    rule [jumpi.false]: <k> JUMPI _DEST I => .K        ... </k> requires I  ==Int 0
-    rule [jumpi.true]:  <k> JUMPI  DEST I => JUMP DEST ... </k> requires I =/=Int 0
+    rule [jumpi.false]: <k> JUMPI _DEST I => .K        ... </k> requires I  ==MInt 0p256
+    rule [jumpi.true]:  <k> JUMPI  DEST I => JUMP DEST ... </k> requires I =/=MInt 0p256
 
     syntax InternalOp ::= "#endBasicBlock"
  // --------------------------------------
@@ -723,13 +729,13 @@ The `JUMP*` family of operations affect the current program counter.
     syntax BinStackOp ::= "RETURN"
  // ------------------------------
     rule <k> RETURN RETSTART RETWIDTH => #end EVMC_SUCCESS ... </k>
-         <output> _ => #range(LM, RETSTART, RETWIDTH) </output>
+         <output> _ => #rangeMInt256(LM, RETSTART, RETWIDTH) </output>
          <localMem> LM </localMem>
 
     syntax BinStackOp ::= "REVERT"
  // ------------------------------
     rule <k> REVERT RETSTART RETWIDTH => #end EVMC_REVERT ... </k>
-         <output> _ => #range(LM, RETSTART, RETWIDTH) </output>
+         <output> _ => #rangeMInt256(LM, RETSTART, RETWIDTH) </output>
          <localMem> LM </localMem>
 ```
 
@@ -740,18 +746,18 @@ These operators query about the current `CALL*` state.
 ```k
     syntax NullStackOp ::= "CALLDATASIZE"
  // -------------------------------------
-   rule <k> CALLDATASIZE => lengthBytes(CD) ~> #push ... </k>
+   rule <k> CALLDATASIZE => roundMInt(lengthBytes(CD))::MInt{256} ~> #push ... </k>
          <callData> CD </callData>
 
     syntax UnStackOp ::= "CALLDATALOAD"
  // -----------------------------------
-   rule <k> CALLDATALOAD DATASTART => #asWord(#range(CD, DATASTART, 32)) ~> #push ... </k>
+   rule <k> CALLDATALOAD DATASTART => BytesToMInt(#rangeMInt256(CD, DATASTART, 32p256)) ~> #push ... </k>
          <callData> CD </callData>
 
     syntax TernStackOp ::= "CALLDATACOPY"
  // -------------------------------------
    rule <k> CALLDATACOPY MEMSTART DATASTART DATAWIDTH => .K ... </k>
-         <localMem> LM => LM [ MEMSTART := #range(CD, DATASTART, DATAWIDTH) ] </localMem>
+         <localMem> LM => LM [ MEMSTART :=MInt256 #rangeMInt256(CD, DATASTART), DATAWIDTH) ] </localMem>
          <callData> CD </callData>
 ```
 
@@ -762,19 +768,19 @@ These operators query about the current return data buffer.
 ```k
     syntax NullStackOp ::= "RETURNDATASIZE"
  // ---------------------------------------
-    rule <k> RETURNDATASIZE => lengthBytes(RD) ~> #push ... </k>
+    rule <k> RETURNDATASIZE => roundMInt(lengthBytes(RD))::MInt{256} ~> #push ... </k>
          <output> RD </output>
 
     syntax TernStackOp ::= "RETURNDATACOPY"
  // ---------------------------------------
     rule <k> RETURNDATACOPY MEMSTART DATASTART DATAWIDTH => .K ... </k>
-         <localMem> LM => LM [ MEMSTART := #range(RD, DATASTART, DATAWIDTH) ] </localMem>
+         <localMem> LM => LM [ MEMSTART :=MInt256 #rangeMInt256(RD, DATASTART, DATAWIDTH) ] </localMem>
          <output> RD </output>
-      requires DATASTART +Int DATAWIDTH <=Int lengthBytes(RD)
+      requires DATASTART +MInt DATAWIDTH <=uMInt (roundMInt(lengthBytes(RD))::MInt{256})
 
     rule <k> RETURNDATACOPY _MEMSTART DATASTART DATAWIDTH => #end EVMC_INVALID_MEMORY_ACCESS ... </k>
          <output> RD </output>
-      requires DATASTART +Int DATAWIDTH >Int lengthBytes(RD)
+      requires DATASTART +MInt DATAWIDTH >uMInt (roundMInt(lengthBytes(RD))::MInt{256})
 ```
 
 ### Log Operations
@@ -783,22 +789,22 @@ These operators query about the current return data buffer.
     syntax BinStackOp ::= LogOp
     syntax LogOp ::= LOG ( Int ) [symbol(LOG)]
  // ------------------------------------------
-    rule <k> LOG(0) MEMSTART MEMWIDTH => Log0(ACCT, #range(LM, MEMSTART, MEMWIDTH)) ...</k>
+    rule <k> LOG(0) MEMSTART MEMWIDTH => Log0(ACCT, #rangeMInt256(LM, MEMSTART), MEMWIDTH)) ...</k>
          <id> ACCT </id>
          <localMem> LM </localMem>
-    rule <k> LOG(1) MEMSTART MEMWIDTH => Log1(ACCT, T1, #range(LM, MEMSTART, MEMWIDTH)) ...</k>
+    rule <k> LOG(1) MEMSTART MEMWIDTH => Log1(ACCT, T1, #rangeMInt256(LM, MEMSTART, MEMWIDTH)) ...</k>
          <id> ACCT </id>
          <wordStack> ListItem(T1) WS => WS </wordStack>
          <localMem> LM </localMem>
-    rule <k> LOG(2) MEMSTART MEMWIDTH => Log2(ACCT, T1, T2, #range(LM, MEMSTART, MEMWIDTH)) ...</k>
+    rule <k> LOG(2) MEMSTART MEMWIDTH => Log2(ACCT, T1, T2, #rangeMInt256(LM, MEMSTART, MEMWIDTH)) ...</k>
          <id> ACCT </id>
          <wordStack> ListItem(T1) ListItem(T2) WS => WS </wordStack>
          <localMem> LM </localMem>
-    rule <k> LOG(3) MEMSTART MEMWIDTH => Log3(ACCT, T1, T2, T3, #range(LM, MEMSTART, MEMWIDTH)) ...</k>
+    rule <k> LOG(3) MEMSTART MEMWIDTH => Log3(ACCT, T1, T2, T3, #rangeMInt256(LM, MEMSTART, MEMWIDTH)) ...</k>
          <id> ACCT </id>
          <wordStack> ListItem(T1) ListItem(T2) ListItem(T3) WS => WS </wordStack>
          <localMem> LM </localMem>
-    rule <k> LOG(4) MEMSTART MEMWIDTH => Log4(ACCT, T1, T2, T3, T4, #range(LM, MEMSTART, MEMWIDTH)) ...</k>
+    rule <k> LOG(4) MEMSTART MEMWIDTH => Log4(ACCT, T1, T2, T3, T4, #rangeMInt256(LM, MEMSTART, MEMWIDTH)) ...</k>
          <id> ACCT </id>
          <wordStack> ListItem(T1) ListItem(T2) ListItem(T3) ListItem(T4) WS => WS </wordStack>
          <localMem> LM </localMem>
@@ -818,19 +824,19 @@ Operators that require access to the rest of the Ethereum network world-state ca
 
     syntax UnStackOp ::= "EXTCODESIZE"
  // ----------------------------------
-    rule <k> EXTCODESIZE ACCT => lengthBytes(GetAccountCode(ACCT)) ~> #push ... </k>
+    rule <k> EXTCODESIZE ACCT => roundMInt(lengthBytes(GetAccountCode(ACCT)))::MInt{256} ~> #push ... </k>
 
     syntax UnStackOp ::= "EXTCODEHASH"
  // ----------------------------------
     rule <k> EXTCODEHASH ACCT => GetCodeHash(ACCT) ~> #push ... </k>
       requires notBool IsAccountEmpty(ACCT)
 
-    rule <k> EXTCODEHASH ACCT => AccessAccount(ACCT) ~> 0 ~> #push ... </k> [owise]
+    rule <k> EXTCODEHASH ACCT => AccessAccount(ACCT) ~> 0p256 ~> #push ... </k> [owise]
 
     syntax QuadStackOp ::= "EXTCODECOPY"
  // ------------------------------------
     rule <k> EXTCODECOPY ACCT MEMSTART PGMSTART WIDTH => .K ... </k>
-         <localMem> LM => LM [ MEMSTART := #range(GetAccountCode(ACCT), PGMSTART, WIDTH) ] </localMem>
+         <localMem> LM => LM [ MEMSTART :=MInt256 #rangeMInt256(GetAccountCode(ACCT), PGMSTART, WIDTH) ] </localMem>
 ```
 
 ### Account Storage Operations
@@ -867,7 +873,7 @@ These rules reach into the network state and load/store from account storage:
 
 ### Transfer Operation
 ```k
-    syntax InternalOp ::= "#transferFundsFrom" Int Int Int
+    syntax InternalOp ::= "#transferFundsFrom" MInt{256} MInt{256} MInt{256}
    // -------------------------------------------------------------------------------------------------
     rule [transferFundsFrom.success]:
       <k> #transferFundsFrom ACCTFROM ACCTTO VALUE => .K ... </k>
@@ -890,21 +896,21 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
 -   `#return` is a placeholder for the calling program, specifying where to place the returned data in memory.
 
 ```k
-    syntax InternalOp ::= "#checkCall"             Int Int
-                        | "#checkBalanceUnderflow" Int Int
-                        | "#checkNonceExceeded"    Int
+    syntax InternalOp ::= "#checkCall"             MInt{256} MInt{256}
+                        | "#checkBalanceUnderflow" MInt{256} MInt{256}
+                        | "#checkNonceExceeded"    MInt{256}
                         | "#checkDepthExceeded"
-                        | "#call"                  Int Int Int Int Int Bytes Bool
-                        | "#callWithCode"          Int Int Int Bytes Int Int Bytes Bool [symbol(callwithcode_check_fork)]
-                        | "#mkCall"                Int Int Int Bytes     Int Bytes Bool
- // -----------------------------------------------------------------------------------
+                        | "#call"                  MInt{256} MInt{256} MInt{256}       MInt{256} MInt{256} Bytes Bool
+                        | "#callWithCode"          MInt{256} MInt{256} MInt{256} Bytes MInt{256} MInt{256} Bytes Bool [symbol(callwithcode_check_fork)]
+                        | "#mkCall"                MInt{256} MInt{256} MInt{256} Bytes           MInt{256} Bytes Bool
+ // -----------------------------------------------------------------------------------------------------------------
      rule <k> #checkBalanceUnderflow ACCT VALUE => #refund GCALL ~> #pushCallStack ~> #pushWorldState ~> #end EVMC_BALANCE_UNDERFLOW ... </k>
          <output> _ => .Bytes </output>
          <callGas> GCALL </callGas>
-      requires VALUE >Int GetAccountBalance(ACCT)
+      requires VALUE >uMInt GetAccountBalance(ACCT)
 
     rule <k> #checkBalanceUnderflow ACCT VALUE => .K ... </k>
-      requires VALUE <=Int GetAccountBalance(ACCT)
+      requires VALUE <=uMInt GetAccountBalance(ACCT)
 
     rule <k> #checkDepthExceeded => #refund GCALL ~> #pushCallStack ~> #pushWorldState ~> #end EVMC_CALL_DEPTH_EXCEEDED ... </k>
          <output> _ => .Bytes </output>
@@ -919,10 +925,10 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
     rule <k> #checkNonceExceeded ACCT => #refund GCALL ~> #pushCallStack ~> #pushWorldState ~> #end EVMC_NONCE_EXCEEDED ... </k>
          <output> _ => .Bytes </output>
          <callGas> GCALL </callGas>
-      requires notBool #rangeNonce(GetAccountNonce(ACCT))
+      requires notBool #rangeNonceMInt256(GetAccountNonce(ACCT))
 
     rule <k> #checkNonceExceeded ACCT => .K ... </k>
-      requires #rangeNonce(GetAccountNonce(ACCT))
+      requires #rangeNonceMInt256(GetAccountNonce(ACCT))
 
     rule <k> #checkCall ACCT VALUE => #checkBalanceUnderflow ACCT VALUE ~> #checkDepthExceeded ... </k>
 
@@ -947,7 +953,7 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
          </k>
 
     rule <k> #mkCall ACCTFROM ACCTTO ACCTCODE BYTES APPVALUE ARGS STATIC:Bool
-          => AccessAccount(ACCTFROM) ~> AccessAccount(ACCTTO) ~> #loadProgram BYTES ~> #initVM ~> #precompiled?(ACCTCODE, SCHED) ~> #execute
+          => AccessAccount(ACCTFROM) ~> AccessAccount(ACCTTO) ~> #loadProgram BYTES ~> #initVM ~> #precompiled?(MInt2Unsigned(ACCTCODE), SCHED) ~> #execute
          ...
          </k>
          <callDepth> CD => CD +Int 1 </callDepth>
@@ -972,7 +978,7 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
     syntax KItem ::= "#initVM"
  // --------------------------
     rule <k> #initVM      => .K ... </k>
-         <pc>           _ => 0      </pc>
+         <pc>           _ => 0p256  </pc>
          <memoryUsed>   _ => 0      </memoryUsed>
          <output>       _ => .Bytes </output>
          <wordStack>    _ => .List  </wordStack>
@@ -992,12 +998,12 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
     rule #widthOpCode(W) => W -Int 94 requires W >=Int 96 andBool W <=Int 127
     rule #widthOpCode(_) => 1 [owise]
 
-    syntax KItem ::= "#return" Int Int
- // ----------------------------------
+    syntax KItem ::= "#return" MInt{256} MInt{256}
+ // ----------------------------------------------
     rule [return.exception]:
          <statusCode> _:ExceptionalStatusCode </statusCode>
          <k> #halt ~> #return _ _
-          => #popCallStack ~> #popWorldState ~> 0 ~> #push
+          => #popCallStack ~> #popWorldState ~> 0p256 ~> #push
           ...
          </k>
          <output> _ => .Bytes </output>
@@ -1006,7 +1012,7 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
          <statusCode> EVMC_REVERT </statusCode>
          <k> #halt ~> #return RETSTART RETWIDTH
           => #popCallStack ~> #popWorldState
-          ~> 0 ~> #push ~> #refund GAVAIL ~> #setLocalMem RETSTART RETWIDTH OUT
+          ~> 0p256 ~> #push ~> #refund GAVAIL ~> #setLocalMem RETSTART RETWIDTH OUT
          ...
          </k>
          <output> OUT </output>
@@ -1016,7 +1022,7 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
          <statusCode> EVMC_SUCCESS </statusCode>
          <k> #halt ~> #return RETSTART RETWIDTH
           => #popCallStack ~> #dropWorldState
-          ~> 1 ~> #push ~> #refund GAVAIL ~> #setLocalMem RETSTART RETWIDTH OUT
+          ~> 1p256 ~> #push ~> #refund GAVAIL ~> #setLocalMem RETSTART RETWIDTH OUT
          ...
          </k>
          <output> OUT </output>
@@ -1024,13 +1030,13 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
 
 
     syntax InternalOp ::= "#refund" Gas
-                        | "#setLocalMem" Int Int Bytes
- // --------------------------------------------------
+                        | "#setLocalMem" MInt{256} MInt{256} Bytes
+ // --------------------------------------------------------------
     rule [refund]: <k> #refund G:Int => .K ... </k> <gas> GAVAIL => GAVAIL +Int G </gas>
 
 
     rule <k> #setLocalMem START WIDTH WS => .K ... </k>
-         <localMem> LM => LM [ START := #range(WS, 0, minInt(WIDTH, lengthBytes(WS))) ] </localMem>
+         <localMem> LM => LM [ START :=MInt256 #rangeMInt256(WS, 0p256, uMinMInt(WIDTH, roundMInt(lengthBytes(WS))::MInt{256})) ] </localMem>
 ```
 
 Ethereum Network OpCodes
@@ -1048,7 +1054,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
          <k> CALL _GCAP ACCTTO VALUE ARGSTART ARGWIDTH RETSTART RETWIDTH
           => AccessAccount(ACCTTO)
           ~> #checkCall ACCTFROM VALUE
-          ~> #call ACCTFROM ACCTTO ACCTTO VALUE VALUE #range(LM, ARGSTART, ARGWIDTH) false
+          ~> #call ACCTFROM ACCTTO ACCTTO VALUE VALUE #rangeMInt256(LM, ARGSTART, ARGWIDTH) false
           ~> #return RETSTART RETWIDTH
 
          ...
@@ -1062,7 +1068,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
          <k> CALLCODE _GCAP ACCTTO VALUE ARGSTART ARGWIDTH RETSTART RETWIDTH
           => AccessAccount(ACCTTO)
           ~> #checkCall ACCTFROM VALUE
-          ~> #call ACCTFROM ACCTFROM ACCTTO VALUE VALUE #range(LM, ARGSTART, ARGWIDTH) false
+          ~> #call ACCTFROM ACCTFROM ACCTTO VALUE VALUE #rangeMInt256(LM, ARGSTART, ARGWIDTH) false
           ~> #return RETSTART RETWIDTH
          ...
          </k>
@@ -1075,7 +1081,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
          <k> DELEGATECALL _GCAP ACCTTO ARGSTART ARGWIDTH RETSTART RETWIDTH
           => AccessAccount(ACCTTO)
           ~> #checkCall ACCTFROM 0
-          ~> #call ACCTAPPFROM ACCTFROM ACCTTO 0 VALUE #range(LM, ARGSTART, ARGWIDTH) false
+          ~> #call ACCTAPPFROM ACCTFROM ACCTTO 0 VALUE #rangeMInt256(LM, ARGSTART, ARGWIDTH) false
           ~> #return RETSTART RETWIDTH
          ...
          </k>
@@ -1090,7 +1096,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
          <k> STATICCALL _GCAP ACCTTO ARGSTART ARGWIDTH RETSTART RETWIDTH
           => AccessAccount(ACCTTO)
           ~> #checkCall ACCTFROM 0
-          ~> #call ACCTFROM ACCTTO ACCTTO 0 0 #range(LM, ARGSTART, ARGWIDTH) true
+          ~> #call ACCTFROM ACCTTO ACCTTO 0 0 #rangeMInt256(LM, ARGSTART, ARGWIDTH) true
           ~> #return RETSTART RETWIDTH
          ...
          </k>
@@ -1106,11 +1112,11 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
 -   `#hasValidInitCode` checks the length of the transaction data in a create transaction. [EIP-3860]
 
 ```k
-    syntax InternalOp ::= "#create"      Int Int Int Bytes
-                        | "#mkCreate"    Int Int Int Bytes
-                        | "#newAccount"  Int Int Int
-                        | "#checkCreate" Int Int
-    // ------------------------------------------------
+    syntax InternalOp ::= "#create"      MInt{256} MInt{256} MInt{256} Bytes
+                        | "#mkCreate"    MInt{256} MInt{256} MInt{256} Bytes
+                        | "#newAccount"  MInt{256} MInt{256} MInt{256}
+                        | "#checkCreate" MInt{256} MInt{256}
+    // ---------------------------------------------------------------------
     rule <k> #create ACCTFROM ACCTTO VALUE INITCODE
           => IncrementNonce(ACCTFROM)
           ~> #pushCallStack ~> #pushWorldState
@@ -1143,19 +1149,19 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
     rule #isValidCode( OUT ,  SCHED) => Ghasrejectedfirstbyte << SCHED >> impliesBool OUT[0] =/=Int 239 requires lengthBytes(OUT) >Int 0
     rule #isValidCode(_OUT , _SCHED) => true                                                            [owise]
 
-    syntax Bool ::= #hasValidInitCode ( Int , Schedule ) [symbol(#hasValidInitCode), function]
- // ------------------------------------------------------------------------------------------
-    rule #hasValidInitCode(INITCODELEN, SCHED) => notBool Ghasmaxinitcodesize << SCHED >> orBool INITCODELEN <=Int maxInitCodeSize < SCHED >
+    syntax Bool ::= #hasValidInitCode ( MInt{256} , Schedule ) [symbol(#hasValidInitCode), function]
+ // ------------------------------------------------------------------------------------------------
+    rule #hasValidInitCode(INITCODELEN, SCHED) => notBool Ghasmaxinitcodesize << SCHED >> orBool MInt2Unsigned(INITCODELEN) <=Int maxInitCodeSize < SCHED >
 
-   syntax KItem ::= "#codeDeposit" Int
-                   | "#mkCodeDeposit" Int
-                   | "#finishCodeDeposit" Int Bytes
+   syntax KItem ::= "#codeDeposit" MInt{256}
+                   | "#mkCodeDeposit" MInt{256}
+                   | "#finishCodeDeposit" MInt{256} Bytes
 
     rule <statusCode> _:ExceptionalStatusCode </statusCode>
-         <k> #halt ~> #codeDeposit _ => #popCallStack ~> #popWorldState ~> 0 ~> #push ... </k> <output> _ => .Bytes </output>
+         <k> #halt ~> #codeDeposit _ => #popCallStack ~> #popWorldState ~> 0p256 ~> #push ... </k> <output> _ => .Bytes </output>
 
     rule <statusCode> EVMC_REVERT </statusCode>
-         <k> #halt ~> #codeDeposit _ => #popCallStack ~> #popWorldState ~> #refund GAVAIL ~> 0 ~> #push ... </k>
+         <k> #halt ~> #codeDeposit _ => #popCallStack ~> #popWorldState ~> #refund GAVAIL ~> 0p256 ~> #push ... </k>
          <gas> GAVAIL </gas>
 
     rule <statusCode> EVMC_SUCCESS </statusCode>
@@ -1170,7 +1176,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
          <output> OUT => .Bytes </output>
       requires lengthBytes(OUT) <=Int maxCodeSize < SCHED > andBool #isValidCode(OUT, SCHED)
 
-    rule <k> #mkCodeDeposit _ACCT => #popCallStack ~> #popWorldState ~> 0 ~> #push ... </k>
+    rule <k> #mkCodeDeposit _ACCT => #popCallStack ~> #popWorldState ~> 0p256 ~> #push ... </k>
          <schedule> SCHED </schedule>
          <output> OUT => .Bytes </output>
       requires notBool ( lengthBytes(OUT) <=Int maxCodeSize < SCHED > andBool #isValidCode(OUT, SCHED) )
@@ -1192,7 +1198,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
          <schedule> FRONTIER </schedule>
 
     rule <statusCode> _:ExceptionalStatusCode </statusCode>
-         <k> #halt ~> #finishCodeDeposit _ _ => #popCallStack ~> #popWorldState ~> 0 ~> #push ... </k>
+         <k> #halt ~> #finishCodeDeposit _ _ => #popCallStack ~> #popWorldState ~> 0p256 ~> #push ... </k>
          <schedule> SCHED </schedule>
       requires SCHED =/=K FRONTIER
 ```
@@ -1204,10 +1210,10 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
  // -------------------------------
     rule [create-valid]:
          <k> CREATE VALUE MEMSTART MEMWIDTH
-          => AccessAccount(#newAddr(ACCT, GetAccountNonce(ACCT)))
+          => AccessAccount(#newAddrMInt256(ACCT, GetAccountNonce(ACCT)))
           ~> #checkCreate ACCT VALUE
-          ~> #create ACCT #newAddr(ACCT, GetAccountNonce(ACCT)) VALUE #range(LM, MEMSTART, MEMWIDTH)
-          ~> #codeDeposit #newAddr(ACCT, GetAccountNonce(ACCT))
+          ~> #create ACCT #newAddrMInt256(ACCT, GetAccountNonce(ACCT)) VALUE #rangeMInt256(LM, MEMSTART, MEMWIDTH)
+          ~> #codeDeposit #newAddrMInt256(ACCT, GetAccountNonce(ACCT))
          ...
          </k>
          <id> ACCT </id>
@@ -1227,10 +1233,10 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
  // --------------------------------
     rule [create2-valid]:
          <k> CREATE2 VALUE MEMSTART MEMWIDTH SALT
-          => AccessAccount(#newAddr(ACCT, SALT, #range(LM, MEMSTART, MEMWIDTH)))
+          => AccessAccount(#newAddrMInt256(ACCT, SALT, #rangeMInt256(LM, MEMSTART, MEMWIDTH)))
           ~> #checkCreate ACCT VALUE
-          ~> #create ACCT #newAddr(ACCT, SALT, #range(LM, MEMSTART, MEMWIDTH)) VALUE #range(LM, MEMSTART, MEMWIDTH)
-          ~> #codeDeposit #newAddr(ACCT, SALT, #range(LM, MEMSTART, MEMWIDTH))
+          ~> #create ACCT #newAddrMInt256(ACCT, SALT, #rangeMInt256(LM, MEMSTART, MEMWIDTH)) VALUE #rangeMInt256(LM, MEMSTART, MEMWIDTH)
+          ~> #codeDeposit #newAddrMInt256(ACCT, SALT, #rangeMInt256(LM, MEMSTART, MEMWIDTH))
          ...
          </k>
          <id> ACCT </id>
@@ -2208,159 +2214,159 @@ After interpreting the strings representing programs as a `WordStack`, it should
 -   `#dasmOpCode` interprets a `Int` as an `OpCode`.
 
 ```k
-    syntax OpCode ::= #dasmOpCode ( Int , Schedule ) [symbol(#dasmOpCode), function, memo, total]
- // ---------------------------------------------------------------------------------------------
-    rule #dasmOpCode(   0,     _ ) => STOP
-    rule #dasmOpCode(   1,     _ ) => ADD
-    rule #dasmOpCode(   2,     _ ) => MUL
-    rule #dasmOpCode(   3,     _ ) => SUB
-    rule #dasmOpCode(   4,     _ ) => DIV
-    rule #dasmOpCode(   5,     _ ) => SDIV
-    rule #dasmOpCode(   6,     _ ) => MOD
-    rule #dasmOpCode(   7,     _ ) => SMOD
-    rule #dasmOpCode(   8,     _ ) => ADDMOD
-    rule #dasmOpCode(   9,     _ ) => MULMOD
-    rule #dasmOpCode(  10,     _ ) => EXP
-    rule #dasmOpCode(  11,     _ ) => SIGNEXTEND
-    rule #dasmOpCode(  16,     _ ) => LT
-    rule #dasmOpCode(  17,     _ ) => GT
-    rule #dasmOpCode(  18,     _ ) => SLT
-    rule #dasmOpCode(  19,     _ ) => SGT
-    rule #dasmOpCode(  20,     _ ) => EQ
-    rule #dasmOpCode(  21,     _ ) => ISZERO
-    rule #dasmOpCode(  22,     _ ) => AND
-    rule #dasmOpCode(  23,     _ ) => EVMOR
-    rule #dasmOpCode(  24,     _ ) => XOR
-    rule #dasmOpCode(  25,     _ ) => NOT
-    rule #dasmOpCode(  26,     _ ) => BYTE
-    rule #dasmOpCode(  27, SCHED ) => SHL requires Ghasshift << SCHED >>
-    rule #dasmOpCode(  28, SCHED ) => SHR requires Ghasshift << SCHED >>
-    rule #dasmOpCode(  29, SCHED ) => SAR requires Ghasshift << SCHED >>
-    rule #dasmOpCode(  32,     _ ) => SHA3
-    rule #dasmOpCode(  48,     _ ) => ADDRESS
-    rule #dasmOpCode(  49,     _ ) => BALANCE
-    rule #dasmOpCode(  50,     _ ) => ORIGIN
-    rule #dasmOpCode(  51,     _ ) => CALLER
-    rule #dasmOpCode(  52,     _ ) => CALLVALUE
-    rule #dasmOpCode(  53,     _ ) => CALLDATALOAD
-    rule #dasmOpCode(  54,     _ ) => CALLDATASIZE
-    rule #dasmOpCode(  55,     _ ) => CALLDATACOPY
-    rule #dasmOpCode(  56,     _ ) => CODESIZE
-    rule #dasmOpCode(  57,     _ ) => CODECOPY
-    rule #dasmOpCode(  58,     _ ) => GASPRICE
-    rule #dasmOpCode(  59,     _ ) => EXTCODESIZE
-    rule #dasmOpCode(  60,     _ ) => EXTCODECOPY
-    rule #dasmOpCode(  61, SCHED ) => RETURNDATASIZE requires Ghasreturndata  << SCHED >>
-    rule #dasmOpCode(  62, SCHED ) => RETURNDATACOPY requires Ghasreturndata  << SCHED >>
-    rule #dasmOpCode(  63, SCHED ) => EXTCODEHASH    requires Ghasextcodehash << SCHED >>
-    rule #dasmOpCode(  64,     _ ) => BLOCKHASH
-    rule #dasmOpCode(  65,     _ ) => COINBASE
-    rule #dasmOpCode(  66,     _ ) => TIMESTAMP
-    rule #dasmOpCode(  67,     _ ) => NUMBER
-    rule #dasmOpCode(  68, SCHED ) => PREVRANDAO  requires         Ghasprevrandao << SCHED >>
-    rule #dasmOpCode(  68, SCHED ) => DIFFICULTY  requires notBool Ghasprevrandao << SCHED >>
-    rule #dasmOpCode(  69,     _ ) => GASLIMIT
-    rule #dasmOpCode(  70, SCHED ) => CHAINID     requires Ghaschainid     << SCHED >>
-    rule #dasmOpCode(  71, SCHED ) => SELFBALANCE requires Ghasselfbalance << SCHED >>
-    rule #dasmOpCode(  72, SCHED ) => BASEFEE     requires Ghasbasefee     << SCHED >>
-    rule #dasmOpCode(  73, SCHED ) => BLOBHASH    requires Ghasblobhash    << SCHED >>
-    rule #dasmOpCode(  74, SCHED ) => BLOBBASEFEE requires Ghasblobbasefee << SCHED >>
-    rule #dasmOpCode(  80,     _ ) => POP
-    rule #dasmOpCode(  81,     _ ) => MLOAD
-    rule #dasmOpCode(  82,     _ ) => MSTORE
-    rule #dasmOpCode(  83,     _ ) => MSTORE8
-    rule #dasmOpCode(  84,     _ ) => SLOAD
-    rule #dasmOpCode(  85,     _ ) => SSTORE
-    rule #dasmOpCode(  86,     _ ) => JUMP
-    rule #dasmOpCode(  87,     _ ) => JUMPI
-    rule #dasmOpCode(  88,     _ ) => PC
-    rule #dasmOpCode(  89,     _ ) => MSIZE
-    rule #dasmOpCode(  90,     _ ) => GAS
-    rule #dasmOpCode(  91,     _ ) => JUMPDEST
-    rule #dasmOpCode(  92, SCHED ) => TLOAD    requires Ghastransient << SCHED >>
-    rule #dasmOpCode(  93, SCHED ) => TSTORE   requires Ghastransient << SCHED >>
-    rule #dasmOpCode(  94, SCHED ) => MCOPY    requires Ghasmcopy     << SCHED >>
-    rule #dasmOpCode(  95, SCHED ) => PUSHZERO requires Ghaspushzero  << SCHED >>
-    rule #dasmOpCode(  96,     _ ) => PUSH(1)
-    rule #dasmOpCode(  97,     _ ) => PUSH(2)
-    rule #dasmOpCode(  98,     _ ) => PUSH(3)
-    rule #dasmOpCode(  99,     _ ) => PUSH(4)
-    rule #dasmOpCode( 100,     _ ) => PUSH(5)
-    rule #dasmOpCode( 101,     _ ) => PUSH(6)
-    rule #dasmOpCode( 102,     _ ) => PUSH(7)
-    rule #dasmOpCode( 103,     _ ) => PUSH(8)
-    rule #dasmOpCode( 104,     _ ) => PUSH(9)
-    rule #dasmOpCode( 105,     _ ) => PUSH(10)
-    rule #dasmOpCode( 106,     _ ) => PUSH(11)
-    rule #dasmOpCode( 107,     _ ) => PUSH(12)
-    rule #dasmOpCode( 108,     _ ) => PUSH(13)
-    rule #dasmOpCode( 109,     _ ) => PUSH(14)
-    rule #dasmOpCode( 110,     _ ) => PUSH(15)
-    rule #dasmOpCode( 111,     _ ) => PUSH(16)
-    rule #dasmOpCode( 112,     _ ) => PUSH(17)
-    rule #dasmOpCode( 113,     _ ) => PUSH(18)
-    rule #dasmOpCode( 114,     _ ) => PUSH(19)
-    rule #dasmOpCode( 115,     _ ) => PUSH(20)
-    rule #dasmOpCode( 116,     _ ) => PUSH(21)
-    rule #dasmOpCode( 117,     _ ) => PUSH(22)
-    rule #dasmOpCode( 118,     _ ) => PUSH(23)
-    rule #dasmOpCode( 119,     _ ) => PUSH(24)
-    rule #dasmOpCode( 120,     _ ) => PUSH(25)
-    rule #dasmOpCode( 121,     _ ) => PUSH(26)
-    rule #dasmOpCode( 122,     _ ) => PUSH(27)
-    rule #dasmOpCode( 123,     _ ) => PUSH(28)
-    rule #dasmOpCode( 124,     _ ) => PUSH(29)
-    rule #dasmOpCode( 125,     _ ) => PUSH(30)
-    rule #dasmOpCode( 126,     _ ) => PUSH(31)
-    rule #dasmOpCode( 127,     _ ) => PUSH(32)
-    rule #dasmOpCode( 128,     _ ) => DUP(1)
-    rule #dasmOpCode( 129,     _ ) => DUP(2)
-    rule #dasmOpCode( 130,     _ ) => DUP(3)
-    rule #dasmOpCode( 131,     _ ) => DUP(4)
-    rule #dasmOpCode( 132,     _ ) => DUP(5)
-    rule #dasmOpCode( 133,     _ ) => DUP(6)
-    rule #dasmOpCode( 134,     _ ) => DUP(7)
-    rule #dasmOpCode( 135,     _ ) => DUP(8)
-    rule #dasmOpCode( 136,     _ ) => DUP(9)
-    rule #dasmOpCode( 137,     _ ) => DUP(10)
-    rule #dasmOpCode( 138,     _ ) => DUP(11)
-    rule #dasmOpCode( 139,     _ ) => DUP(12)
-    rule #dasmOpCode( 140,     _ ) => DUP(13)
-    rule #dasmOpCode( 141,     _ ) => DUP(14)
-    rule #dasmOpCode( 142,     _ ) => DUP(15)
-    rule #dasmOpCode( 143,     _ ) => DUP(16)
-    rule #dasmOpCode( 144,     _ ) => SWAP(1)
-    rule #dasmOpCode( 145,     _ ) => SWAP(2)
-    rule #dasmOpCode( 146,     _ ) => SWAP(3)
-    rule #dasmOpCode( 147,     _ ) => SWAP(4)
-    rule #dasmOpCode( 148,     _ ) => SWAP(5)
-    rule #dasmOpCode( 149,     _ ) => SWAP(6)
-    rule #dasmOpCode( 150,     _ ) => SWAP(7)
-    rule #dasmOpCode( 151,     _ ) => SWAP(8)
-    rule #dasmOpCode( 152,     _ ) => SWAP(9)
-    rule #dasmOpCode( 153,     _ ) => SWAP(10)
-    rule #dasmOpCode( 154,     _ ) => SWAP(11)
-    rule #dasmOpCode( 155,     _ ) => SWAP(12)
-    rule #dasmOpCode( 156,     _ ) => SWAP(13)
-    rule #dasmOpCode( 157,     _ ) => SWAP(14)
-    rule #dasmOpCode( 158,     _ ) => SWAP(15)
-    rule #dasmOpCode( 159,     _ ) => SWAP(16)
-    rule #dasmOpCode( 160,     _ ) => LOG(0)
-    rule #dasmOpCode( 161,     _ ) => LOG(1)
-    rule #dasmOpCode( 162,     _ ) => LOG(2)
-    rule #dasmOpCode( 163,     _ ) => LOG(3)
-    rule #dasmOpCode( 164,     _ ) => LOG(4)
-    rule #dasmOpCode( 240,     _ ) => CREATE
-    rule #dasmOpCode( 241,     _ ) => CALL
-    rule #dasmOpCode( 242,     _ ) => CALLCODE
-    rule #dasmOpCode( 243,     _ ) => RETURN
-    rule #dasmOpCode( 244, SCHED ) => DELEGATECALL requires SCHED =/=K FRONTIER
-    rule #dasmOpCode( 245, SCHED ) => CREATE2      requires Ghascreate2    << SCHED >>
-    rule #dasmOpCode( 250, SCHED ) => STATICCALL   requires Ghasstaticcall << SCHED >>
-    rule #dasmOpCode( 253, SCHED ) => REVERT       requires Ghasrevert     << SCHED >>
-    rule #dasmOpCode( 254,     _ ) => INVALID
-    rule #dasmOpCode( 255,     _ ) => SELFDESTRUCT
-    rule #dasmOpCode(   W,     _ ) => UNDEFINED(W) [owise]
+    syntax OpCode ::= #dasmOpCode ( MInt{64} , Schedule ) [symbol(#dasmOpCode), function, memo, total]
+ // --------------------------------------------------------------------------------------------------
+    rule #dasmOpCode(   0p64,     _ ) => STOP
+    rule #dasmOpCode(   1p64,     _ ) => ADD
+    rule #dasmOpCode(   2p64,     _ ) => MUL
+    rule #dasmOpCode(   3p64,     _ ) => SUB
+    rule #dasmOpCode(   4p64,     _ ) => DIV
+    rule #dasmOpCode(   5p64,     _ ) => SDIV
+    rule #dasmOpCode(   6p64,     _ ) => MOD
+    rule #dasmOpCode(   7p64,     _ ) => SMOD
+    rule #dasmOpCode(   8p64,     _ ) => ADDMOD
+    rule #dasmOpCode(   9p64,     _ ) => MULMOD
+    rule #dasmOpCode(  10p64,     _ ) => EXP
+    rule #dasmOpCode(  11p64,     _ ) => SIGNEXTEND
+    rule #dasmOpCode(  16p64,     _ ) => LT
+    rule #dasmOpCode(  17p64,     _ ) => GT
+    rule #dasmOpCode(  18p64,     _ ) => SLT
+    rule #dasmOpCode(  19p64,     _ ) => SGT
+    rule #dasmOpCode(  20p64,     _ ) => EQ
+    rule #dasmOpCode(  21p64,     _ ) => ISZERO
+    rule #dasmOpCode(  22p64,     _ ) => AND
+    rule #dasmOpCode(  23p64,     _ ) => EVMOR
+    rule #dasmOpCode(  24p64,     _ ) => XOR
+    rule #dasmOpCode(  25p64,     _ ) => NOT
+    rule #dasmOpCode(  26p64,     _ ) => BYTE
+    rule #dasmOpCode(  27p64, SCHED ) => SHL requires Ghasshift << SCHED >>
+    rule #dasmOpCode(  28p64, SCHED ) => SHR requires Ghasshift << SCHED >>
+    rule #dasmOpCode(  29p64, SCHED ) => SAR requires Ghasshift << SCHED >>
+    rule #dasmOpCode(  32p64,     _ ) => SHA3
+    rule #dasmOpCode(  48p64,     _ ) => ADDRESS
+    rule #dasmOpCode(  49p64,     _ ) => BALANCE
+    rule #dasmOpCode(  50p64,     _ ) => ORIGIN
+    rule #dasmOpCode(  51p64,     _ ) => CALLER
+    rule #dasmOpCode(  52p64,     _ ) => CALLVALUE
+    rule #dasmOpCode(  53p64,     _ ) => CALLDATALOAD
+    rule #dasmOpCode(  54p64,     _ ) => CALLDATASIZE
+    rule #dasmOpCode(  55p64,     _ ) => CALLDATACOPY
+    rule #dasmOpCode(  56p64,     _ ) => CODESIZE
+    rule #dasmOpCode(  57p64,     _ ) => CODECOPY
+    rule #dasmOpCode(  58p64,     _ ) => GASPRICE
+    rule #dasmOpCode(  59p64,     _ ) => EXTCODESIZE
+    rule #dasmOpCode(  60p64,     _ ) => EXTCODECOPY
+    rule #dasmOpCode(  61p64, SCHED ) => RETURNDATASIZE requires Ghasreturndata  << SCHED >>
+    rule #dasmOpCode(  62p64, SCHED ) => RETURNDATACOPY requires Ghasreturndata  << SCHED >>
+    rule #dasmOpCode(  63p64, SCHED ) => EXTCODEHASH    requires Ghasextcodehash << SCHED >>
+    rule #dasmOpCode(  64p64,     _ ) => BLOCKHASH
+    rule #dasmOpCode(  65p64,     _ ) => COINBASE
+    rule #dasmOpCode(  66p64,     _ ) => TIMESTAMP
+    rule #dasmOpCode(  67p64,     _ ) => NUMBER
+    rule #dasmOpCode(  68p64, SCHED ) => PREVRANDAO  requires         Ghasprevrandao << SCHED >>
+    rule #dasmOpCode(  68p64, SCHED ) => DIFFICULTY  requires notBool Ghasprevrandao << SCHED >>
+    rule #dasmOpCode(  69p64,     _ ) => GASLIMIT
+    rule #dasmOpCode(  70p64, SCHED ) => CHAINID     requires Ghaschainid     << SCHED >>
+    rule #dasmOpCode(  71p64, SCHED ) => SELFBALANCE requires Ghasselfbalance << SCHED >>
+    rule #dasmOpCode(  72p64, SCHED ) => BASEFEE     requires Ghasbasefee     << SCHED >>
+    rule #dasmOpCode(  73p64, SCHED ) => BLOBHASH    requires Ghasblobhash    << SCHED >>
+    rule #dasmOpCode(  74p64, SCHED ) => BLOBBASEFEE requires Ghasblobbasefee << SCHED >>
+    rule #dasmOpCode(  80p64,     _ ) => POP
+    rule #dasmOpCode(  81p64,     _ ) => MLOAD
+    rule #dasmOpCode(  82p64,     _ ) => MSTORE
+    rule #dasmOpCode(  83p64,     _ ) => MSTORE8
+    rule #dasmOpCode(  84p64,     _ ) => SLOAD
+    rule #dasmOpCode(  85p64,     _ ) => SSTORE
+    rule #dasmOpCode(  86p64,     _ ) => JUMP
+    rule #dasmOpCode(  87p64,     _ ) => JUMPI
+    rule #dasmOpCode(  88p64,     _ ) => PC
+    rule #dasmOpCode(  89p64,     _ ) => MSIZE
+    rule #dasmOpCode(  90p64,     _ ) => GAS
+    rule #dasmOpCode(  91p64,     _ ) => JUMPDEST
+    rule #dasmOpCode(  92p64, SCHED ) => TLOAD    requires Ghastransient << SCHED >>
+    rule #dasmOpCode(  93p64, SCHED ) => TSTORE   requires Ghastransient << SCHED >>
+    rule #dasmOpCode(  94p64, SCHED ) => MCOPY    requires Ghasmcopy     << SCHED >>
+    rule #dasmOpCode(  95p64, SCHED ) => PUSHZERO requires Ghaspushzero  << SCHED >>
+    rule #dasmOpCode(  96p64,     _ ) => PUSH(1)
+    rule #dasmOpCode(  97p64,     _ ) => PUSH(2)
+    rule #dasmOpCode(  98p64,     _ ) => PUSH(3)
+    rule #dasmOpCode(  99p64,     _ ) => PUSH(4)
+    rule #dasmOpCode( 100p64,     _ ) => PUSH(5)
+    rule #dasmOpCode( 101p64,     _ ) => PUSH(6)
+    rule #dasmOpCode( 102p64,     _ ) => PUSH(7)
+    rule #dasmOpCode( 103p64,     _ ) => PUSH(8)
+    rule #dasmOpCode( 104p64,     _ ) => PUSH(9)
+    rule #dasmOpCode( 105p64,     _ ) => PUSH(10)
+    rule #dasmOpCode( 106p64,     _ ) => PUSH(11)
+    rule #dasmOpCode( 107p64,     _ ) => PUSH(12)
+    rule #dasmOpCode( 108p64,     _ ) => PUSH(13)
+    rule #dasmOpCode( 109p64,     _ ) => PUSH(14)
+    rule #dasmOpCode( 110p64,     _ ) => PUSH(15)
+    rule #dasmOpCode( 111p64,     _ ) => PUSH(16)
+    rule #dasmOpCode( 112p64,     _ ) => PUSH(17)
+    rule #dasmOpCode( 113p64,     _ ) => PUSH(18)
+    rule #dasmOpCode( 114p64,     _ ) => PUSH(19)
+    rule #dasmOpCode( 115p64,     _ ) => PUSH(20)
+    rule #dasmOpCode( 116p64,     _ ) => PUSH(21)
+    rule #dasmOpCode( 117p64,     _ ) => PUSH(22)
+    rule #dasmOpCode( 118p64,     _ ) => PUSH(23)
+    rule #dasmOpCode( 119p64,     _ ) => PUSH(24)
+    rule #dasmOpCode( 120p64,     _ ) => PUSH(25)
+    rule #dasmOpCode( 121p64,     _ ) => PUSH(26)
+    rule #dasmOpCode( 122p64,     _ ) => PUSH(27)
+    rule #dasmOpCode( 123p64,     _ ) => PUSH(28)
+    rule #dasmOpCode( 124p64,     _ ) => PUSH(29)
+    rule #dasmOpCode( 125p64,     _ ) => PUSH(30)
+    rule #dasmOpCode( 126p64,     _ ) => PUSH(31)
+    rule #dasmOpCode( 127p64,     _ ) => PUSH(32)
+    rule #dasmOpCode( 128p64,     _ ) => DUP(1)
+    rule #dasmOpCode( 129p64,     _ ) => DUP(2)
+    rule #dasmOpCode( 130p64,     _ ) => DUP(3)
+    rule #dasmOpCode( 131p64,     _ ) => DUP(4)
+    rule #dasmOpCode( 132p64,     _ ) => DUP(5)
+    rule #dasmOpCode( 133p64,     _ ) => DUP(6)
+    rule #dasmOpCode( 134p64,     _ ) => DUP(7)
+    rule #dasmOpCode( 135p64,     _ ) => DUP(8)
+    rule #dasmOpCode( 136p64,     _ ) => DUP(9)
+    rule #dasmOpCode( 137p64,     _ ) => DUP(10)
+    rule #dasmOpCode( 138p64,     _ ) => DUP(11)
+    rule #dasmOpCode( 139p64,     _ ) => DUP(12)
+    rule #dasmOpCode( 140p64,     _ ) => DUP(13)
+    rule #dasmOpCode( 141p64,     _ ) => DUP(14)
+    rule #dasmOpCode( 142p64,     _ ) => DUP(15)
+    rule #dasmOpCode( 143p64,     _ ) => DUP(16)
+    rule #dasmOpCode( 144p64,     _ ) => SWAP(1)
+    rule #dasmOpCode( 145p64,     _ ) => SWAP(2)
+    rule #dasmOpCode( 146p64,     _ ) => SWAP(3)
+    rule #dasmOpCode( 147p64,     _ ) => SWAP(4)
+    rule #dasmOpCode( 148p64,     _ ) => SWAP(5)
+    rule #dasmOpCode( 149p64,     _ ) => SWAP(6)
+    rule #dasmOpCode( 150p64,     _ ) => SWAP(7)
+    rule #dasmOpCode( 151p64,     _ ) => SWAP(8)
+    rule #dasmOpCode( 152p64,     _ ) => SWAP(9)
+    rule #dasmOpCode( 153p64,     _ ) => SWAP(10)
+    rule #dasmOpCode( 154p64,     _ ) => SWAP(11)
+    rule #dasmOpCode( 155p64,     _ ) => SWAP(12)
+    rule #dasmOpCode( 156p64,     _ ) => SWAP(13)
+    rule #dasmOpCode( 157p64,     _ ) => SWAP(14)
+    rule #dasmOpCode( 158p64,     _ ) => SWAP(15)
+    rule #dasmOpCode( 159p64,     _ ) => SWAP(16)
+    rule #dasmOpCode( 160p64,     _ ) => LOG(0)
+    rule #dasmOpCode( 161p64,     _ ) => LOG(1)
+    rule #dasmOpCode( 162p64,     _ ) => LOG(2)
+    rule #dasmOpCode( 163p64,     _ ) => LOG(3)
+    rule #dasmOpCode( 164p64,     _ ) => LOG(4)
+    rule #dasmOpCode( 240p64,     _ ) => CREATE
+    rule #dasmOpCode( 241p64,     _ ) => CALL
+    rule #dasmOpCode( 242p64,     _ ) => CALLCODE
+    rule #dasmOpCode( 243p64,     _ ) => RETURN
+    rule #dasmOpCode( 244p64, SCHED ) => DELEGATECALL requires SCHED =/=K FRONTIER
+    rule #dasmOpCode( 245p64, SCHED ) => CREATE2      requires Ghascreate2    << SCHED >>
+    rule #dasmOpCode( 250p64, SCHED ) => STATICCALL   requires Ghasstaticcall << SCHED >>
+    rule #dasmOpCode( 253p64, SCHED ) => REVERT       requires Ghasrevert     << SCHED >>
+    rule #dasmOpCode( 254p64,     _ ) => INVALID
+    rule #dasmOpCode( 255p64,     _ ) => SELFDESTRUCT
+    rule #dasmOpCode(      W,     _ ) => UNDEFINED(W) [owise]
 
 endmodule
 ```

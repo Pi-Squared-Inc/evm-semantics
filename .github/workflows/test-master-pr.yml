@@ -28,6 +28,12 @@ jobs:
           private-key: ${{ secrets.CICD_GITHUB_WEBAPP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
 
+      - name: Check out evm-semantics repository
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/checkout@v4
+        with:
+          path: evm
+
       - name: Check out revm repository
         uses: actions/checkout@v4
         with:
@@ -41,14 +47,11 @@ jobs:
       - name: Check newly pushed master commit matches pointer
         if: ${{ github.event_name == 'push' }}
         run: |
-          set -euo pipefail
-          echo "Get new evm-semantics master commit"
+          set -euxo pipefail
           local_commit=${{ github.event.after }}
-          echo "Grab pinned evm-semantics commit from revm repo"
           [ ! -f revm/deps/evm-semantics ] && exit 1
-          remote_commit=$(cat revm/deps/evm-semantics)
-          echo "Comparing local commit $local_commit with revm pinned commit $remote_commit"
-          if [ "$local_commit" != "$remote_commit" ]; then
+          git fetch origin "$local_commit" "$remote_commit"
+          if [ git diff --exit-code "$local_commit" "$remote_commit" -- ]; then
             exit 2
           fi
 
@@ -57,13 +60,10 @@ jobs:
       - name: Check PR commit matches matches pointer
         if: ${{ github.event_name == 'pull_request' }}
         run: |
-          set -euo pipefail
-          echo "Get new evm-semantics PR commit"
+          set -euxo pipefail
           local_commit=${{ github.event.pull_request.head.sha }}
-          echo "Grab pinned evm-semantics commit from revm repo"
           [ ! -f revm/deps/evm-semantics ] && exit 1
           remote_commit=$(cat revm/deps/evm-semantics)
-          echo "Comparing local commit $local_commit with revm pinned commit $remote_commit"
           if [ "$local_commit" != "$remote_commit" ]; then
             exit 2
           fi

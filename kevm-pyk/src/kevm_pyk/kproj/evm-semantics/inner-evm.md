@@ -13,7 +13,7 @@ requires "network.md"
 requires "gas.md"
 requires "ulm.k"
 
-module EVM
+module INNER-EVM
     imports STRING
     imports EVM-DATA
     imports NETWORK

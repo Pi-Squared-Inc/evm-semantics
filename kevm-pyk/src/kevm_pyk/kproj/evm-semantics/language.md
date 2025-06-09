@@ -4,7 +4,7 @@ requires "lemmas/lemmas.k"
 
 // Workaround not using hooks
 module EVM2
-    imports EVM
+    imports INNER-EVM
     rule ComputeValidJumpDests(... code:Code) => #computeValidJumpDests(Code)
 
     syntax Bytes ::= #computeValidJumpDests(Bytes)             [symbol(computeValidJumpDests),    function, memo, total]
@@ -22,7 +22,7 @@ module EVM2
 endmodule
 
 module CSE
-    imports EVM
+    imports INNER-EVM
     imports LEMMAS
     imports GAS
     imports INFINITE-GAS

@@ -1,0 +1,304 @@
+```k
+requires "summaries/STOP-CANCUN.k"
+requires "summaries/ADD-CANCUN.k"
+requires "summaries/MUL-CANCUN.k"
+requires "summaries/SUB-CANCUN.k"
+requires "summaries/DIV-CANCUN.k"
+requires "summaries/SDIV-CANCUN.k"
+requires "summaries/MOD-CANCUN.k"
+requires "summaries/SMOD-CANCUN.k"
+requires "summaries/ADDMOD-CANCUN.k"
+requires "summaries/MULMOD-CANCUN.k"
+requires "summaries/EXP-LT-CANCUN.k"
+requires "summaries/EXP-GT-CANCUN.k"
+requires "summaries/SIGNEXTEND-CANCUN.k"
+requires "summaries/LT-CANCUN.k"
+requires "summaries/GT-CANCUN.k"
+requires "summaries/SLT-CANCUN.k"
+requires "summaries/SGT-CANCUN.k"
+requires "summaries/EQ-CANCUN.k"
+requires "summaries/ISZERO-CANCUN.k"
+requires "summaries/AND-CANCUN.k"
+requires "summaries/EVMOR-CANCUN.k"
+requires "summaries/XOR-CANCUN.k"
+requires "summaries/NOT-CANCUN.k"
+requires "summaries/BYTE-CANCUN.k"
+requires "summaries/SHL-CANCUN.k"
+requires "summaries/SHR-CANCUN.k"
+requires "summaries/SAR-CANCUN.k"
+requires "summaries/SHA3-CANCUN.k"
+requires "summaries/ADDRESS-CANCUN.k"
+requires "summaries/BALANCE-CANCUN.k"
+requires "summaries/ORIGIN-CANCUN.k"
+requires "summaries/CALLER-CANCUN.k"
+requires "summaries/CALLVALUE-CANCUN.k"
+requires "summaries/CALLDATALOAD-CANCUN.k"
+requires "summaries/CALLDATASIZE-CANCUN.k"
+requires "summaries/CALLDATACOPY-CANCUN.k"
+requires "summaries/CODESIZE-CANCUN.k"
+requires "summaries/CODECOPY-CANCUN.k"
+requires "summaries/GASPRICE-CANCUN.k"
+requires "summaries/EXTCODESIZE-CANCUN.k"
+requires "summaries/EXTCODECOPY-CANCUN.k"
+requires "summaries/RETURNDATASIZE-CANCUN.k"
+requires "summaries/RETURNDATACOPY-LT-CANCUN.k"
+requires "summaries/RETURNDATACOPY-GT-CANCUN.k"
+requires "summaries/EXTCODEHASH-E-CANCUN.k"
+requires "summaries/EXTCODEHASH-NE-CANCUN.k"
+requires "summaries/BLOCKHASH-CANCUN.k"
+requires "summaries/COINBASE-CANCUN.k"
+requires "summaries/TIMESTAMP-CANCUN.k"
+requires "summaries/NUMBER-CANCUN.k"
+requires "summaries/PREVRANDAO-CANCUN.k"
+requires "summaries/DIFFICULTY-CANCUN.k"
+requires "summaries/GASLIMIT-CANCUN.k"
+requires "summaries/CHAINID-CANCUN.k"
+requires "summaries/SELFBALANCE-CANCUN.k"
+requires "summaries/BASEFEE-CANCUN.k"
+requires "summaries/BLOBHASH-LT-CANCUN.k"
+requires "summaries/BLOBHASH-GT-CANCUN.k"
+requires "summaries/BLOBBASEFEE-CANCUN.k"
+requires "summaries/POP-CANCUN.k"
+requires "summaries/MLOAD-CANCUN.k"
+requires "summaries/MSTORE-CANCUN.k"
+requires "summaries/MSTORE8-CANCUN.k"
+requires "summaries/SLOAD-CANCUN.k"
+requires "summaries/SSTORE-CANCUN.k"
+requires "summaries/JUMP-CANCUN.k"
+requires "summaries/JUMPI-F-CANCUN.k"
+requires "summaries/JUMPI-T-CANCUN.k"
+requires "summaries/PC-CANCUN.k"
+requires "summaries/MSIZE-CANCUN.k"
+requires "summaries/GAS-CANCUN.k"
+requires "summaries/JUMPDEST-CANCUN.k"
+requires "summaries/TLOAD-CANCUN.k"
+requires "summaries/TSTORE-CANCUN.k"
+requires "summaries/MCOPY-CANCUN.k"
+requires "summaries/PUSHZERO-CANCUN.k"
+requires "summaries/PUSH-01-CANCUN.k"
+requires "summaries/PUSH-02-CANCUN.k"
+requires "summaries/PUSH-03-CANCUN.k"
+requires "summaries/PUSH-04-CANCUN.k"
+requires "summaries/PUSH-05-CANCUN.k"
+requires "summaries/PUSH-06-CANCUN.k"
+requires "summaries/PUSH-07-CANCUN.k"
+requires "summaries/PUSH-08-CANCUN.k"
+requires "summaries/PUSH-09-CANCUN.k"
+requires "summaries/PUSH-10-CANCUN.k"
+requires "summaries/PUSH-11-CANCUN.k"
+requires "summaries/PUSH-12-CANCUN.k"
+requires "summaries/PUSH-13-CANCUN.k"
+requires "summaries/PUSH-14-CANCUN.k"
+requires "summaries/PUSH-15-CANCUN.k"
+requires "summaries/PUSH-16-CANCUN.k"
+requires "summaries/PUSH-17-CANCUN.k"
+requires "summaries/PUSH-18-CANCUN.k"
+requires "summaries/PUSH-19-CANCUN.k"
+requires "summaries/PUSH-20-CANCUN.k"
+requires "summaries/PUSH-21-CANCUN.k"
+requires "summaries/PUSH-22-CANCUN.k"
+requires "summaries/PUSH-23-CANCUN.k"
+requires "summaries/PUSH-24-CANCUN.k"
+requires "summaries/PUSH-25-CANCUN.k"
+requires "summaries/PUSH-26-CANCUN.k"
+requires "summaries/PUSH-27-CANCUN.k"
+requires "summaries/PUSH-28-CANCUN.k"
+requires "summaries/PUSH-29-CANCUN.k"
+requires "summaries/PUSH-30-CANCUN.k"
+requires "summaries/PUSH-31-CANCUN.k"
+requires "summaries/PUSH-32-CANCUN.k"
+requires "summaries/DUP-01-CANCUN.k"
+requires "summaries/DUP-02-CANCUN.k"
+requires "summaries/DUP-03-CANCUN.k"
+requires "summaries/DUP-04-CANCUN.k"
+requires "summaries/DUP-05-CANCUN.k"
+requires "summaries/DUP-06-CANCUN.k"
+requires "summaries/DUP-07-CANCUN.k"
+requires "summaries/DUP-08-CANCUN.k"
+requires "summaries/DUP-09-CANCUN.k"
+requires "summaries/DUP-10-CANCUN.k"
+requires "summaries/DUP-11-CANCUN.k"
+requires "summaries/DUP-12-CANCUN.k"
+requires "summaries/DUP-13-CANCUN.k"
+requires "summaries/DUP-14-CANCUN.k"
+requires "summaries/DUP-15-CANCUN.k"
+requires "summaries/DUP-16-CANCUN.k"
+requires "summaries/LOG-00-CANCUN.k"
+requires "summaries/LOG-01-CANCUN.k"
+requires "summaries/LOG-02-CANCUN.k"
+requires "summaries/LOG-03-CANCUN.k"
+requires "summaries/LOG-04-CANCUN.k"
+requires "summaries/CREATE-CANCUN.k"
+requires "summaries/CALL-CANCUN.k"
+requires "summaries/CALLCODE-CANCUN.k"
+requires "summaries/RETURN-CANCUN.k"
+requires "summaries/DELEGATECALL-CANCUN.k"
+requires "summaries/CREATE2-CANCUN.k"
+requires "summaries/STATICCALL-CANCUN.k"
+requires "summaries/REVERT-CANCUN.k"
+requires "summaries/INVALID-CANCUN.k"
+requires "summaries/SELFDESTRUCT-CANCUN.k"
+requires "summaries/ECREC-CANCUN.k"
+requires "summaries/SHA256-CANCUN.k"
+requires "summaries/RIP160-CANCUN.k"
+requires "summaries/ID-CANCUN.k"
+requires "summaries/MODEXP-CANCUN.k"
+requires "summaries/ECADD-CANCUN.k"
+requires "summaries/ECMUL-CANCUN.k"
+requires "summaries/ECPAIRING-CANCUN.k"
+requires "summaries/BLAKE2F-CANCUN.k"
+requires "summaries/KZGPOINTEVAL-CANCUN.k"
+requires "summaries/SWAP-01-CANCUN.k"
+module SUMMARIZED-CANCUN
+    imports SUMMARY-CANCUN-STOP
+    imports SUMMARY-CANCUN-ADD
+    imports SUMMARY-CANCUN-MUL
+    imports SUMMARY-CANCUN-SUB
+    imports SUMMARY-CANCUN-DIV
+    imports SUMMARY-CANCUN-SDIV
+    imports SUMMARY-CANCUN-MOD
+    imports SUMMARY-CANCUN-SMOD
+    imports SUMMARY-CANCUN-ADDMOD
+    imports SUMMARY-CANCUN-MULMOD
+    imports SUMMARY-CANCUN-EXP-LT
+    imports SUMMARY-CANCUN-EXP-GT
+    imports SUMMARY-CANCUN-SIGNEXTEND
+    imports SUMMARY-CANCUN-LT
+    imports SUMMARY-CANCUN-GT
+    imports SUMMARY-CANCUN-SLT
+    imports SUMMARY-CANCUN-SGT
+    imports SUMMARY-CANCUN-EQ
+    imports SUMMARY-CANCUN-ISZERO
+    imports SUMMARY-CANCUN-AND
+    imports SUMMARY-CANCUN-EVMOR
+    imports SUMMARY-CANCUN-XOR
+    imports SUMMARY-CANCUN-NOT
+    imports SUMMARY-CANCUN-BYTE
+    imports SUMMARY-CANCUN-SHL
+    imports SUMMARY-CANCUN-SHR
+    imports SUMMARY-CANCUN-SAR
+    imports SUMMARY-CANCUN-SHA3
+    imports SUMMARY-CANCUN-ADDRESS
+    imports SUMMARY-CANCUN-BALANCE
+    imports SUMMARY-CANCUN-ORIGIN
+    imports SUMMARY-CANCUN-CALLER
+    imports SUMMARY-CANCUN-CALLVALUE
+    imports SUMMARY-CANCUN-CALLDATALOAD
+    imports SUMMARY-CANCUN-CALLDATASIZE
+    imports SUMMARY-CANCUN-CALLDATACOPY
+    imports SUMMARY-CANCUN-CODESIZE
+    imports SUMMARY-CANCUN-CODECOPY
+    imports SUMMARY-CANCUN-GASPRICE
+    imports SUMMARY-CANCUN-EXTCODESIZE
+    imports SUMMARY-CANCUN-EXTCODECOPY
+    imports SUMMARY-CANCUN-RETURNDATASIZE
+    imports SUMMARY-CANCUN-RETURNDATACOPY-LT
+    imports SUMMARY-CANCUN-RETURNDATACOPY-GT
+    imports SUMMARY-CANCUN-EXTCODEHASH-E
+    imports SUMMARY-CANCUN-EXTCODEHASH-NE
+    imports SUMMARY-CANCUN-BLOCKHASH
+    imports SUMMARY-CANCUN-COINBASE
+    imports SUMMARY-CANCUN-TIMESTAMP
+    imports SUMMARY-CANCUN-NUMBER
+    imports SUMMARY-CANCUN-PREVRANDAO
+    imports SUMMARY-CANCUN-DIFFICULTY
+    imports SUMMARY-CANCUN-GASLIMIT
+    imports SUMMARY-CANCUN-CHAINID
+    imports SUMMARY-CANCUN-SELFBALANCE
+    imports SUMMARY-CANCUN-BASEFEE
+    imports SUMMARY-CANCUN-BLOBHASH-LT
+    imports SUMMARY-CANCUN-BLOBHASH-GT
+    imports SUMMARY-CANCUN-BLOBBASEFEE
+    imports SUMMARY-CANCUN-POP
+    imports SUMMARY-CANCUN-MLOAD
+    imports SUMMARY-CANCUN-MSTORE
+    imports SUMMARY-CANCUN-MSTORE8
+    imports SUMMARY-CANCUN-SLOAD
+    imports SUMMARY-CANCUN-SSTORE
+    imports SUMMARY-CANCUN-JUMP
+    imports SUMMARY-CANCUN-JUMPI-F
+    imports SUMMARY-CANCUN-JUMPI-T
+    imports SUMMARY-CANCUN-PC
+    imports SUMMARY-CANCUN-MSIZE
+    imports SUMMARY-CANCUN-GAS
+    imports SUMMARY-CANCUN-JUMPDEST
+    imports SUMMARY-CANCUN-TLOAD
+    imports SUMMARY-CANCUN-TSTORE
+    imports SUMMARY-CANCUN-MCOPY
+    imports SUMMARY-CANCUN-PUSHZERO
+    imports SUMMARY-CANCUN-PUSH-01
+    imports SUMMARY-CANCUN-PUSH-02
+    imports SUMMARY-CANCUN-PUSH-03
+    imports SUMMARY-CANCUN-PUSH-04
+    imports SUMMARY-CANCUN-PUSH-05
+    imports SUMMARY-CANCUN-PUSH-06
+    imports SUMMARY-CANCUN-PUSH-07
+    imports SUMMARY-CANCUN-PUSH-08
+    imports SUMMARY-CANCUN-PUSH-09
+    imports SUMMARY-CANCUN-PUSH-10
+    imports SUMMARY-CANCUN-PUSH-11
+    imports SUMMARY-CANCUN-PUSH-12
+    imports SUMMARY-CANCUN-PUSH-13
+    imports SUMMARY-CANCUN-PUSH-14
+    imports SUMMARY-CANCUN-PUSH-15
+    imports SUMMARY-CANCUN-PUSH-16
+    imports SUMMARY-CANCUN-PUSH-17
+    imports SUMMARY-CANCUN-PUSH-18
+    imports SUMMARY-CANCUN-PUSH-19
+    imports SUMMARY-CANCUN-PUSH-20
+    imports SUMMARY-CANCUN-PUSH-21
+    imports SUMMARY-CANCUN-PUSH-22
+    imports SUMMARY-CANCUN-PUSH-23
+    imports SUMMARY-CANCUN-PUSH-24
+    imports SUMMARY-CANCUN-PUSH-25
+    imports SUMMARY-CANCUN-PUSH-26
+    imports SUMMARY-CANCUN-PUSH-27
+    imports SUMMARY-CANCUN-PUSH-28
+    imports SUMMARY-CANCUN-PUSH-29
+    imports SUMMARY-CANCUN-PUSH-30
+    imports SUMMARY-CANCUN-PUSH-31
+    imports SUMMARY-CANCUN-PUSH-32
+    imports SUMMARY-CANCUN-DUP-01
+    imports SUMMARY-CANCUN-DUP-02
+    imports SUMMARY-CANCUN-DUP-03
+    imports SUMMARY-CANCUN-DUP-04
+    imports SUMMARY-CANCUN-DUP-05
+    imports SUMMARY-CANCUN-DUP-06
+    imports SUMMARY-CANCUN-DUP-07
+    imports SUMMARY-CANCUN-DUP-08
+    imports SUMMARY-CANCUN-DUP-09
+    imports SUMMARY-CANCUN-DUP-10
+    imports SUMMARY-CANCUN-DUP-11
+    imports SUMMARY-CANCUN-DUP-12
+    imports SUMMARY-CANCUN-DUP-13
+    imports SUMMARY-CANCUN-DUP-14
+    imports SUMMARY-CANCUN-DUP-15
+    imports SUMMARY-CANCUN-DUP-16
+    imports SUMMARY-CANCUN-LOG-00
+    imports SUMMARY-CANCUN-LOG-01
+    imports SUMMARY-CANCUN-LOG-02
+    imports SUMMARY-CANCUN-LOG-03
+    imports SUMMARY-CANCUN-LOG-04
+    imports SUMMARY-CANCUN-CREATE
+    imports SUMMARY-CANCUN-CALL
+    imports SUMMARY-CANCUN-CALLCODE
+    imports SUMMARY-CANCUN-RETURN
+    imports SUMMARY-CANCUN-DELEGATECALL
+    imports SUMMARY-CANCUN-CREATE2
+    imports SUMMARY-CANCUN-STATICCALL
+    imports SUMMARY-CANCUN-REVERT
+    imports SUMMARY-CANCUN-INVALID
+    imports SUMMARY-CANCUN-SELFDESTRUCT
+    imports SUMMARY-CANCUN-ECREC
+    imports SUMMARY-CANCUN-SHA256
+    imports SUMMARY-CANCUN-RIP160
+    imports SUMMARY-CANCUN-ID
+    imports SUMMARY-CANCUN-MODEXP
+    imports SUMMARY-CANCUN-ECADD
+    imports SUMMARY-CANCUN-ECMUL
+    imports SUMMARY-CANCUN-ECPAIRING
+    imports SUMMARY-CANCUN-BLAKE2F
+    imports SUMMARY-CANCUN-KZGPOINTEVAL
+    imports SUMMARY-CANCUN-SWAP-01
+endmodule
+```

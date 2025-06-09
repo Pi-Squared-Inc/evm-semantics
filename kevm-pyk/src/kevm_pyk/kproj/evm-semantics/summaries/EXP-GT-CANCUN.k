@@ -1,0 +1,54 @@
+/*******************************************************************************
+0 frontier nodes remaining.
+
+┌─ 1 (root)
+│
+│  (13 steps)
+└─ 2 (stuck, leaf)
+
+
+
+
+ *******************************************************************************/
+requires "../language.md"
+module SUMMARY-CANCUN-EXP-GT
+    imports public EVM-CSE-PRELUDE
+    
+    rule [BASIC-BLOCK-1-TO-2]: <generatedTop>
+           <k>
+             ( #nextOpCode [ 10 ]
+             ~> #execute
+             ~> K_CELL_DOTS => #execute
+             ~> K_CELL_DOTS:K )
+           </k>
+           <schedule>
+             CANCUN
+           </schedule>
+           <ethereum>
+             <evm>
+               <callState>
+                 <wordStack>
+                   ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) => ListItem ( powmod ( STACK0:Int , STACK1:Int , pow256 ) ) ) STACK_REST
+                 </wordStack>
+                 <pc>
+                   ( PC_CELL => ( PC_CELL:Int +Int 1 ) )
+                 </pc>
+                 <gas>
+                   ( GAS_CELL => ( GAS_CELL:Int +Int -10 ) )
+                 </gas>
+                 ...
+               </callState>
+               ...
+             </evm>
+           </ethereum>
+           ...
+         </generatedTop>
+      requires ( size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) STACK_REST ) <Int 1025
+       andBool ( 2 <=Int size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) STACK_REST )
+       andBool ( ( notBool 0 <Int STACK1:Int )
+       andBool ( ( GAS_CELL:Int +Int -10 ) >=Int 0
+               ))))
+       ensures STACK1:Int <=Int 0
+      [priority(50), label(BASIC-BLOCK-1-TO-2)]
+
+endmodule

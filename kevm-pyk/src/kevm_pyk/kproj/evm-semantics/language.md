@@ -289,21 +289,18 @@ Call / Create
 
 ```
 
-```reth
+```k
     syntax InternalOp ::= "#pushWorldState"
  // ---------------------------------------
-    rule <k> #pushWorldState => PushInsideCall() ... </k>
-         <snapshotCount> SC => SC +Int 1 </snapshotCount>
-         <snapshot>  SS => pushList(SC +Int 1, SS) </snapshot>
+    rule <k> #pushWorldState => PushState() ... </k>
+
     syntax InternalOp ::= "#popWorldState"
  // --------------------------------------
-    rule <k> #popWorldState => RevertInsideCall(S) ... </k>
-         <snapshotCount> SC => SC -Int 1 </snapshotCount>
-         <snapshot> ListItem(S) SS => SS </snapshot>
+    rule <k> #popWorldState => RollbackState() ... </k>
+
     syntax InternalOp ::= "#dropWorldState"
  // ---------------------------------------
-    rule <k> #dropWorldState => .K ... </k>
-         <snapshot> ListItem(_) SS => SS </snapshot>
+    rule <k> #dropWorldState => CommitState() ... </k>
 ```
 
 ```k
@@ -373,7 +370,7 @@ Call / Create
 
     rule <k> #newAccount ACCT => #if NewAccount(ACCT) #then .K #else  #end EVMC_ACCOUNT_ALREADY_EXISTS #fi ... </k>
 ```
-```reth
+```k
     syntax InternalOp ::= "#newAccount" Int Int Int
    // ---------------------------------------------
 

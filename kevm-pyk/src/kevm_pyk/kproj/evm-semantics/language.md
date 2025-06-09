@@ -211,6 +211,14 @@ This splits out looking up the OpCode in the program buffer from disassembling i
         [priority(20)]
 ```
 
+Helpers
+-------
+
+```k
+syntax Bool ::= Bytes "==Bytes" Bytes   [symbol(_==Bytes_), function, total]
+rule B1 ==Bytes B2 => B1 ==K B2
+```
+
 Precompiled
 -----------
 

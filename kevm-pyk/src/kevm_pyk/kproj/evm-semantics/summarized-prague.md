@@ -1,0 +1,318 @@
+```k
+requires "summaries/STOP-PRAGUE.k"
+requires "summaries/ADD-PRAGUE.k"
+requires "summaries/MUL-PRAGUE.k"
+requires "summaries/SUB-PRAGUE.k"
+requires "summaries/DIV-PRAGUE.k"
+requires "summaries/SDIV-PRAGUE.k"
+requires "summaries/MOD-PRAGUE.k"
+requires "summaries/SMOD-PRAGUE.k"
+requires "summaries/ADDMOD-PRAGUE.k"
+requires "summaries/MULMOD-PRAGUE.k"
+requires "summaries/EXP-LT-PRAGUE.k"
+requires "summaries/EXP-GT-PRAGUE.k"
+requires "summaries/SIGNEXTEND-PRAGUE.k"
+requires "summaries/LT-PRAGUE.k"
+requires "summaries/GT-PRAGUE.k"
+requires "summaries/SLT-PRAGUE.k"
+requires "summaries/SGT-PRAGUE.k"
+requires "summaries/EQ-PRAGUE.k"
+requires "summaries/ISZERO-PRAGUE.k"
+requires "summaries/AND-PRAGUE.k"
+requires "summaries/EVMOR-PRAGUE.k"
+requires "summaries/XOR-PRAGUE.k"
+requires "summaries/NOT-PRAGUE.k"
+requires "summaries/BYTE-PRAGUE.k"
+requires "summaries/SHL-PRAGUE.k"
+requires "summaries/SHR-PRAGUE.k"
+requires "summaries/SAR-PRAGUE.k"
+requires "summaries/SHA3-PRAGUE.k"
+requires "summaries/ADDRESS-PRAGUE.k"
+requires "summaries/BALANCE-PRAGUE.k"
+requires "summaries/ORIGIN-PRAGUE.k"
+requires "summaries/CALLER-PRAGUE.k"
+requires "summaries/CALLVALUE-PRAGUE.k"
+requires "summaries/CALLDATALOAD-PRAGUE.k"
+requires "summaries/CALLDATASIZE-PRAGUE.k"
+requires "summaries/CALLDATACOPY-PRAGUE.k"
+requires "summaries/CODESIZE-PRAGUE.k"
+requires "summaries/CODECOPY-PRAGUE.k"
+requires "summaries/GASPRICE-PRAGUE.k"
+requires "summaries/EXTCODESIZE-PRAGUE.k"
+requires "summaries/EXTCODECOPY-PRAGUE.k"
+requires "summaries/RETURNDATASIZE-PRAGUE.k"
+requires "summaries/RETURNDATACOPY-LT-PRAGUE.k"
+requires "summaries/RETURNDATACOPY-GT-PRAGUE.k"
+requires "summaries/EXTCODEHASH-E-PRAGUE.k"
+requires "summaries/EXTCODEHASH-NE-PRAGUE.k"
+requires "summaries/BLOCKHASH-PRAGUE.k"
+requires "summaries/COINBASE-PRAGUE.k"
+requires "summaries/TIMESTAMP-PRAGUE.k"
+requires "summaries/NUMBER-PRAGUE.k"
+requires "summaries/PREVRANDAO-PRAGUE.k"
+requires "summaries/DIFFICULTY-PRAGUE.k"
+requires "summaries/GASLIMIT-PRAGUE.k"
+requires "summaries/CHAINID-PRAGUE.k"
+requires "summaries/SELFBALANCE-PRAGUE.k"
+requires "summaries/BASEFEE-PRAGUE.k"
+requires "summaries/BLOBHASH-LT-PRAGUE.k"
+requires "summaries/BLOBHASH-GT-PRAGUE.k"
+requires "summaries/BLOBBASEFEE-PRAGUE.k"
+requires "summaries/POP-PRAGUE.k"
+requires "summaries/MLOAD-PRAGUE.k"
+requires "summaries/MSTORE-PRAGUE.k"
+requires "summaries/MSTORE8-PRAGUE.k"
+requires "summaries/SLOAD-PRAGUE.k"
+requires "summaries/SSTORE-PRAGUE.k"
+requires "summaries/JUMP-PRAGUE.k"
+requires "summaries/JUMPI-F-PRAGUE.k"
+requires "summaries/JUMPI-T-PRAGUE.k"
+requires "summaries/PC-PRAGUE.k"
+requires "summaries/MSIZE-PRAGUE.k"
+requires "summaries/GAS-PRAGUE.k"
+requires "summaries/JUMPDEST-PRAGUE.k"
+requires "summaries/TLOAD-PRAGUE.k"
+requires "summaries/TSTORE-PRAGUE.k"
+requires "summaries/MCOPY-PRAGUE.k"
+requires "summaries/PUSHZERO-PRAGUE.k"
+requires "summaries/PUSH-01-PRAGUE.k"
+requires "summaries/PUSH-02-PRAGUE.k"
+requires "summaries/PUSH-03-PRAGUE.k"
+requires "summaries/PUSH-04-PRAGUE.k"
+requires "summaries/PUSH-05-PRAGUE.k"
+requires "summaries/PUSH-06-PRAGUE.k"
+requires "summaries/PUSH-07-PRAGUE.k"
+requires "summaries/PUSH-08-PRAGUE.k"
+requires "summaries/PUSH-09-PRAGUE.k"
+requires "summaries/PUSH-10-PRAGUE.k"
+requires "summaries/PUSH-11-PRAGUE.k"
+requires "summaries/PUSH-12-PRAGUE.k"
+requires "summaries/PUSH-13-PRAGUE.k"
+requires "summaries/PUSH-14-PRAGUE.k"
+requires "summaries/PUSH-15-PRAGUE.k"
+requires "summaries/PUSH-16-PRAGUE.k"
+requires "summaries/PUSH-17-PRAGUE.k"
+requires "summaries/PUSH-18-PRAGUE.k"
+requires "summaries/PUSH-19-PRAGUE.k"
+requires "summaries/PUSH-20-PRAGUE.k"
+requires "summaries/PUSH-21-PRAGUE.k"
+requires "summaries/PUSH-22-PRAGUE.k"
+requires "summaries/PUSH-23-PRAGUE.k"
+requires "summaries/PUSH-24-PRAGUE.k"
+requires "summaries/PUSH-25-PRAGUE.k"
+requires "summaries/PUSH-26-PRAGUE.k"
+requires "summaries/PUSH-27-PRAGUE.k"
+requires "summaries/PUSH-28-PRAGUE.k"
+requires "summaries/PUSH-29-PRAGUE.k"
+requires "summaries/PUSH-30-PRAGUE.k"
+requires "summaries/PUSH-31-PRAGUE.k"
+requires "summaries/PUSH-32-PRAGUE.k"
+requires "summaries/DUP-01-PRAGUE.k"
+requires "summaries/DUP-02-PRAGUE.k"
+requires "summaries/DUP-03-PRAGUE.k"
+requires "summaries/DUP-04-PRAGUE.k"
+requires "summaries/DUP-05-PRAGUE.k"
+requires "summaries/DUP-06-PRAGUE.k"
+requires "summaries/DUP-07-PRAGUE.k"
+requires "summaries/DUP-08-PRAGUE.k"
+requires "summaries/DUP-09-PRAGUE.k"
+requires "summaries/DUP-10-PRAGUE.k"
+requires "summaries/DUP-11-PRAGUE.k"
+requires "summaries/DUP-12-PRAGUE.k"
+requires "summaries/DUP-13-PRAGUE.k"
+requires "summaries/DUP-14-PRAGUE.k"
+requires "summaries/DUP-15-PRAGUE.k"
+requires "summaries/DUP-16-PRAGUE.k"
+requires "summaries/LOG-00-PRAGUE.k"
+requires "summaries/LOG-01-PRAGUE.k"
+requires "summaries/LOG-02-PRAGUE.k"
+requires "summaries/LOG-03-PRAGUE.k"
+requires "summaries/LOG-04-PRAGUE.k"
+requires "summaries/CREATE-PRAGUE.k"
+requires "summaries/CALL-PRAGUE.k"
+requires "summaries/CALLCODE-PRAGUE.k"
+requires "summaries/RETURN-PRAGUE.k"
+requires "summaries/DELEGATECALL-PRAGUE.k"
+requires "summaries/CREATE2-PRAGUE.k"
+requires "summaries/STATICCALL-PRAGUE.k"
+requires "summaries/REVERT-PRAGUE.k"
+requires "summaries/INVALID-PRAGUE.k"
+requires "summaries/SELFDESTRUCT-PRAGUE.k"
+requires "summaries/ECREC-PRAGUE.k"
+requires "summaries/SHA256-PRAGUE.k"
+requires "summaries/RIP160-PRAGUE.k"
+requires "summaries/ID-PRAGUE.k"
+requires "summaries/MODEXP-PRAGUE.k"
+requires "summaries/ECADD-PRAGUE.k"
+requires "summaries/ECMUL-PRAGUE.k"
+requires "summaries/ECPAIRING-PRAGUE.k"
+requires "summaries/BLAKE2F-PRAGUE.k"
+requires "summaries/KZGPOINTEVAL-PRAGUE.k"
+requires "summaries/BLS12G1ADD-PRAGUE.k"
+requires "summaries/BLS12G1MSM-PRAGUE.k"
+requires "summaries/BLS12G2ADD-PRAGUE.k"
+requires "summaries/BLS12G2MSM-PRAGUE.k"
+requires "summaries/BLS12PAIRING_CHECK-PRAGUE.k"
+requires "summaries/BLS12MAPFPTOG1-PRAGUE.k"
+requires "summaries/BLS12MAPFP2TOG2-PRAGUE.k"
+requires "summaries/SWAP-01-PRAGUE.k"
+module SUMMARIZED-PRAGUE
+    imports SUMMARY-PRAGUE-STOP
+    imports SUMMARY-PRAGUE-ADD
+    imports SUMMARY-PRAGUE-MUL
+    imports SUMMARY-PRAGUE-SUB
+    imports SUMMARY-PRAGUE-DIV
+    imports SUMMARY-PRAGUE-SDIV
+    imports SUMMARY-PRAGUE-MOD
+    imports SUMMARY-PRAGUE-SMOD
+    imports SUMMARY-PRAGUE-ADDMOD
+    imports SUMMARY-PRAGUE-MULMOD
+    imports SUMMARY-PRAGUE-EXP-LT
+    imports SUMMARY-PRAGUE-EXP-GT
+    imports SUMMARY-PRAGUE-SIGNEXTEND
+    imports SUMMARY-PRAGUE-LT
+    imports SUMMARY-PRAGUE-GT
+    imports SUMMARY-PRAGUE-SLT
+    imports SUMMARY-PRAGUE-SGT
+    imports SUMMARY-PRAGUE-EQ
+    imports SUMMARY-PRAGUE-ISZERO
+    imports SUMMARY-PRAGUE-AND
+    imports SUMMARY-PRAGUE-EVMOR
+    imports SUMMARY-PRAGUE-XOR
+    imports SUMMARY-PRAGUE-NOT
+    imports SUMMARY-PRAGUE-BYTE
+    imports SUMMARY-PRAGUE-SHL
+    imports SUMMARY-PRAGUE-SHR
+    imports SUMMARY-PRAGUE-SAR
+    imports SUMMARY-PRAGUE-SHA3
+    imports SUMMARY-PRAGUE-ADDRESS
+    imports SUMMARY-PRAGUE-BALANCE
+    imports SUMMARY-PRAGUE-ORIGIN
+    imports SUMMARY-PRAGUE-CALLER
+    imports SUMMARY-PRAGUE-CALLVALUE
+    imports SUMMARY-PRAGUE-CALLDATALOAD
+    imports SUMMARY-PRAGUE-CALLDATASIZE
+    imports SUMMARY-PRAGUE-CALLDATACOPY
+    imports SUMMARY-PRAGUE-CODESIZE
+    imports SUMMARY-PRAGUE-CODECOPY
+    imports SUMMARY-PRAGUE-GASPRICE
+    imports SUMMARY-PRAGUE-EXTCODESIZE
+    imports SUMMARY-PRAGUE-EXTCODECOPY
+    imports SUMMARY-PRAGUE-RETURNDATASIZE
+    imports SUMMARY-PRAGUE-RETURNDATACOPY-LT
+    imports SUMMARY-PRAGUE-RETURNDATACOPY-GT
+    imports SUMMARY-PRAGUE-EXTCODEHASH-E
+    imports SUMMARY-PRAGUE-EXTCODEHASH-NE
+    imports SUMMARY-PRAGUE-BLOCKHASH
+    imports SUMMARY-PRAGUE-COINBASE
+    imports SUMMARY-PRAGUE-TIMESTAMP
+    imports SUMMARY-PRAGUE-NUMBER
+    imports SUMMARY-PRAGUE-PREVRANDAO
+    imports SUMMARY-PRAGUE-DIFFICULTY
+    imports SUMMARY-PRAGUE-GASLIMIT
+    imports SUMMARY-PRAGUE-CHAINID
+    imports SUMMARY-PRAGUE-SELFBALANCE
+    imports SUMMARY-PRAGUE-BASEFEE
+    imports SUMMARY-PRAGUE-BLOBHASH-LT
+    imports SUMMARY-PRAGUE-BLOBHASH-GT
+    imports SUMMARY-PRAGUE-BLOBBASEFEE
+    imports SUMMARY-PRAGUE-POP
+    imports SUMMARY-PRAGUE-MLOAD
+    imports SUMMARY-PRAGUE-MSTORE
+    imports SUMMARY-PRAGUE-MSTORE8
+    imports SUMMARY-PRAGUE-SLOAD
+    imports SUMMARY-PRAGUE-SSTORE
+    imports SUMMARY-PRAGUE-JUMP
+    imports SUMMARY-PRAGUE-JUMPI-F
+    imports SUMMARY-PRAGUE-JUMPI-T
+    imports SUMMARY-PRAGUE-PC
+    imports SUMMARY-PRAGUE-MSIZE
+    imports SUMMARY-PRAGUE-GAS
+    imports SUMMARY-PRAGUE-JUMPDEST
+    imports SUMMARY-PRAGUE-TLOAD
+    imports SUMMARY-PRAGUE-TSTORE
+    imports SUMMARY-PRAGUE-MCOPY
+    imports SUMMARY-PRAGUE-PUSHZERO
+    imports SUMMARY-PRAGUE-PUSH-01
+    imports SUMMARY-PRAGUE-PUSH-02
+    imports SUMMARY-PRAGUE-PUSH-03
+    imports SUMMARY-PRAGUE-PUSH-04
+    imports SUMMARY-PRAGUE-PUSH-05
+    imports SUMMARY-PRAGUE-PUSH-06
+    imports SUMMARY-PRAGUE-PUSH-07
+    imports SUMMARY-PRAGUE-PUSH-08
+    imports SUMMARY-PRAGUE-PUSH-09
+    imports SUMMARY-PRAGUE-PUSH-10
+    imports SUMMARY-PRAGUE-PUSH-11
+    imports SUMMARY-PRAGUE-PUSH-12
+    imports SUMMARY-PRAGUE-PUSH-13
+    imports SUMMARY-PRAGUE-PUSH-14
+    imports SUMMARY-PRAGUE-PUSH-15
+    imports SUMMARY-PRAGUE-PUSH-16
+    imports SUMMARY-PRAGUE-PUSH-17
+    imports SUMMARY-PRAGUE-PUSH-18
+    imports SUMMARY-PRAGUE-PUSH-19
+    imports SUMMARY-PRAGUE-PUSH-20
+    imports SUMMARY-PRAGUE-PUSH-21
+    imports SUMMARY-PRAGUE-PUSH-22
+    imports SUMMARY-PRAGUE-PUSH-23
+    imports SUMMARY-PRAGUE-PUSH-24
+    imports SUMMARY-PRAGUE-PUSH-25
+    imports SUMMARY-PRAGUE-PUSH-26
+    imports SUMMARY-PRAGUE-PUSH-27
+    imports SUMMARY-PRAGUE-PUSH-28
+    imports SUMMARY-PRAGUE-PUSH-29
+    imports SUMMARY-PRAGUE-PUSH-30
+    imports SUMMARY-PRAGUE-PUSH-31
+    imports SUMMARY-PRAGUE-PUSH-32
+    imports SUMMARY-PRAGUE-DUP-01
+    imports SUMMARY-PRAGUE-DUP-02
+    imports SUMMARY-PRAGUE-DUP-03
+    imports SUMMARY-PRAGUE-DUP-04
+    imports SUMMARY-PRAGUE-DUP-05
+    imports SUMMARY-PRAGUE-DUP-06
+    imports SUMMARY-PRAGUE-DUP-07
+    imports SUMMARY-PRAGUE-DUP-08
+    imports SUMMARY-PRAGUE-DUP-09
+    imports SUMMARY-PRAGUE-DUP-10
+    imports SUMMARY-PRAGUE-DUP-11
+    imports SUMMARY-PRAGUE-DUP-12
+    imports SUMMARY-PRAGUE-DUP-13
+    imports SUMMARY-PRAGUE-DUP-14
+    imports SUMMARY-PRAGUE-DUP-15
+    imports SUMMARY-PRAGUE-DUP-16
+    imports SUMMARY-PRAGUE-LOG-00
+    imports SUMMARY-PRAGUE-LOG-01
+    imports SUMMARY-PRAGUE-LOG-02
+    imports SUMMARY-PRAGUE-LOG-03
+    imports SUMMARY-PRAGUE-LOG-04
+    imports SUMMARY-PRAGUE-CREATE
+    imports SUMMARY-PRAGUE-CALL
+    imports SUMMARY-PRAGUE-CALLCODE
+    imports SUMMARY-PRAGUE-RETURN
+    imports SUMMARY-PRAGUE-DELEGATECALL
+    imports SUMMARY-PRAGUE-CREATE2
+    imports SUMMARY-PRAGUE-STATICCALL
+    imports SUMMARY-PRAGUE-REVERT
+    imports SUMMARY-PRAGUE-INVALID
+    imports SUMMARY-PRAGUE-SELFDESTRUCT
+    imports SUMMARY-PRAGUE-ECREC
+    imports SUMMARY-PRAGUE-SHA256
+    imports SUMMARY-PRAGUE-RIP160
+    imports SUMMARY-PRAGUE-ID
+    imports SUMMARY-PRAGUE-MODEXP
+    imports SUMMARY-PRAGUE-ECADD
+    imports SUMMARY-PRAGUE-ECMUL
+    imports SUMMARY-PRAGUE-ECPAIRING
+    imports SUMMARY-PRAGUE-BLAKE2F
+    imports SUMMARY-PRAGUE-KZGPOINTEVAL
+    imports SUMMARY-PRAGUE-BLS12G1ADD
+    imports SUMMARY-PRAGUE-BLS12G1MSM
+    imports SUMMARY-PRAGUE-BLS12G2ADD
+    imports SUMMARY-PRAGUE-BLS12G2MSM
+    imports SUMMARY-PRAGUE-BLS12PAIRING_CHECK
+    imports SUMMARY-PRAGUE-BLS12MAPFPTOG1
+    imports SUMMARY-PRAGUE-BLS12MAPFP2TOG2
+    imports SUMMARY-PRAGUE-SWAP-01
+endmodule
+```

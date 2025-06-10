@@ -1467,6 +1467,7 @@ Precompiled Contracts
        andBool verifyKZGProof(substrBytes(CD, 96, 144), substrBytes(CD, 32, 64), substrBytes(CD, 64, 96), substrBytes(CD, 144, 192))
 
     rule <k> KZGPOINTEVAL => #end EVMC_PRECOMPILE_FAILURE ... </k>
+         <callData> CD </callData>
       requires notBool
              ( lengthBytes( CD ) ==Int 192
        andBool #kzg2vh(substrBytes(CD, 96, 144)) ==Bytes substrBytes(CD, 0, 32)

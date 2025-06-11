@@ -212,6 +212,11 @@ This splits out looking up the OpCode in the program buffer from disassembling i
          <pc> PCOUNT </pc>
       requires 0 <=Int PCOUNT andBool PCOUNT <Int lengthBytes(PGM)
         [priority(20)]
+
+    rule <k> #execute => #end EVMC_SUCCESS ... </k>
+         <pc> PCOUNT </pc>
+      requires PCOUNT ==Int lengthBytes(PGM)
+        [priority(20)]
 ```
 
 Control Flow

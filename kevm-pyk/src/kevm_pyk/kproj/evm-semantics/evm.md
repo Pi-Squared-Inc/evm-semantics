@@ -79,11 +79,11 @@ For symbolic execution, we create an additional cell, to capture the
 side-effects of impure hooks.
 
 ```symbolic
-        <worldState> .WorldState </worldState>
+        <symbolicWorldState> .SymbolicWorldState </symbolicWorldState>
 
-    syntax WorldState ::= ".WorldState" [function, total]
+    syntax SymbolicWorldState ::= ".SymbolicWorldState" [function, total]
     rule <k> WS:WorldState => .K ... </k>
-         <worldState> _ => WS </worldState>
+         <symbolicWorldState> _ => WS </symbolicWorldState>
 ```
 
 ```k

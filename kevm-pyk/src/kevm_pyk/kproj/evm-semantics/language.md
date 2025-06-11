@@ -241,7 +241,7 @@ Precompiled
 
 ```k
     syntax KItem ::= "#precompiled?" "(" Int "," Schedule ")"
-    rule <k> #precompiled?(0, _) => .K ... </k>
+    rule <k> #precompiled?(_, _) => .K ... </k> [owise]
 ```
 
 ```k

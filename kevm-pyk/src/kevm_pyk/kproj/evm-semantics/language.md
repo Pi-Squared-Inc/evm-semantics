@@ -214,6 +214,7 @@ This splits out looking up the OpCode in the program buffer from disassembling i
         [priority(20)]
 
     rule <k> #execute => #end EVMC_SUCCESS ... </k>
+         <program> PGM </program>
          <pc> PCOUNT </pc>
       requires PCOUNT ==Int lengthBytes(PGM)
         [priority(20)]
@@ -354,7 +355,7 @@ Call / Create
     syntax InternalOp ::= "#pc" "[" OpCode "]" [symbol(pc)]
  // -------------------------------------------------------
     rule [pc.inc]:
-         <k> #pc [ OP ] => .K ... </k>
+         <k> #pc [ OP_ ] => .K ... </k>
          <pc> PCOUNT => PCOUNT +Int 1 </pc>
 ```
 

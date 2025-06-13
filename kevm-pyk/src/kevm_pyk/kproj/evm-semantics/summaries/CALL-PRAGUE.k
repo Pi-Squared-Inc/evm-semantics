@@ -81,4 +81,17 @@ module SUMMARY-PRAGUE-CALL
                ))))))
       [priority(50), label(BASIC-BLOCK-1-TO-2)]
 
+/*
+    rule [BASIC-BLOCK-1-TO-2]: <generatedTop>
+           <k>
+             ( #nextOpCode [ 241 ]
+             ~> #execute
+             ~> K_CELL_DOTS =>  
+	     "AccountExists" ~> ( AccountExists ( ... acct: ( STACK1:Int modInt 2 ^Int 160 ) )
+             "isAccountEmpty" ~>        ( IsAccountEmpty ( ... acct: ( STACK1:Int modInt 2 ^Int 160 ) )
+       	     "GetAccountBalance" ~>        ( GetAccountBalance ( ... acct: ID_CELL ) >=Int STACK2:Int
+ )
+           </k>
+          [owise]
+*/
 endmodule

@@ -52,7 +52,6 @@ module SUMMARY-PRAGUE-JUMP
        andBool ( STACK0:Int <Int lengthBytes ( JUMPDESTS_CELL )
        andBool ( ( GAS_CELL:Int +Int -8 ) >=Int 0
                )))))
-       andBool STACK0:Int =/=Int 1510
        ensures ( 1 ==Int JUMPDESTS_CELL:Bytes [ STACK0:Int ]
        andBool ( STACK0:Int <Int lengthBytes ( JUMPDESTS_CELL:Bytes )
                ))

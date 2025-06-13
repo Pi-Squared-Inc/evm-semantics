@@ -47,7 +47,6 @@ module SUMMARY-PRAGUE-JUMPDEST
        andBool ( 0 <=Int size ( STACK_REST )
        andBool ( ( GAS_CELL:Int +Int -1 ) >=Int 0
                )))
-       andBool PC_CELL:Int =/=Int 1510
        ensures size ( STACK_REST:List ) <Int 1025
       [priority(50), label(BASIC-BLOCK-1-TO-2)]
 

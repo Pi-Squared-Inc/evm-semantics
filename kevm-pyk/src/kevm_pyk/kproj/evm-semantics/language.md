@@ -242,6 +242,14 @@ syntax Bool ::= Bytes "==Bytes" Bytes   [symbol(_==Bytes_), function, total]
 rule B1 ==Bytes B2 => B1 ==K B2
 ```
 
+```k
+syntax List ::= #ComputeSwap(Int, List) [macro]
+rule #ComputeSwap(Idx:Int, STACK:List) => STACK [ Idx <- STACK[0] ] [ 0 <- STACK[Idx] ]
+
+syntax Bool ::= #CheckSwap(Int, List) [macro]
+rule #CheckSwap(Idx:Int, STACK:List) => Idx <Int size( STACK )
+```
+
 Precompiled
 -----------
 

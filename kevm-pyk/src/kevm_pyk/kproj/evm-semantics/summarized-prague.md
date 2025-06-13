@@ -156,6 +156,15 @@ requires "summaries/BLS12PAIRING_CHECK-PRAGUE.k"
 requires "summaries/BLS12MAPFPTOG1-PRAGUE.k"
 requires "summaries/BLS12MAPFP2TOG2-PRAGUE.k"
 requires "summaries/SWAP-01-PRAGUE.k"
+requires "summaries/SWAP-02-PRAGUE.k"
+requires "summaries/SWAP-03-PRAGUE.k"
+requires "summaries/SWAP-04-PRAGUE.k"
+requires "summaries/SWAP-05-PRAGUE.k"
+requires "summaries/SWAP-06-PRAGUE.k"
+requires "summaries/SWAP-07-PRAGUE.k"
+requires "summaries/SWAP-08-PRAGUE.k"
+requires "summaries/SWAP-09-PRAGUE.k"
+requires "summaries/SWAP-10-PRAGUE.k"
 module SUMMARIZED-PRAGUE
     imports SUMMARY-PRAGUE-STOP
     imports SUMMARY-PRAGUE-ADD
@@ -314,5 +323,14 @@ module SUMMARIZED-PRAGUE
     imports SUMMARY-PRAGUE-BLS12MAPFPTOG1
     imports SUMMARY-PRAGUE-BLS12MAPFP2TOG2
     imports SUMMARY-PRAGUE-SWAP-01
+    imports SUMMARY-PRAGUE-SWAP-02
+    imports SUMMARY-PRAGUE-SWAP-03
+    imports SUMMARY-PRAGUE-SWAP-04
+    imports SUMMARY-PRAGUE-SWAP-05
+    imports SUMMARY-PRAGUE-SWAP-06
+    imports SUMMARY-PRAGUE-SWAP-07
+    imports SUMMARY-PRAGUE-SWAP-08
+    imports SUMMARY-PRAGUE-SWAP-09
+    imports SUMMARY-PRAGUE-SWAP-10
 endmodule
 ```

@@ -29,7 +29,7 @@ module SUMMARY-PRAGUE-EXTCODEHASH-E
              <evm>
                <callState>
                  <wordStack>
-                   ListItem ( ( STACK0:Int => 0 ) ) ( STACK_REST => ListItem ( STACK_REST:List ) )
+                   ListItem ( ( STACK0:Int => 0 ) )  STACK_REST:List 
                  </wordStack>
                  <pc>
                    ( PC_CELL => ( PC_CELL:Int +Int 1 ) )

@@ -81,7 +81,6 @@ module SUMMARY-PRAGUE-CALL
                ))))))
       [priority(50), label(BASIC-BLOCK-1-TO-2)]
 
-/*
     rule [BASIC-BLOCK-1-TO-2]: <generatedTop>
            <k>
              ( #nextOpCode [ 241 ]
@@ -93,5 +92,4 @@ module SUMMARY-PRAGUE-CALL
  )
            </k>
           [owise]
-*/
 endmodule

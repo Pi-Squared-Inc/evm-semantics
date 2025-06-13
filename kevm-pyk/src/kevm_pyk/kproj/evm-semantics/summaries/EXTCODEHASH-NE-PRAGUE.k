@@ -28,7 +28,7 @@ module SUMMARY-PRAGUE-EXTCODEHASH-NE
              <evm>
                <callState>
                  <wordStack>
-                   ListItem ( ( STACK0:Int => GetCodeHash ( ... addr: ( STACK0:Int modInt pow160 ) ) ) ) ( STACK_REST => ListItem ( STACK_REST:List ) )
+                   ListItem ( ( STACK0:Int => GetCodeHash ( ... addr: ( STACK0:Int modInt pow160 ) ) ) )  STACK_REST:List 
                  </wordStack>
                  <pc>
                    ( PC_CELL => ( PC_CELL:Int +Int 1 ) )

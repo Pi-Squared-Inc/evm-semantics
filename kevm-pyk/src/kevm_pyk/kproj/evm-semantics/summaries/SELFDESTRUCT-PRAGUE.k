@@ -38,7 +38,7 @@ module SUMMARY-PRAGUE-SELFDESTRUCT
                    ID_CELL
                  </id>
                  <wordStack>
-                   ( ListItem ( STACK0:Int ) STACK_REST => ListItem ( STACK_REST:List ) )
+                   ( ListItem ( STACK0:Int ) STACK_REST => STACK_REST:List )
                  </wordStack>
                  <gas>
                    ( GAS_CELL => ( ( ( GAS_CELL:Int -Int #if ( IsAccountEmpty ( ... acct: ( STACK0:Int modInt pow160 ) ) andBool ( notBool GetAccountBalance ( ... acct: ID_CELL:Int ) ==Int 0 ) ) #then 25000 #else 0 #fi ) -Int #if ( STACK0:Int modInt pow160 ) in ACCESSEDACCOUNTS_CELL:Set #then 0 #else 2600 #fi ) +Int -5000 ) )

@@ -81,15 +81,20 @@ module SUMMARY-PRAGUE-CALL
                ))))))
       [priority(50), label(BASIC-BLOCK-1-TO-2)]
 
-    rule [BASIC-BLOCK-1-TO-2]: <generatedTop>
-           <k>
+    rule <k>
              ( #nextOpCode [ 241 ]
              ~> #execute
-             ~> K_CELL_DOTS =>  
-	     "AccountExists" ~> ( AccountExists ( ... acct: ( STACK1:Int modInt 2 ^Int 160 ) )
-             "isAccountEmpty" ~>        ( IsAccountEmpty ( ... acct: ( STACK1:Int modInt 2 ^Int 160 ) )
-       	     "GetAccountBalance" ~>        ( GetAccountBalance ( ... acct: ID_CELL ) >=Int STACK2:Int
- )
+             ) => (
+	     "AccountExists" ~> ( AccountExists ( ... acct: ( STACK1:Int modInt 2 ^Int 160 ) ) )
+             "isAccountEmpty" ~> ( IsAccountEmpty ( ... acct: ( STACK1:Int modInt 2 ^Int 160 ) ) )
+       	     "GetAccountBalance" ~> ( GetAccountBalance ( ... acct: ID_CELL ) >=Int STACK2:Int )
+             )
            </k>
+                 <id>
+                   ID_CELL
+                 </id>
+                 <wordStack>
+                   ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) ListItem ( STACK4:Int ) ListItem ( STACK5:Int ) ListItem ( STACK6:Int ) ListItem ( STACK7:Int ) => ListItem ( STACK7:Int ) )  STACK_REST:List 
+                 </wordStack>
           [owise]
 endmodule

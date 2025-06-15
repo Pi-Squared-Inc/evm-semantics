@@ -35,7 +35,7 @@ module SUMMARY-PRAGUE-CALL
                    ID_CELL
                  </id>
                  <wordStack>
-                   ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) ListItem ( STACK4:Int ) ListItem ( STACK5:Int ) ListItem ( STACK6:Int ) ListItem ( STACK7:Int ) => ListItem ( STACK7:Int ) )  STACK_REST:List 
+                   ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) ListItem ( STACK4:Int ) ListItem ( STACK5:Int ) ListItem ( STACK6:Int ) STACK_REST:List ) => STACK_REST
                  </wordStack>
                  <localMem>
                    LOCALMEM_CELL
@@ -63,8 +63,8 @@ module SUMMARY-PRAGUE-CALL
            
            ...
          </generatedTop>
-      requires ( size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) ListItem ( STACK4:Int ) ListItem ( STACK5:Int ) ListItem ( STACK6:Int ) ListItem ( STACK7:Int ) STACK_REST ) <Int 1025
-       andBool ( 8 <=Int size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) ListItem ( STACK4:Int ) ListItem ( STACK5:Int ) ListItem ( STACK6:Int ) ListItem ( STACK7:Int ) STACK_REST )
+      requires ( size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) ListItem ( STACK4:Int ) ListItem ( STACK5:Int ) ListItem ( STACK6:Int ) STACK_REST ) <Int 1025
+       andBool ( 7 <=Int size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) ListItem ( STACK4:Int ) ListItem ( STACK5:Int ) ListItem ( STACK6:Int ) STACK_REST )
        andBool ( ( notBool STATIC_CELL )
        andBool ( STACK2:Int =/=Int 0
        andBool ( AccountExists ( ... acct: ( STACK1:Int modInt 2 ^Int 160 ) )
@@ -94,7 +94,7 @@ module SUMMARY-PRAGUE-CALL
                    ID_CELL
                  </id>
                  <wordStack>
-                   ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) ListItem ( STACK4:Int ) ListItem ( STACK5:Int ) ListItem ( STACK6:Int ) ListItem ( STACK7:Int ) => ListItem ( STACK7:Int ) )  STACK_REST:List 
+                   ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) ListItem ( STACK4:Int ) ListItem ( STACK5:Int ) ListItem ( STACK6:Int ) STACK_REST:List ) => STACK_REST
                  </wordStack>
           [owise]
 endmodule

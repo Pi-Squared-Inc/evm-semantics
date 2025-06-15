@@ -365,7 +365,7 @@ Call / Create
     syntax InternalOp ::= "#pc" "[" OpCode "]" [symbol(pc)]
  // -------------------------------------------------------
     rule [pc.inc]:
-         <k> #pc [ OP_ ] => .K ... </k>
+         <k> #pc [ _OP ] => .K ... </k>
          <pc> PCOUNT => PCOUNT +Int 1 </pc>
 ```
 

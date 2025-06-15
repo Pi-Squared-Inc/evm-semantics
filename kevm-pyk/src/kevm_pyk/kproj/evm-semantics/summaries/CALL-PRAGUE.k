@@ -85,9 +85,9 @@ module SUMMARY-PRAGUE-CALL
              ( #nextOpCode [ 241 ]
              ~> #execute
              ) => (
-	     "AccountExists" ~> ( AccountExists ( ... acct: ( STACK1:Int modInt 2 ^Int 160 ) ) )
-             "isAccountEmpty" ~> ( IsAccountEmpty ( ... acct: ( STACK1:Int modInt 2 ^Int 160 ) ) )
-       	     "GetAccountBalance" ~> ( GetAccountBalance ( ... acct: ID_CELL ) >=Int STACK2:Int )
+             "AccountExists" ~> ( AccountExists ( ... acct: ( STACK1:Int modInt 2 ^Int 160 ) ) ) ~>
+             "isAccountEmpty" ~> ( IsAccountEmpty ( ... acct: ( STACK1:Int modInt 2 ^Int 160 ) ) ) ~>
+             "GetAccountBalance" ~> ( GetAccountBalance ( ... acct: ID_CELL ) >=Int STACK2:Int )
              )
            </k>
                  <id>

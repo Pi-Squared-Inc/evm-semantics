@@ -2014,9 +2014,9 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
 
     syntax Exp ::= #handleCallGas(Schedule, acctNonExistent: BExp, cap: Gas, avail: Gas, value: Int, acct:Int, AccountInfo)  [strict(2)]
  // ------------------------------------------------------------------------------------------------------------------------------------
-    rule #handleCallGas(SCHED, ISEMPTY:Bool, GCAP, GAVAIL, VALUE, ACCTTO, AccountInfo(ISWARM, TGT_ACCT))
-          => Ccallgas(SCHED, ISEMPTY, GCAP, GAVAIL, VALUE, ISWARM, TGT_ACCT, ACCTTO ==Int TGT_ACCT) ~> #allocateCallGas
-          ~> Ccall(SCHED, ISEMPTY, GCAP, GAVAIL, VALUE, ISWARM, TGT_ACCT, ACCTTO ==Int TGT_ACCT)
+    rule #handleCallGas(SCHED, ISEMPTY:Bool, GCAP, GAVAIL, VALUE, ACCTTO, ACCTINFO)
+          => Ccallgas(SCHED, ISEMPTY, GCAP, GAVAIL, VALUE, isWarm(ACCTINFO), delegation(ACCTINFO), ACCTTO ==Int delegation(ACCTINFO)) ~> #allocateCallGas
+          ~> Ccall(SCHED, ISEMPTY, GCAP, GAVAIL, VALUE, isWarm(ACCTINFO), delegation(ACCTINFO), ACCTTO ==Int delegation(ACCTINFO))
 
     rule <k> #gasExec(SCHED, CALL GCAP ACCTTO VALUE _ _ _ _)
           => #handleCallGas(SCHED, #accountNonexistent(ACCTTO), GCAP, GAVAIL, VALUE, ACCTTO, GetAccountInfoAndWarmIt(ACCTTO))

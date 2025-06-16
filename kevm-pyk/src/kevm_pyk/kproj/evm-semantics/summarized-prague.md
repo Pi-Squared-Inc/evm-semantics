@@ -130,6 +130,8 @@ requires "summaries/LOG-03-PRAGUE.k"
 requires "summaries/LOG-04-PRAGUE.k"
 requires "summaries/CREATE-PRAGUE.k"
 requires "summaries/CALL-PRAGUE.k"
+requires "summaries/CALL-NA-PRAGUE.k"
+requires "summaries/CALL-NE-PRAGUE.k"
 requires "summaries/CALLCODE-PRAGUE.k"
 requires "summaries/RETURN-PRAGUE.k"
 requires "summaries/DELEGATECALL-PRAGUE.k"
@@ -297,6 +299,8 @@ module SUMMARIZED-PRAGUE
     imports SUMMARY-PRAGUE-LOG-04
     imports SUMMARY-PRAGUE-CREATE
     imports SUMMARY-PRAGUE-CALL
+    imports SUMMARY-PRAGUE-CALL-NA
+    imports SUMMARY-PRAGUE-CALL-NE
     imports SUMMARY-PRAGUE-CALLCODE
     imports SUMMARY-PRAGUE-RETURN
     imports SUMMARY-PRAGUE-DELEGATECALL

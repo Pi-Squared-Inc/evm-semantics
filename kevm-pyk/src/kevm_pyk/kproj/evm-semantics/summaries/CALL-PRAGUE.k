@@ -18,7 +18,8 @@ module SUMMARY-PRAGUE-CALL
            <k>
              ( #nextOpCode [ 241 ]
              ~> #execute
-             ~> K_CELL_DOTS => AccessAccount ( ... acct: ( STACK1:Int modInt pow160 ) )
+             ~> K_CELL_DOTS
+             => AccessAccount ( ... acct: ( STACK1:Int modInt pow160 ) )
              ~> #call ID_CELL:Int ( STACK1:Int modInt pow160 ) ( STACK1:Int modInt pow160 ) STACK2:Int STACK2:Int #range ( LOCALMEM_CELL:Bytes , STACK3:Int , STACK4:Int ) false
              ~> #return STACK5:Int STACK6:Int
              ~> #pc [ CALL ]
@@ -84,10 +85,12 @@ module SUMMARY-PRAGUE-CALL
     rule <k>
              ( #nextOpCode [ 241 ]
              ~> #execute
+             ~> K_CELL_DOTS:K
              ) => (
              "AccountExists" ~> ( AccountExists ( ... acct: ( STACK1:Int modInt 2 ^Int 160 ) ) ) ~>
              "isAccountEmpty" ~> ( IsAccountEmpty ( ... acct: ( STACK1:Int modInt 2 ^Int 160 ) ) ) ~>
              "GetAccountBalance" ~> ( GetAccountBalance ( ... acct: ID_CELL ) >=Int STACK2:Int )
+             ~> K_CELL_DOTS:K
              )
            </k>
                  <id>

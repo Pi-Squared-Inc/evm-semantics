@@ -326,7 +326,7 @@ The `#next [_]` operator initiates execution by:
 -   `#changesState` is true if the given opcode will change `<network>` state given the arguments.
 
 ```k
-    syntax Bool ::= #changesState ( OpCode , List ) [symbol(#changesState), function]
+    syntax Bool ::= #changesState ( OpCode , List ) [symbol(#changesState), total, function]
  // ---------------------------------------------------------------------------------
 ```
 

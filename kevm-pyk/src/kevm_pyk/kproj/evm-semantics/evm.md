@@ -1448,7 +1448,7 @@ Precompiled Contracts
     rule <k> BLAKE2F => #end EVMC_PRECOMPILE_FAILURE ... </k>
          <callData> CD </callData>
       requires lengthBytes( CD ) ==Int 213
-       andBool CD[212] >Int 1
+       andBool notBool (CD[212] <=Int 1)
 
     rule <k> BLAKE2F => #end EVMC_PRECOMPILE_FAILURE ... </k>
          <callData> CD </callData>

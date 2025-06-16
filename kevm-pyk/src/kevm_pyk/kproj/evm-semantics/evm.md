@@ -82,7 +82,7 @@ side-effects of impure hooks.
         <symbolicWorldState> .SymbolicWorldState </symbolicWorldState>
 
     syntax SymbolicWorldState ::= ".SymbolicWorldState" [function, total]
-    rule <k> WS:WorldState => .K ... </k>
+    rule <k> WS:SymbolicWorldState => .K ... </k>
          <symbolicWorldState> _ => WS </symbolicWorldState>
 ```
 

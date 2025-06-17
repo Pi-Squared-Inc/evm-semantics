@@ -110,6 +110,7 @@ module EVM-CSE-PRELUDE
     imports NETWORK
     imports GAS
     imports ULM
+    imports K-IO
 
 
     configuration
@@ -190,10 +191,15 @@ This splits out looking up the OpCode in the program buffer from disassembling i
     rule [halt]:
          <k> #halt ~> (#execute => .K) ... </k>
 
+    syntax K ::= #traceGas(Bytes, Int, Int) [macro]
+    rule #traceGas(PGM, PCOUNT, GAVAIL)
+      => #log(Int2String(PCOUNT) +String ":" +String Int2String(PGM[PCOUNT]) +String ":" +String Int2String(GAVAIL))
+
     rule [lookupOpCode]:
-         <k> (.K => #nextOpCode[PGM[PCOUNT]]) ~> #execute ... </k>
+         <k> (.K => #traceGas(PGM, PCOUNT, GAVAIL) ~> #nextOpCode[PGM[PCOUNT]]) ~> #execute ... </k>
          <program> PGM </program>
          <pc> PCOUNT </pc>
+         <gas> GAVAIL </gas>
       requires 0 <=Int PCOUNT andBool PCOUNT <Int lengthBytes(PGM)
         [priority(50)]
 

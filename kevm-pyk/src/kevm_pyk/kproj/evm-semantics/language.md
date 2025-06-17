@@ -281,6 +281,11 @@ Precompiled
       requires I =/=Int LEN
     rule <k> #ecpairing(A, B, LEN, _, LEN) => #end EVMC_SUCCESS ... </k>
          <output> _ => #padToWidth(32, #asByteStack(bool2Word(BN128AtePairing(A, B)))) </output>
+
+    rule <k> (#checkPoint => .K) ~> #ecpairing(ListItem(AK::G1Point) _, ListItem(BK::G2Point) _, _, _, _) ... </k>
+      requires isValidPoint(AK) andBool isValidPoint(BK)
+    rule <k> #checkPoint ~> #ecpairing(ListItem(AK::G1Point) _, ListItem(BK::G2Point) _, _, _, _) => #end EVMC_PRECOMPILE_FAILURE ... </k>
+      requires notBool isValidPoint(AK) orBool notBool isValidPoint(BK)
 ```
 
 ```k

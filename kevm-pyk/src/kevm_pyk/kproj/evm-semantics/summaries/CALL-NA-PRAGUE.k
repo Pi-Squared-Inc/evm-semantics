@@ -68,7 +68,7 @@ module SUMMARY-PRAGUE-CALL-NA
        andBool ( ( notBool STATIC_CELL )
        // andBool ( STACK2:Int =/=Int 0 )
        andBool ( ( notBool AccountExists ( ... acct: ( STACK1:Int modInt 2 ^Int 160 ) ) )
-       andBool ( ( notBool IsAccountEmpty ( ... acct: ( STACK1:Int modInt 2 ^Int 160 ) ) )
+       andBool ( ( IsAccountEmpty ( ... acct: ( STACK1:Int modInt 2 ^Int 160 ) ) )
        andBool ( GetAccountBalance ( ... acct: ID_CELL ) >=Int STACK2:Int
        andBool ( CALLDEPTH_CELL <Int 1024
                )))))))
@@ -77,7 +77,7 @@ module SUMMARY-PRAGUE-CALL-NA
        andBool ( CALLDEPTH_CELL:Int <Int 1024
        andBool ( STACK2:Int <=Int GetAccountBalance ( ... acct: ID_CELL:Int )
        andBool ( ( notBool AccountExists ( ... acct: ( STACK1:Int modInt pow160 ) ) )
-       andBool ( ( notBool IsAccountEmpty ( ... acct: ( STACK1:Int modInt pow160 ) ) )
+       andBool ( ( IsAccountEmpty ( ... acct: ( STACK1:Int modInt pow160 ) ) )
                )))))
       [priority(50), label(BASIC-BLOCK-1-TO-2)]
 

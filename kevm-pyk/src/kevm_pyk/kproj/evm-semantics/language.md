@@ -202,6 +202,7 @@ This splits out looking up the OpCode in the program buffer from disassembling i
 
 ```k
     syntax KItem ::= "#nextOpCode" "[" Int "]"      [symbol(nextOpCode)]
+    syntax OpCode ::= InternalOp
 
     rule [halt]:
          <k> #halt ~> (#execute => .K) ... </k>

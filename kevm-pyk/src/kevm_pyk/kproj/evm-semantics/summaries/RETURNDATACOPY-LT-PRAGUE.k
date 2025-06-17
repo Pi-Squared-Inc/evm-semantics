@@ -31,7 +31,7 @@ module SUMMARY-PRAGUE-RETURNDATACOPY-LT
                </output>
                <callState>
                  <wordStack>
-                   ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) STACK_REST => STACK_REST:List )
+                   ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) STACK_REST:List => STACK_REST:List )
                  </wordStack>
                  <localMem>
                    ( LOCALMEM_CELL => LOCALMEM_CELL:Bytes [ STACK0:Int := #range ( OUTPUT_CELL:Bytes , STACK1:Int , STACK2:Int ) ] )
@@ -52,12 +52,12 @@ module SUMMARY-PRAGUE-RETURNDATACOPY-LT
            </ethereum>
            ...
          </generatedTop>
-      requires ( size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) STACK_REST ) <Int 1024
-       andBool ( 3 <=Int size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) STACK_REST )
-       andBool ( ( STACK1:Int +Int STACK2:Int ) <Int lengthBytes ( OUTPUT_CELL )
+      requires ( size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) STACK_REST:List ) <Int 1024
+       andBool ( 3 <=Int size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) STACK_REST:List )
+       andBool ( ( STACK1:Int +Int STACK2:Int ) <=Int lengthBytes ( OUTPUT_CELL )
        andBool ( ( ( ( GAS_CELL:Int -Int ( Cmem ( PRAGUE , #memoryUsageUpdate ( MEMORYUSED_CELL:Int , STACK0:Int , STACK2:Int ) ) -Int Cmem ( PRAGUE , MEMORYUSED_CELL:Int ) ) ) -Int ( 3 *Int ( STACK2:Int up/Int 32 ) ) ) +Int -3 ) >=Int 0
                ))))
-       ensures ( STACK1:Int +Int STACK2:Int ) <Int lengthBytes ( OUTPUT_CELL:Bytes )
+       ensures ( STACK1:Int +Int STACK2:Int ) <=Int lengthBytes ( OUTPUT_CELL:Bytes )
       [priority(50), label(BASIC-BLOCK-1-TO-2)]
 
 endmodule

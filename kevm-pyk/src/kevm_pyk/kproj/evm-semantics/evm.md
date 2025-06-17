@@ -19,6 +19,7 @@ module EVM
     imports NETWORK
     imports GAS
     imports ULM
+    imports K-IO
 ```
 
 Configuration
@@ -216,11 +217,16 @@ OpCode Execution
     rule [halt]:
          <k> #halt ~> (#execute => .K) ... </k>
 
+    syntax K ::= #traceGas(Bytes, Int, Int) [macro]
+    rule #traceGas(PGM, PCOUNT, GAVAIL)
+      => #log(Int2String(PCOUNT) +String ":" +String Int2String(PGM[PCOUNT]) +String ":" +String Int2String(GAVAIL))
+
     rule [step]:
-         <k> (.K => #next [ #lookupOpCode(PGM, PCOUNT, SCHED) ]) ~> #execute ... </k>
+         <k> (.K => #traceGas(PGM, PCOUNT, GAVAIL) ~> #next [ #lookupOpCode(PGM, PCOUNT, SCHED) ]) ~> #execute ... </k>
          <program> PGM </program>
          <pc> PCOUNT </pc>
          <schedule> SCHED </schedule>
+         <gas> GAVAIL </gas>
 ```
 
 ### Single Step

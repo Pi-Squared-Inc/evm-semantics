@@ -472,6 +472,9 @@ Call / Create
  // --------------------------------------------------
     rule [refund]: <k> #refund G:Int => .K ... </k> <gas> GAVAIL => GAVAIL +Int G </gas>
 
+    rule <k> #setLocalMem START WIDTH WS => .K ... </k>
+         <localMem> LM => LM [ START := #range(WS, 0, minInt(WIDTH, lengthBytes(WS))) ] </localMem>
+
     rule <k> #mkCodeDeposit _ACCT => #popCallStack ~> #popWorldState ~> 0 ~> #push ... </k>
          <schedule> SCHED </schedule>
          <output> OUT => .Bytes </output>

@@ -113,20 +113,14 @@ module EVM-CSE-PRELUDE
 
 
     configuration
-        <k> #precompiled? ($ACCTCODE, getSchedule($SCHEDULE:Int)) ~> #execute </k>
-        <exit-code exit=""> 1 </exit-code>
-        <schedule> getSchedule($SCHEDULE:Int) </schedule>
         <ethereum>
           <evm>
 
             // Mutable during a single transaction
             // -----------------------------------
 
-            <output>          .Bytes      </output>           // H_RETURN
-            <statusCode>      .StatusCode </statusCode>
-            <callStack>       .List       </callStack>
-
             <callState>
+              <gas>       $GAS:Int </gas>               // \mau_g
               <program>   $PGM                         </program>
               <jumpDests> ComputeValidJumpDests($PGM) </jumpDests>
 
@@ -140,7 +134,6 @@ module EVM-CSE-PRELUDE
               <wordStack>   .List  </wordStack>           // \mu_s
               <localMem>    .Bytes </localMem>            // \mu_m
               <pc>          0      </pc>                  // \mu_pc
-              <gas>         $GAS:Int </gas>               // \mau_g
               <memoryUsed>  0      </memoryUsed>          // \mu_i
               <callGas>     0:Gas  </callGas>
 
@@ -148,12 +141,19 @@ module EVM-CSE-PRELUDE
               <callDepth> 0     </callDepth>
             </callState>
 
+            <output>          .Bytes      </output>           // H_RETURN
+            <statusCode>      .StatusCode </statusCode>
+            <callStack>       .List       </callStack>
+
             // Immutable during a single transaction
             // -------------------------------------
             <snapshotCount> 0 </snapshotCount>
             <snapshot> ListItem(0) </snapshot>
           </evm>
         </ethereum>
+        <exit-code exit=""> 1 </exit-code>
+        <schedule> getSchedule($SCHEDULE:Int) </schedule>
+        <k> #precompiled? ($ACCTCODE, getSchedule($SCHEDULE:Int)) ~> #execute </k>
 ```
 
 Load Program

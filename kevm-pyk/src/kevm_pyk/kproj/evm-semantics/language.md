@@ -240,18 +240,22 @@ Control Flow
     rule <k> #halt ~> (_:OpCode => .K) ... </k>
 ```
 
-Helpers
--------
+Overall Gas
+-----------
 
 ```k
-```
+    syntax Bool ::= #inStorage     ( Map   , Account , Int ) [symbol(#inStorage), function, total]
+                  | #inStorageAux1 ( KItem ,           Int ) [symbol(#inStorageAux1), function, total]
+                  | #inStorageAux2 ( Set   ,           Int ) [symbol(#inStorageAux2), function, total]
+ // --------------------------------------------------------------------------------------------------
+    rule #inStorage(TS, ACCT, KEY) => #inStorageAux1(TS[ACCT], KEY) requires ACCT in_keys(TS)
+    rule #inStorage(_, _, _)       => false                         [owise]
 
-```k
-syntax List ::= #ComputeSwap(Int, List) [macro]
-rule #ComputeSwap(Idx:Int, STACK:List) => STACK [ Idx <- STACK[0] ] [ 0 <- STACK[Idx] ]
+    rule #inStorageAux1(KEYS:Set, KEY) => #inStorageAux2(KEYS, KEY)
+    rule #inStorageAux1(_, _)          => false                     [owise]
 
-syntax Bool ::= #CheckSwap(Int, List) [macro]
-rule #CheckSwap(Idx:Int, STACK:List) => Idx <Int size( STACK )
+    rule #inStorageAux2(KEYS, KEY) => true  requires KEY in KEYS
+    rule #inStorageAux2(_, _)      => false [owise]
 ```
 
 Precompiled

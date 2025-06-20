@@ -3,7 +3,7 @@
 
 ┌─ 1 (root)
 │
-│  (27 steps)
+│  (28 steps)
 └─ 2 (stuck, leaf)
 
 
@@ -41,7 +41,7 @@ module SUMMARY-PRAGUE-DELEGATECALL
                    CALLVALUE_CELL
                  </callValue>
                  <wordStack>
-                   ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) ListItem ( STACK4:Int ) ListItem ( STACK5:Int ) STACK_REST => STACK_REST:List )
+                   ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) ListItem ( STACK4:Int ) ListItem ( STACK5:Int ) STACK_REST => ListItem ( STACK_REST:List ) )
                  </wordStack>
                  <localMem>
                    LOCALMEM_CELL
@@ -60,6 +60,12 @@ module SUMMARY-PRAGUE-DELEGATECALL
                  </callDepth>
                  ...
                </callState>
+               <substate>
+                 <accessedAccounts>
+                   ( ACCESSEDACCOUNTS_CELL => ACCESSEDACCOUNTS_CELL:Set |Set SetItem ( ( STACK1:Int modInt pow160 ) ) )
+                 </accessedAccounts>
+                 ...
+               </substate>
                ...
              </evm>
            </ethereum>
@@ -77,6 +83,6 @@ module SUMMARY-PRAGUE-DELEGATECALL
        andBool ( CALLDEPTH_CELL:Int <Int 1024
        andBool ( 0 <=Int GetAccountBalance ( ... acct: ID_CELL:Int )
                )))
-      [priority(20), label(BASIC-BLOCK-1-TO-2)]
+      [priority(50), label(BASIC-BLOCK-1-TO-2)]
 
 endmodule

@@ -56,6 +56,6 @@ module SUMMARY-CANCUN-REVERT
        andBool ( 2 <=Int size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) STACK_REST )
        andBool ( ( GAS_CELL:Int -Int ( Cmem ( CANCUN , #memoryUsageUpdate ( MEMORYUSED_CELL:Int , STACK0:Int , STACK1:Int ) ) -Int Cmem ( CANCUN , MEMORYUSED_CELL:Int ) ) ) >=Int 0
                )))
-      [label(BASIC-BLOCK-1-TO-2)]
+      [priority(50), label(BASIC-BLOCK-1-TO-2)]
 
 endmodule

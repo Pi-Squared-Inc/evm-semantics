@@ -3,7 +3,7 @@
 
 ┌─ 1 (root)
 │
-│  (21 steps)
+│  (22 steps)
 └─ 2 (stuck, leaf)
 
 
@@ -57,6 +57,12 @@ module SUMMARY-CANCUN-CREATE
                  </callDepth>
                  ...
                </callState>
+               <substate>
+                 <accessedAccounts>
+                   ( ACCESSEDACCOUNTS_CELL => ACCESSEDACCOUNTS_CELL:Set |Set SetItem ( #newAddr ( ID_CELL:Int , GetAccountNonce ( ... acct: ID_CELL:Int ) ) ) )
+                 </accessedAccounts>
+                 ...
+               </substate>
                ...
              </evm>
            </ethereum>

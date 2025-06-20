@@ -3,7 +3,7 @@
 
 ┌─ 1 (root)
 │
-│  (17 steps)
+│  (18 steps)
 └─ 2 (stuck, leaf)
 
 
@@ -37,13 +37,19 @@ module SUMMARY-CANCUN-EXTCODECOPY
                    ( PC_CELL => ( PC_CELL:Int +Int 1 ) )
                  </pc>
                  <gas>
-                   ( GAS_CELL => ( ( ( GAS_CELL:Int -Int ( Cmem ( CANCUN , #memoryUsageUpdate ( MEMORYUSED_CELL:Int , STACK1:Int , STACK3:Int ) ) -Int Cmem ( CANCUN , MEMORYUSED_CELL:Int ) ) ) -Int Cextcodecopy ( CANCUN , STACK3:Int ) ) -Int #if AccessedAccount ( ... acct: ( STACK0:Int modInt pow160 ) ) #then 100 #else 2600 #fi ) )
+                   ( GAS_CELL => ( ( ( GAS_CELL:Int -Int ( Cmem ( CANCUN , #memoryUsageUpdate ( MEMORYUSED_CELL:Int , STACK1:Int , STACK3:Int ) ) -Int Cmem ( CANCUN , MEMORYUSED_CELL:Int ) ) ) -Int Cextcodecopy ( CANCUN , STACK3:Int ) ) -Int #if ( STACK0:Int modInt pow160 ) in ACCESSEDACCOUNTS_CELL:Set #then 100 #else 2600 #fi ) )
                  </gas>
                  <memoryUsed>
                    ( MEMORYUSED_CELL => #memoryUsageUpdate ( MEMORYUSED_CELL:Int , STACK1:Int , STACK3:Int ) )
                  </memoryUsed>
                  ...
                </callState>
+               <substate>
+                 <accessedAccounts>
+                   ( ACCESSEDACCOUNTS_CELL => ACCESSEDACCOUNTS_CELL:Set |Set SetItem ( ( STACK0:Int modInt pow160 ) ) )
+                 </accessedAccounts>
+                 ...
+               </substate>
                ...
              </evm>
            </ethereum>
@@ -51,7 +57,7 @@ module SUMMARY-CANCUN-EXTCODECOPY
          </generatedTop>
       requires ( size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) STACK_REST ) <Int 1024
        andBool ( 4 <=Int size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) STACK_REST )
-       andBool ( ( ( ( GAS_CELL:Int -Int ( Cmem ( CANCUN , #memoryUsageUpdate ( MEMORYUSED_CELL:Int , STACK1:Int , STACK3:Int ) ) -Int Cmem ( CANCUN , MEMORYUSED_CELL:Int ) ) ) -Int Cextcodecopy ( CANCUN , STACK3:Int ) ) -Int #if AccessedAccount ( ... acct: ( STACK0:Int modInt pow160 ) ) #then 100 #else 2600 #fi ) >=Int 0
+       andBool ( ( ( ( GAS_CELL:Int -Int ( Cmem ( CANCUN , #memoryUsageUpdate ( MEMORYUSED_CELL:Int , STACK1:Int , STACK3:Int ) ) -Int Cmem ( CANCUN , MEMORYUSED_CELL:Int ) ) ) -Int Cextcodecopy ( CANCUN , STACK3:Int ) ) -Int #if ( STACK0:Int modInt pow160 ) in ACCESSEDACCOUNTS_CELL:Set #then 100 #else 2600 #fi ) >=Int 0
                )))
       [priority(50), label(BASIC-BLOCK-1-TO-2)]
 

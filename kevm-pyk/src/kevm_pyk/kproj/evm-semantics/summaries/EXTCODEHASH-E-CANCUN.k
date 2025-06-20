@@ -3,7 +3,7 @@
 
 ┌─ 1 (root)
 │
-│  (16 steps)
+│  (17 steps)
 └─ 2 (stuck, leaf)
 
 
@@ -35,10 +35,16 @@ module SUMMARY-CANCUN-EXTCODEHASH-E
                    ( PC_CELL => ( PC_CELL:Int +Int 1 ) )
                  </pc>
                  <gas>
-                   ( GAS_CELL => ( GAS_CELL:Int -Int #if AccessedAccount ( ... acct: ( STACK0:Int modInt pow160 ) ) #then 100 #else 2600 #fi ) )
+                   ( GAS_CELL => ( GAS_CELL:Int -Int #if ( STACK0:Int modInt pow160 ) in ACCESSEDACCOUNTS_CELL:Set #then 100 #else 2600 #fi ) )
                  </gas>
                  ...
                </callState>
+               <substate>
+                 <accessedAccounts>
+                   ( ACCESSEDACCOUNTS_CELL => ACCESSEDACCOUNTS_CELL:Set |Set SetItem ( ( STACK0:Int modInt pow160 ) ) )
+                 </accessedAccounts>
+                 ...
+               </substate>
                ...
              </evm>
            </ethereum>
@@ -48,7 +54,7 @@ module SUMMARY-CANCUN-EXTCODEHASH-E
       requires ( size ( ListItem ( STACK0:Int ) STACK_REST ) <Int 1024
        andBool ( 1 <=Int size ( ListItem ( STACK0:Int ) STACK_REST )
        andBool ( IsAccountEmpty ( ... acct: ( STACK0:Int modInt 2 ^Int 160 ) )
-       andBool ( ( GAS_CELL:Int -Int #if AccessedAccount ( ... acct: ( STACK0:Int modInt pow160 ) ) #then 100 #else 2600 #fi ) >=Int 0
+       andBool ( ( GAS_CELL:Int -Int #if ( STACK0:Int modInt pow160 ) in ACCESSEDACCOUNTS_CELL:Set #then 100 #else 2600 #fi ) >=Int 0
                ))))
        ensures IsAccountEmpty ( ... acct: ( STACK0:Int modInt pow160 ) )
       [priority(50), label(BASIC-BLOCK-1-TO-2)]

@@ -54,10 +54,10 @@ module SUMMARY-CANCUN-RETURNDATACOPY-LT
          </generatedTop>
       requires ( size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) STACK_REST ) <Int 1024
        andBool ( 3 <=Int size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) STACK_REST )
-       andBool ( ( STACK1:Int +Int STACK2:Int ) <Int lengthBytes ( OUTPUT_CELL )
+       andBool ( ( STACK1:Int +Int STACK2:Int ) <=Int lengthBytes ( OUTPUT_CELL )
        andBool ( ( ( ( GAS_CELL:Int -Int ( Cmem ( CANCUN , #memoryUsageUpdate ( MEMORYUSED_CELL:Int , STACK0:Int , STACK2:Int ) ) -Int Cmem ( CANCUN , MEMORYUSED_CELL:Int ) ) ) -Int ( 3 *Int ( STACK2:Int up/Int 32 ) ) ) +Int -3 ) >=Int 0
                ))))
-       ensures ( STACK1:Int +Int STACK2:Int ) <Int lengthBytes ( OUTPUT_CELL:Bytes )
+       ensures ( STACK1:Int +Int STACK2:Int ) <=Int lengthBytes ( OUTPUT_CELL:Bytes )
       [priority(50), label(BASIC-BLOCK-1-TO-2)]
 
 endmodule

@@ -79,6 +79,6 @@ module SUMMARY-CANCUN-CREATE2
        andBool ( STACK0:Int <=Int GetAccountBalance ( ... acct: ID_CELL:Int )
        andBool ( GetAccountNonce ( ... acct: ID_CELL:Int ) <Int maxUInt64
                ))))))
-      [label(BASIC-BLOCK-1-TO-2)]
+      [priority(50), label(BASIC-BLOCK-1-TO-2)]
 
 endmodule

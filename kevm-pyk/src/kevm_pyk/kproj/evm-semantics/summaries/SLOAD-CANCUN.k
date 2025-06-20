@@ -3,7 +3,7 @@
 
 ┌─ 1 (root)
 │
-│  (15 steps)
+│  (16 steps)
 └─ 2 (stuck, leaf)
 
 
@@ -41,6 +41,12 @@ module SUMMARY-CANCUN-SLOAD
                  </gas>
                  ...
                </callState>
+               <substate>
+                 <accessedStorage>
+                   ( ACCESSEDSTORAGE_CELL => ACCESSEDSTORAGE_CELL:Map [ ID_CELL:Int <- project:Set ( ACCESSEDSTORAGE_CELL:Map [ ID_CELL:Int ] orDefault .Set ~> .K ) |Set SetItem ( STACK0:Int ) ] )
+                 </accessedStorage>
+                 ...
+               </substate>
                ...
              </evm>
            </ethereum>

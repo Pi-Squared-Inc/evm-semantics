@@ -141,6 +141,11 @@ module EVM-CSE-PRELUDE
               <callDepth> 0     </callDepth>
             </callState>
 
+            <substate>
+              <accessedAccounts> .Set  </accessedAccounts>
+              <accessedStorage>  .Map  </accessedStorage>
+            </substate>
+
             <output>          .Bytes      </output>           // H_RETURN
             <statusCode>      .StatusCode </statusCode>
             <callStack>       .List       </callStack>

@@ -3,7 +3,7 @@
 
 ┌─ 1 (root)
 │
-│  (27 steps)
+│  (28 steps)
 └─ 2 (stuck, leaf)
 
 
@@ -35,7 +35,7 @@ module SUMMARY-PRAGUE-CALL-NA
                    ID_CELL
                  </id>
                  <wordStack>
-                   ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) ListItem ( STACK4:Int ) ListItem ( STACK5:Int ) ListItem ( STACK6:Int ) STACK_REST:List => STACK_REST:List )
+                   ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) ListItem ( STACK4:Int ) ListItem ( STACK5:Int ) ListItem ( STACK6:Int ) STACK_REST => ListItem ( STACK_REST:List ) )
                  </wordStack>
                  <localMem>
                    LOCALMEM_CELL
@@ -57,13 +57,20 @@ module SUMMARY-PRAGUE-CALL-NA
                  </callDepth>
                  ...
                </callState>
+               <substate>
+                 <accessedAccounts>
+                   ( ACCESSEDACCOUNTS_CELL => ACCESSEDACCOUNTS_CELL:Set |Set SetItem ( ( STACK1:Int modInt pow160 ) ) )
+                 </accessedAccounts>
+                 ...
+               </substate>
                ...
              </evm>
            </ethereum>
+           
            ...
          </generatedTop>
-      requires ( size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) ListItem ( STACK4:Int ) ListItem ( STACK5:Int ) ListItem ( STACK6:Int ) STACK_REST:List ) <Int 1025
-       andBool ( 7 <=Int size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) ListItem ( STACK4:Int ) ListItem ( STACK5:Int ) ListItem ( STACK6:Int ) STACK_REST:List )
+      requires ( size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) ListItem ( STACK4:Int ) ListItem ( STACK5:Int ) ListItem ( STACK6:Int ) STACK_REST ) <Int 1025
+       andBool ( 7 <=Int size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) ListItem ( STACK4:Int ) ListItem ( STACK5:Int ) ListItem ( STACK6:Int ) STACK_REST )
        andBool ( ( notBool STATIC_CELL )
        andBool ( ( notBool AccountExists ( ... acct: ( STACK1:Int modInt 2 ^Int 160 ) ) )
        andBool ( IsAccountEmpty ( ... acct: ( STACK1:Int modInt 2 ^Int 160 ) )

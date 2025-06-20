@@ -53,6 +53,6 @@ module SUMMARY-CANCUN-ECREC
        andBool ( ( GAS_CELL:Int +Int -3000 ) >=Int 0
                ))
        ensures size ( WORDSTACK_CELL:List ) <Int 1024
-      [label(BASIC-BLOCK-1-TO-2)]
+      [priority(50), label(BASIC-BLOCK-1-TO-2)]
 
 endmodule

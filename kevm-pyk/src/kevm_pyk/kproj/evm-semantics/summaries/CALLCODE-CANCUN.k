@@ -3,7 +3,7 @@
 
 ┌─ 1 (root)
 │
-│  (27 steps)
+│  (28 steps)
 └─ 2 (stuck, leaf)
 
 
@@ -54,6 +54,12 @@ module SUMMARY-CANCUN-CALLCODE
                  </callDepth>
                  ...
                </callState>
+               <substate>
+                 <accessedAccounts>
+                   ( ACCESSEDACCOUNTS_CELL => ACCESSEDACCOUNTS_CELL:Set |Set SetItem ( ( STACK1:Int modInt pow160 ) ) )
+                 </accessedAccounts>
+                 ...
+               </substate>
                ...
              </evm>
            </ethereum>
@@ -70,6 +76,6 @@ module SUMMARY-CANCUN-CALLCODE
        andBool ( CALLDEPTH_CELL:Int <Int 1024
        andBool ( STACK2:Int <=Int GetAccountBalance ( ... acct: ID_CELL:Int )
                )))
-      [priority(20), label(BASIC-BLOCK-1-TO-2)]
+      [priority(50), label(BASIC-BLOCK-1-TO-2)]
 
 endmodule

@@ -3,7 +3,7 @@
 
 ┌─ 1 (root)
 │
-│  (15 steps)
+│  (16 steps)
 └─ 2 (stuck, leaf)
 
 
@@ -38,13 +38,19 @@ module SUMMARY-PRAGUE-SSTORE
                    ( PC_CELL => ( PC_CELL:Int +Int 1 ) )
                  </pc>
                  <gas>
-                   ( GAS_CELL => ( ( GAS_CELL:Int -Int Csstore ( PRAGUE , STACK1:Int , GetAccountStorage ( ... acct: ID_CELL:Int , key: STACK0:Int ) , GetAccountOrigStorage ( ... acct: ID_CELL:Int , key: STACK0:Int ) ) ) -Int #if AccessedStorage ( ... acct: ID_CELL:Int , key: STACK0:Int ) #then 0 #else 2100 #fi ) )
+                   ( GAS_CELL => ( ( GAS_CELL:Int -Int Csstore ( PRAGUE , STACK1:Int , GetAccountStorage ( ... acct: ID_CELL:Int , key: STACK0:Int ) , GetAccountOrigStorage ( ... acct: ID_CELL:Int , key: STACK0:Int ) ) ) -Int #if #inStorage ( ACCESSEDSTORAGE_CELL:Map , ID_CELL:Int , STACK0:Int ) #then 0 #else 2100 #fi ) )
                  </gas>
                  <static>
                    ( STATIC_CELL => false )
                  </static>
                  ...
                </callState>
+               <substate>
+                 <accessedStorage>
+                   ( ACCESSEDSTORAGE_CELL => ACCESSEDSTORAGE_CELL:Map [ ID_CELL:Int <- project:Set ( ACCESSEDSTORAGE_CELL:Map [ ID_CELL:Int ] orDefault .Set ~> .K ) |Set SetItem ( STACK0:Int ) ] )
+                 </accessedStorage>
+                 ...
+               </substate>
                ...
              </evm>
            </ethereum>
@@ -54,7 +60,7 @@ module SUMMARY-PRAGUE-SSTORE
       requires ( size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) STACK_REST ) <Int 1025
        andBool ( 2 <=Int size ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) STACK_REST )
        andBool ( ( notBool STATIC_CELL )
-       andBool ( ( ( GAS_CELL:Int -Int Csstore ( PRAGUE , STACK1:Int , GetAccountStorage ( ... acct: ID_CELL:Int , key: STACK0:Int ) , GetAccountOrigStorage ( ... acct: ID_CELL:Int , key: STACK0:Int ) ) ) -Int #if AccessedStorage ( ... acct: ID_CELL:Int , key: STACK0:Int ) #then 0 #else 2100 #fi ) >=Int 0
+       andBool ( ( ( GAS_CELL:Int -Int Csstore ( PRAGUE , STACK1:Int , GetAccountStorage ( ... acct: ID_CELL:Int , key: STACK0:Int ) , GetAccountOrigStorage ( ... acct: ID_CELL:Int , key: STACK0:Int ) ) ) -Int #if #inStorage ( ACCESSEDSTORAGE_CELL:Map , ID_CELL:Int , STACK0:Int ) #then 0 #else 2100 #fi ) >=Int 0
                ))))
        ensures ( notBool STATIC_CELL:Bool )
       [priority(50), label(BASIC-BLOCK-1-TO-2)]

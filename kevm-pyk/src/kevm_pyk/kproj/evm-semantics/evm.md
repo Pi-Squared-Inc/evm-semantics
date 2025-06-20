@@ -19,6 +19,7 @@ module EVM
     imports NETWORK
     imports GAS
     imports ULM
+    imports MINT
 ```
 
 Configuration
@@ -31,6 +32,7 @@ We've broken up the configuration into two components; those parts of the state 
 In the comments next to each cell, we've marked which component of the YellowPaper state corresponds to each cell.
 
 ```k
+   syntax MInt{64} 
     configuration
         <k> #loadProgram($PGM:Bytes) ~> #precompiled?($ACCTCODE:Int, getSchedule($SCHEDULE:Int)) ~> #execute </k>
         <exit-code exit=""> 1 </exit-code>
@@ -63,7 +65,7 @@ In the comments next to each cell, we've marked which component of the YellowPap
               // \mu_*
               <wordStack>   .List  </wordStack>           // \mu_s
               <localMem>    .Bytes </localMem>            // \mu_m
-              <pc>          0      </pc>                  // \mu_pc
+              <pc>          0p64      </pc>                  // \mu_pc
               <gas>         $GAS:Gas </gas>               // \mau_g
               <memoryUsed>  0      </memoryUsed>          // \mu_i
               <callGas>     0:Gas  </callGas>
@@ -202,9 +204,9 @@ OpCode Execution
 ```k
     syntax MaybeOpCode ::= ".NoOpCode" | OpCode
 
-    syntax MaybeOpCode ::= "#lookupOpCode" "(" Bytes "," Int "," Schedule ")" [function, total]
+    syntax MaybeOpCode ::= "#lookupOpCode" "(" Bytes "," MInt{64} "," Schedule ")" [function, total]
  // -------------------------------------------------------------------------------------------
-    rule #lookupOpCode(BA, I, SCHED) => #dasmOpCode(BA[I], SCHED) requires 0 <=Int I andBool I <Int lengthBytes(BA)
+    rule #lookupOpCode(BA, I, SCHED) => #dasmOpCode(BA[I], SCHED) requires 0p64 <=uMInt I andBool I <uMInt lengthBytes(BA)
     rule #lookupOpCode(_, _, _)  => .NoOpCode [owise]
 ```
 
@@ -276,51 +278,51 @@ The `#next [_]` operator initiates execution by:
     syntax Bool ::= #stackUnderflow ( List , OpCode ) [symbol(#stackUnderflow), macro]
                   | #stackOverflow  ( List , OpCode ) [symbol(#stackOverflow), macro]
  // ----------------------------------------------------------------------------------
-    rule #stackUnderflow(WS, OP:OpCode) => size(WS) <Int #stackNeeded(OP)
-    rule #stackOverflow (WS, OP) => size(WS) +Int #stackDelta(OP) >Int 1024
+    rule #stackUnderflow(WS, OP:OpCode) => size(WS) <uMInt #stackNeeded(OP)
+    rule #stackOverflow (WS, OP) => size(WS) +MInt #stackDelta(OP) >uMInt 1024p64
 
-    syntax Int ::= #stackNeeded ( OpCode ) [symbol(#stackNeeded), function]
+    syntax MInt{64} ::= #stackNeeded ( OpCode ) [symbol(#stackNeeded), function]
  // -----------------------------------------------------------------------
-    rule #stackNeeded(_POP:PushOp)      => 0
-    rule #stackNeeded(_IOP:InvalidOp)   => 0
-    rule #stackNeeded(_NOP:NullStackOp) => 0
-    rule #stackNeeded(_UOP:UnStackOp)   => 1
-    rule #stackNeeded(BOP:BinStackOp)   => 2 requires notBool isLogOp(BOP)
-    rule #stackNeeded(_TOP:TernStackOp) => 3
-    rule #stackNeeded(_QOP:QuadStackOp) => 4
+    rule #stackNeeded(_POP:PushOp)      => 0p64
+    rule #stackNeeded(_IOP:InvalidOp)   => 0p64
+    rule #stackNeeded(_NOP:NullStackOp) => 0p64
+    rule #stackNeeded(_UOP:UnStackOp)   => 1p64
+    rule #stackNeeded(BOP:BinStackOp)   => 2p64 requires notBool isLogOp(BOP)
+    rule #stackNeeded(_TOP:TernStackOp) => 3p64
+    rule #stackNeeded(_QOP:QuadStackOp) => 4p64
     rule #stackNeeded(DUP(N))           => N
-    rule #stackNeeded(SWAP(N))          => N +Int 1
-    rule #stackNeeded(LOG(N))           => N +Int 2
-    rule #stackNeeded(_CSOP:CallSixOp)  => 6
-    rule #stackNeeded(COP:CallOp)       => 7 requires notBool isCallSixOp(COP)
+    rule #stackNeeded(SWAP(N))          => N +MInt 1p64
+    rule #stackNeeded(LOG(N))           => N +MInt 2p64
+    rule #stackNeeded(_CSOP:CallSixOp)  => 6p64
+    rule #stackNeeded(COP:CallOp)       => 7p64 requires notBool isCallSixOp(COP)
 
-    syntax Int ::= #stackAdded ( OpCode ) [symbol(#stackAdded), function]
+    syntax MInt{64} ::= #stackAdded ( OpCode ) [symbol(#stackAdded), function]
  // ---------------------------------------------------------------------
-    rule #stackAdded(CALLDATACOPY)   => 0
-    rule #stackAdded(RETURNDATACOPY) => 0
-    rule #stackAdded(CODECOPY)       => 0
-    rule #stackAdded(EXTCODECOPY)    => 0
-    rule #stackAdded(POP)            => 0
-    rule #stackAdded(MSTORE)         => 0
-    rule #stackAdded(MSTORE8)        => 0
-    rule #stackAdded(SSTORE)         => 0
-    rule #stackAdded(JUMP)           => 0
-    rule #stackAdded(JUMPI)          => 0
-    rule #stackAdded(JUMPDEST)       => 0
-    rule #stackAdded(STOP)           => 0
-    rule #stackAdded(RETURN)         => 0
-    rule #stackAdded(REVERT)         => 0
-    rule #stackAdded(SELFDESTRUCT)   => 0
-    rule #stackAdded(PUSH(_))        => 1
-    rule #stackAdded(LOG(_))         => 0
-    rule #stackAdded(SWAP(N))        => N +Int 1
-    rule #stackAdded(DUP(N))         => N +Int 1
-    rule #stackAdded(_IOP:InvalidOp) => 0
-    rule #stackAdded(_OP)            => 1 [owise]
+    rule #stackAdded(CALLDATACOPY)   => 0p64
+    rule #stackAdded(RETURNDATACOPY) => 0p64
+    rule #stackAdded(CODECOPY)       => 0p64
+    rule #stackAdded(EXTCODECOPY)    => 0p64
+    rule #stackAdded(POP)            => 0p64
+    rule #stackAdded(MSTORE)         => 0p64
+    rule #stackAdded(MSTORE8)        => 0p64
+    rule #stackAdded(SSTORE)         => 0p64
+    rule #stackAdded(JUMP)           => 0p64
+    rule #stackAdded(JUMPI)          => 0p64
+    rule #stackAdded(JUMPDEST)       => 0p64
+    rule #stackAdded(STOP)           => 0p64
+    rule #stackAdded(RETURN)         => 0p64
+    rule #stackAdded(REVERT)         => 0p64
+    rule #stackAdded(SELFDESTRUCT)   => 0p64
+    rule #stackAdded(PUSH(_))        => 1p64
+    rule #stackAdded(LOG(_))         => 0p64
+    rule #stackAdded(SWAP(N))        => N +MInt 1p64
+    rule #stackAdded(DUP(N))         => N +MInt 1p64
+    rule #stackAdded(_IOP:InvalidOp) => 0p64
+    rule #stackAdded(_OP)            => 1p64 [owise]
 
-    syntax Int ::= #stackDelta ( OpCode ) [symbol(#stackDelta), function]
+    syntax MInt{64} ::= #stackDelta ( OpCode ) [symbol(#stackDelta), function]
  // ---------------------------------------------------------------------
-    rule #stackDelta(OP) => #stackAdded(OP) -Int #stackNeeded(OP)
+    rule #stackDelta(OP) => #stackAdded(OP) -MInt #stackNeeded(OP)
 ```
 
 -   `#changesState` is true if the given opcode will change `<network>` state given the arguments.
@@ -436,12 +438,12 @@ The arguments to `PUSH` must be skipped over (as they are inline), and the opcod
  // -------------------------------------------------------
     rule [pc.inc]:
          <k> #pc [ OP ] => .K ... </k>
-         <pc> PCOUNT => PCOUNT +Int #widthOp(OP) </pc>
+         <pc> PCOUNT => PCOUNT +MInt #widthOp(OP) </pc>
 
-    syntax Int ::= #widthOp ( OpCode ) [symbol(#widthOp), function, total]
+    syntax MInt{64} ::= #widthOp ( OpCode ) [symbol(#widthOp), function, total]
  // ----------------------------------------------------------------------
-    rule #widthOp(PUSH(N)) => 1 +Int N
-    rule #widthOp(_)       => 1        [owise]
+    rule #widthOp(PUSH(N)) => 1p64 +MInt N
+    rule #widthOp(_)       => 1p64        [owise]
 ```
 
 ### Block processing
@@ -524,18 +526,19 @@ Some operators don't calculate anything, they just push the stack around a bit.
  // --------------------------
     rule <k> POP _ => .K ... </k>
 
-    syntax StackOp ::= DUP  ( Int ) [symbol(DUP)]
-                     | SWAP ( Int ) [symbol(SWAP)]
+    syntax StackOp ::= DUP  ( MInt{64} ) [symbol(DUP)]
+                     | SWAP ( MInt{64} ) [symbol(SWAP)]
  // ----------------------------------------------
-    rule <k> DUP(N)  WS:List => #setStack (pushList(WS [ N -Int 1 ], WS))                      ... </k>
-    rule <k> SWAP(N) (ListItem(W0) WS)    => #setStack (pushList(WS [ N -Int 1 ], (WS [ N -Int 1 <- W0 ]))) ... </k>
+    rule <k> DUP(N)  WS:List => #setStack (pushList(WS [ N -MInt 1p64 ], WS))               
+           ... </k>
+    rule <k> SWAP(N) (ListItem(W0) WS)    => #setStack (pushList(WS [ N -MInt 1p64 ], (WS [ N -MInt 1p64 <- W0 ]))) ... </k>
 
     syntax PushOp ::= "PUSHZERO"
-                    | PUSH ( Int ) [symbol(PUSH)]
+                    | PUSH ( MInt{64} ) [symbol(PUSH)]
  // ---------------------------------------------
     rule <k> PUSHZERO => 0 ~> #push ... </k>
 
-    rule <k> PUSH(N) => #asWord(#range(PGM, PCOUNT +Int 1, N)) ~> #push ... </k>
+    rule <k> PUSH(N) => #asWord(#range64(PGM, PCOUNT +MInt 1p64, N:MInt{64})) ~> #push ... </k>
          <pc> PCOUNT </pc>
          <program> PGM </program>
 ```
@@ -636,7 +639,7 @@ These operators make queries about the current execution state.
 ```k
     syntax NullStackOp ::= "PC" | "GAS" | "GASPRICE" | "GASLIMIT" | "BASEFEE" | "BLOBBASEFEE"
  // -----------------------------------------------------------------------------------------
-    rule <k> PC          => PCOUNT          ~> #push ... </k> <pc> PCOUNT </pc>
+    rule <k> PC          => MInt2Unsigned(PCOUNT)          ~> #push ... </k> <pc> PCOUNT </pc>
     rule <k> GAS         => gas2Int(GAVAIL) ~> #push ... </k> <gas> GAVAIL </gas>
     rule <k> GASPRICE    => GasPrice()      ~> #push ... </k>
     rule <k> GASLIMIT    => GasLimit()      ~> #push ... </k>
@@ -662,7 +665,7 @@ These operators make queries about the current execution state.
 
     syntax NullStackOp ::= "MSIZE" | "CODESIZE"
  // -------------------------------------------
-    rule <k> MSIZE    => 32 *Word MU         ~> #push ... </k> <memoryUsed> MU </memoryUsed>
+    rule <k> MSIZE    => 32 *Word MU      ~> #push ... </k> <memoryUsed> MU </memoryUsed>
     rule <k> CODESIZE => lengthBytes(PGM) ~> #push ... </k> <program> PGM </program>
 
     syntax TernStackOp ::= "CODECOPY"
@@ -708,9 +711,9 @@ The `JUMP*` family of operations affect the current program counter.
  // ---------------------------
     rule [jump]:
          <k> JUMP DEST => #endBasicBlock ... </k>
-         <pc> _ => DEST </pc>
+         <pc> _ => Int2MInt(DEST):MInt{64} </pc>
          <jumpDests> DESTS </jumpDests>
-      requires DEST <Int lengthBytes(DESTS) andBool DESTS[DEST] ==Int 1
+      requires DEST <Int (lengthBytes(DESTS)):Int andBool (DESTS[DEST]):Int ==Int 1
 
     rule <k> JUMP _ => #end EVMC_BAD_JUMP_DESTINATION ... </k> [owise]
 
@@ -794,24 +797,24 @@ These operators query about the current return data buffer.
 
 ```k
     syntax BinStackOp ::= LogOp
-    syntax LogOp ::= LOG ( Int ) [symbol(LOG)]
+    syntax LogOp ::= LOG ( MInt{64} ) [symbol(LOG)]
  // ------------------------------------------
-    rule <k> LOG(0) MEMSTART MEMWIDTH => Log0(ACCT, #range(LM, MEMSTART, MEMWIDTH)) ...</k>
+    rule <k> LOG(0p64) MEMSTART MEMWIDTH => Log0(ACCT, #range(LM, MEMSTART, MEMWIDTH)) ...</k>
          <id> ACCT </id>
          <localMem> LM </localMem>
-    rule <k> LOG(1) MEMSTART MEMWIDTH => Log1(ACCT, T1, #range(LM, MEMSTART, MEMWIDTH)) ...</k>
+    rule <k> LOG(1p64) MEMSTART MEMWIDTH => Log1(ACCT, T1, #range(LM, MEMSTART, MEMWIDTH)) ...</k>
          <id> ACCT </id>
          <wordStack> ListItem(T1) WS => WS </wordStack>
          <localMem> LM </localMem>
-    rule <k> LOG(2) MEMSTART MEMWIDTH => Log2(ACCT, T1, T2, #range(LM, MEMSTART, MEMWIDTH)) ...</k>
+    rule <k> LOG(2p64) MEMSTART MEMWIDTH => Log2(ACCT, T1, T2, #range(LM, MEMSTART, MEMWIDTH)) ...</k>
          <id> ACCT </id>
          <wordStack> ListItem(T1) ListItem(T2) WS => WS </wordStack>
          <localMem> LM </localMem>
-    rule <k> LOG(3) MEMSTART MEMWIDTH => Log3(ACCT, T1, T2, T3, #range(LM, MEMSTART, MEMWIDTH)) ...</k>
+    rule <k> LOG(3p64) MEMSTART MEMWIDTH => Log3(ACCT, T1, T2, T3, #range(LM, MEMSTART, MEMWIDTH)) ...</k>
          <id> ACCT </id>
          <wordStack> ListItem(T1) ListItem(T2) ListItem(T3) WS => WS </wordStack>
          <localMem> LM </localMem>
-    rule <k> LOG(4) MEMSTART MEMWIDTH => Log4(ACCT, T1, T2, T3, T4, #range(LM, MEMSTART, MEMWIDTH)) ...</k>
+    rule <k> LOG(4p64) MEMSTART MEMWIDTH => Log4(ACCT, T1, T2, T3, T4, #range(LM, MEMSTART, MEMWIDTH)) ...</k>
          <id> ACCT </id>
          <wordStack> ListItem(T1) ListItem(T2) ListItem(T3) ListItem(T4) WS => WS </wordStack>
          <localMem> LM </localMem>
@@ -985,7 +988,7 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
     syntax KItem ::= "#initVM"
  // --------------------------
     rule <k> #initVM      => .K ... </k>
-         <pc>           _ => 0      </pc>
+         <pc>           _ => 0p64      </pc>
          <memoryUsed>   _ => 0      </memoryUsed>
          <output>       _ => .Bytes </output>
          <wordStack>    _ => .List  </wordStack>
@@ -1000,11 +1003,6 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
 ```
 
 ```k
-    syntax Int ::= #widthOpCode(Int) [symbol(#widthOpCode), function]
- // -----------------------------------------------------------------
-    rule #widthOpCode(W) => W -Int 94 requires W >=Int 96 andBool W <=Int 127
-    rule #widthOpCode(_) => 1 [owise]
-
     syntax KItem ::= "#return" Int Int
  // ----------------------------------
     rule [return.exception]:
@@ -2010,7 +2008,7 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
     rule <k> #gasExec(SCHED, CODECOPY        _ _ WIDTH) => Gverylow < SCHED > +Int (Gcopy < SCHED > *Int (WIDTH up/Int 32)) ... </k>
     rule <k> #gasExec(SCHED, MCOPY           _ _ WIDTH) => Gverylow < SCHED > +Int (Gcopy < SCHED > *Int (WIDTH up/Int 32)) ... </k>
 
-    rule <k> #gasExec(SCHED, LOG(N) _ WIDTH) => (Glog < SCHED > +Int (Glogdata < SCHED > *Int WIDTH) +Int (N *Int Glogtopic < SCHED >)) ... </k>
+    rule <k> #gasExec(SCHED, LOG(N) _ WIDTH) => (Glog < SCHED > +Int (Glogdata < SCHED > *Int WIDTH) +Int (MInt2Unsigned(N) *Int Glogtopic < SCHED >)) ... </k>
 
     syntax Exp ::= #handleCallGas(Schedule, acctNonExistent: BExp, cap: Gas, avail: Gas, value: Int, acct:Int, AccountInfo)  [strict(2)]
  // ------------------------------------------------------------------------------------------------------------------------------------
@@ -2313,75 +2311,75 @@ After interpreting the strings representing programs as a `WordStack`, it should
     rule #dasmOpCode(  93, SCHED ) => TSTORE   requires Ghastransient << SCHED >>
     rule #dasmOpCode(  94, SCHED ) => MCOPY    requires Ghasmcopy     << SCHED >>
     rule #dasmOpCode(  95, SCHED ) => PUSHZERO requires Ghaspushzero  << SCHED >>
-    rule #dasmOpCode(  96,     _ ) => PUSH(1)
-    rule #dasmOpCode(  97,     _ ) => PUSH(2)
-    rule #dasmOpCode(  98,     _ ) => PUSH(3)
-    rule #dasmOpCode(  99,     _ ) => PUSH(4)
-    rule #dasmOpCode( 100,     _ ) => PUSH(5)
-    rule #dasmOpCode( 101,     _ ) => PUSH(6)
-    rule #dasmOpCode( 102,     _ ) => PUSH(7)
-    rule #dasmOpCode( 103,     _ ) => PUSH(8)
-    rule #dasmOpCode( 104,     _ ) => PUSH(9)
-    rule #dasmOpCode( 105,     _ ) => PUSH(10)
-    rule #dasmOpCode( 106,     _ ) => PUSH(11)
-    rule #dasmOpCode( 107,     _ ) => PUSH(12)
-    rule #dasmOpCode( 108,     _ ) => PUSH(13)
-    rule #dasmOpCode( 109,     _ ) => PUSH(14)
-    rule #dasmOpCode( 110,     _ ) => PUSH(15)
-    rule #dasmOpCode( 111,     _ ) => PUSH(16)
-    rule #dasmOpCode( 112,     _ ) => PUSH(17)
-    rule #dasmOpCode( 113,     _ ) => PUSH(18)
-    rule #dasmOpCode( 114,     _ ) => PUSH(19)
-    rule #dasmOpCode( 115,     _ ) => PUSH(20)
-    rule #dasmOpCode( 116,     _ ) => PUSH(21)
-    rule #dasmOpCode( 117,     _ ) => PUSH(22)
-    rule #dasmOpCode( 118,     _ ) => PUSH(23)
-    rule #dasmOpCode( 119,     _ ) => PUSH(24)
-    rule #dasmOpCode( 120,     _ ) => PUSH(25)
-    rule #dasmOpCode( 121,     _ ) => PUSH(26)
-    rule #dasmOpCode( 122,     _ ) => PUSH(27)
-    rule #dasmOpCode( 123,     _ ) => PUSH(28)
-    rule #dasmOpCode( 124,     _ ) => PUSH(29)
-    rule #dasmOpCode( 125,     _ ) => PUSH(30)
-    rule #dasmOpCode( 126,     _ ) => PUSH(31)
-    rule #dasmOpCode( 127,     _ ) => PUSH(32)
-    rule #dasmOpCode( 128,     _ ) => DUP(1)
-    rule #dasmOpCode( 129,     _ ) => DUP(2)
-    rule #dasmOpCode( 130,     _ ) => DUP(3)
-    rule #dasmOpCode( 131,     _ ) => DUP(4)
-    rule #dasmOpCode( 132,     _ ) => DUP(5)
-    rule #dasmOpCode( 133,     _ ) => DUP(6)
-    rule #dasmOpCode( 134,     _ ) => DUP(7)
-    rule #dasmOpCode( 135,     _ ) => DUP(8)
-    rule #dasmOpCode( 136,     _ ) => DUP(9)
-    rule #dasmOpCode( 137,     _ ) => DUP(10)
-    rule #dasmOpCode( 138,     _ ) => DUP(11)
-    rule #dasmOpCode( 139,     _ ) => DUP(12)
-    rule #dasmOpCode( 140,     _ ) => DUP(13)
-    rule #dasmOpCode( 141,     _ ) => DUP(14)
-    rule #dasmOpCode( 142,     _ ) => DUP(15)
-    rule #dasmOpCode( 143,     _ ) => DUP(16)
-    rule #dasmOpCode( 144,     _ ) => SWAP(1)
-    rule #dasmOpCode( 145,     _ ) => SWAP(2)
-    rule #dasmOpCode( 146,     _ ) => SWAP(3)
-    rule #dasmOpCode( 147,     _ ) => SWAP(4)
-    rule #dasmOpCode( 148,     _ ) => SWAP(5)
-    rule #dasmOpCode( 149,     _ ) => SWAP(6)
-    rule #dasmOpCode( 150,     _ ) => SWAP(7)
-    rule #dasmOpCode( 151,     _ ) => SWAP(8)
-    rule #dasmOpCode( 152,     _ ) => SWAP(9)
-    rule #dasmOpCode( 153,     _ ) => SWAP(10)
-    rule #dasmOpCode( 154,     _ ) => SWAP(11)
-    rule #dasmOpCode( 155,     _ ) => SWAP(12)
-    rule #dasmOpCode( 156,     _ ) => SWAP(13)
-    rule #dasmOpCode( 157,     _ ) => SWAP(14)
-    rule #dasmOpCode( 158,     _ ) => SWAP(15)
-    rule #dasmOpCode( 159,     _ ) => SWAP(16)
-    rule #dasmOpCode( 160,     _ ) => LOG(0)
-    rule #dasmOpCode( 161,     _ ) => LOG(1)
-    rule #dasmOpCode( 162,     _ ) => LOG(2)
-    rule #dasmOpCode( 163,     _ ) => LOG(3)
-    rule #dasmOpCode( 164,     _ ) => LOG(4)
+    rule #dasmOpCode(  96,     _ ) => PUSH(1p64)
+    rule #dasmOpCode(  97,     _ ) => PUSH(2p64)
+    rule #dasmOpCode(  98,     _ ) => PUSH(3p64)
+    rule #dasmOpCode(  99,     _ ) => PUSH(4p64)
+    rule #dasmOpCode( 100,     _ ) => PUSH(5p64)
+    rule #dasmOpCode( 101,     _ ) => PUSH(6p64)
+    rule #dasmOpCode( 102,     _ ) => PUSH(7p64)
+    rule #dasmOpCode( 103,     _ ) => PUSH(8p64)
+    rule #dasmOpCode( 104,     _ ) => PUSH(9p64)
+    rule #dasmOpCode( 105,     _ ) => PUSH(10p64)
+    rule #dasmOpCode( 106,     _ ) => PUSH(11p64)
+    rule #dasmOpCode( 107,     _ ) => PUSH(12p64)
+    rule #dasmOpCode( 108,     _ ) => PUSH(13p64)
+    rule #dasmOpCode( 109,     _ ) => PUSH(14p64)
+    rule #dasmOpCode( 110,     _ ) => PUSH(15p64)
+    rule #dasmOpCode( 111,     _ ) => PUSH(16p64)
+    rule #dasmOpCode( 112,     _ ) => PUSH(17p64)
+    rule #dasmOpCode( 113,     _ ) => PUSH(18p64)
+    rule #dasmOpCode( 114,     _ ) => PUSH(19p64)
+    rule #dasmOpCode( 115,     _ ) => PUSH(20p64)
+    rule #dasmOpCode( 116,     _ ) => PUSH(21p64)
+    rule #dasmOpCode( 117,     _ ) => PUSH(22p64)
+    rule #dasmOpCode( 118,     _ ) => PUSH(23p64)
+    rule #dasmOpCode( 119,     _ ) => PUSH(24p64)
+    rule #dasmOpCode( 120,     _ ) => PUSH(25p64)
+    rule #dasmOpCode( 121,     _ ) => PUSH(26p64)
+    rule #dasmOpCode( 122,     _ ) => PUSH(27p64)
+    rule #dasmOpCode( 123,     _ ) => PUSH(28p64)
+    rule #dasmOpCode( 124,     _ ) => PUSH(29p64)
+    rule #dasmOpCode( 125,     _ ) => PUSH(30p64)
+    rule #dasmOpCode( 126,     _ ) => PUSH(31p64)
+    rule #dasmOpCode( 127,     _ ) => PUSH(32p64)
+    rule #dasmOpCode( 128,     _ ) => DUP(1p64)
+    rule #dasmOpCode( 129,     _ ) => DUP(2p64)
+    rule #dasmOpCode( 130,     _ ) => DUP(3p64)
+    rule #dasmOpCode( 131,     _ ) => DUP(4p64)
+    rule #dasmOpCode( 132,     _ ) => DUP(5p64)
+    rule #dasmOpCode( 133,     _ ) => DUP(6p64)
+    rule #dasmOpCode( 134,     _ ) => DUP(7p64)
+    rule #dasmOpCode( 135,     _ ) => DUP(8p64)
+    rule #dasmOpCode( 136,     _ ) => DUP(9p64)
+    rule #dasmOpCode( 137,     _ ) => DUP(10p64)
+    rule #dasmOpCode( 138,     _ ) => DUP(11p64)
+    rule #dasmOpCode( 139,     _ ) => DUP(12p64)
+    rule #dasmOpCode( 140,     _ ) => DUP(13p64)
+    rule #dasmOpCode( 141,     _ ) => DUP(14p64)
+    rule #dasmOpCode( 142,     _ ) => DUP(15p64)
+    rule #dasmOpCode( 143,     _ ) => DUP(16p64)
+    rule #dasmOpCode( 144,     _ ) => SWAP(1p64)
+    rule #dasmOpCode( 145,     _ ) => SWAP(2p64)
+    rule #dasmOpCode( 146,     _ ) => SWAP(3p64)
+    rule #dasmOpCode( 147,     _ ) => SWAP(4p64)
+    rule #dasmOpCode( 148,     _ ) => SWAP(5p64)
+    rule #dasmOpCode( 149,     _ ) => SWAP(6p64)
+    rule #dasmOpCode( 150,     _ ) => SWAP(7p64)
+    rule #dasmOpCode( 151,     _ ) => SWAP(8p64)
+    rule #dasmOpCode( 152,     _ ) => SWAP(9p64)
+    rule #dasmOpCode( 153,     _ ) => SWAP(10p64)
+    rule #dasmOpCode( 154,     _ ) => SWAP(11p64)
+    rule #dasmOpCode( 155,     _ ) => SWAP(12p64)
+    rule #dasmOpCode( 156,     _ ) => SWAP(13p64)
+    rule #dasmOpCode( 157,     _ ) => SWAP(14p64)
+    rule #dasmOpCode( 158,     _ ) => SWAP(15p64)
+    rule #dasmOpCode( 159,     _ ) => SWAP(16p64)
+    rule #dasmOpCode( 160,     _ ) => LOG(0p64)
+    rule #dasmOpCode( 161,     _ ) => LOG(1p64)
+    rule #dasmOpCode( 162,     _ ) => LOG(2p64)
+    rule #dasmOpCode( 163,     _ ) => LOG(3p64)
+    rule #dasmOpCode( 164,     _ ) => LOG(4p64)
     rule #dasmOpCode( 240,     _ ) => CREATE
     rule #dasmOpCode( 241,     _ ) => CALL
     rule #dasmOpCode( 242,     _ ) => CALLCODE

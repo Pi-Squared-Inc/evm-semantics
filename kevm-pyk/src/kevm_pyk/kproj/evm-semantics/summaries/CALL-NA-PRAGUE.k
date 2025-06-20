@@ -35,7 +35,7 @@ module SUMMARY-PRAGUE-CALL-NA
                    ID_CELL
                  </id>
                  <wordStack>
-                   ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) ListItem ( STACK4:Int ) ListItem ( STACK5:Int ) ListItem ( STACK6:Int ) STACK_REST => ListItem ( STACK_REST:List ) )
+                   ( ListItem ( STACK0:Int ) ListItem ( STACK1:Int ) ListItem ( STACK2:Int ) ListItem ( STACK3:Int ) ListItem ( STACK4:Int ) ListItem ( STACK5:Int ) ListItem ( STACK6:Int ) STACK_REST => STACK_REST:List )
                  </wordStack>
                  <localMem>
                    LOCALMEM_CELL

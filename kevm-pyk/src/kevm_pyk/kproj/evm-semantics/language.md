@@ -142,7 +142,7 @@ module EVM-CSE-PRELUDE
             </callState>
 
             <substate>
-              <accessedAccounts> .Set  </accessedAccounts>
+              <accessedAccounts> SetItem($ID:Int) SetItem(1) SetItem(2) SetItem(3) SetItem(4) SetItem(5) SetItem(6) SetItem(7) SetItem(8) SetItem(9) SetItem(10) SetItem(11) SetItem(12) SetItem(13) SetItem(14) SetItem(15) SetItem(16) SetItem(17) </accessedAccounts>
               <accessedStorage>  .Map  </accessedStorage>
             </substate>
 

@@ -195,13 +195,13 @@ This splits out looking up the OpCode in the program buffer from disassembling i
          <program> PGM </program>
          <pc> PCOUNT </pc>
       requires 0 <=Int PCOUNT andBool PCOUNT <Int lengthBytes(PGM)
-        [priority(20)]
+        [priority(50)]
 
     rule <k> #execute => #end EVMC_SUCCESS ... </k>
          <program> PGM </program>
          <pc> PCOUNT </pc>
       requires PCOUNT ==Int lengthBytes(PGM)
-        [priority(20)]
+        [priority(50)]
 ```
 
 Control Flow

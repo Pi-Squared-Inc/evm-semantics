@@ -500,8 +500,9 @@ These are just used by the other operators for shuffling local execution state a
 ```k
     syntax InternalOp ::= "#push" | "#setStack" List
  // ------------------------------------------------
-    rule <k> W0:MInt{256} ~> #push => .K ... </k> <wordStack> WS => pushList(W0, WS) </wordStack>
-    rule <k> #setStack WS          => .K ... </k> <wordStack> _  => WS      </wordStack>
+    rule <k> W0:MInt{256}          ~> #push => .K ... </k> <wordStack> WS => pushList(W0, WS) </wordStack>
+    rule <k> EvmWord(W0:MInt{256}) ~> #push => .K ... </k> <wordStack> WS => pushList(W0, WS) </wordStack>
+    rule <k> #setStack WS                   => .K ... </k> <wordStack> _  => WS               </wordStack>
 ```
 
 ### Invalid Operator
@@ -659,12 +660,12 @@ These operators make queries about the current execution state.
 
     syntax NullStackOp ::= "ADDRESS" | "ORIGIN" | "CALLER" | "CALLVALUE" | "CHAINID" | "SELFBALANCE"
  // ------------------------------------------------------------------------------------------------
-    rule <k> ADDRESS     => ACCT                    ~> #push ... </k> <id> ACCT </id>
-    rule <k> ORIGIN      => Origin()                ~> #push ... </k>
-    rule <k> CALLER      => CL                      ~> #push ... </k> <caller> CL </caller>
-    rule <k> CALLVALUE   => CV                      ~> #push ... </k> <callValue> CV </callValue>
-    rule <k> CHAINID     => ChainId()               ~> #push ... </k>
-    rule <k> SELFBALANCE => GetAccountBalance(ACCT) ~> #push ... </k> <id> ACCT </id>
+    rule <k> ADDRESS     => ACCT                             ~> #push ... </k> <id> ACCT </id>
+    rule <k> ORIGIN      => Origin()                         ~> #push ... </k>
+    rule <k> CALLER      => CL                               ~> #push ... </k> <caller> CL </caller>
+    rule <k> CALLVALUE   => CV                               ~> #push ... </k> <callValue> CV </callValue>
+    rule <k> CHAINID     => ChainId()                        ~> #push ... </k>
+    rule <k> SELFBALANCE => GetAccountBalance(EvmWord(ACCT)) ~> #push ... </k> <id> ACCT </id>
 
     syntax NullStackOp ::= "MSIZE" | "CODESIZE"
  // -------------------------------------------
@@ -684,7 +685,7 @@ These operators make queries about the current execution state.
 The blockhash is calculated here using the "shortcut" formula used for running tests.
 
 ```k
-    rule <k> BLOCKHASH N => BlockHash(N) ~> #push ... </k>
+    rule <k> BLOCKHASH N => BlockHash(EvmWord(N)) ~> #push ... </k>
 ```
 
 ```k
@@ -692,10 +693,10 @@ The blockhash is calculated here using the "shortcut" formula used for running t
  // -------------------------------
 
     rule <k> BLOBHASH INDEX => 0p256 ~> #push ... </k>
-       requires INDEX >=uMInt BlobHashesSize()
+       requires INDEX >=uMInt unwrapEvmWord(BlobHashesSize())
 
-    rule <k> BLOBHASH INDEX => BlobHash(INDEX) ~> #push ... </k>
-       requires INDEX <uMInt BlobHashesSize()
+    rule <k> BLOBHASH INDEX => BlobHash(EvmWord(INDEX)) ~> #push ... </k>
+       requires INDEX <uMInt unwrapEvmWord(BlobHashesSize())
 ```
 
 EVM OpCodes
@@ -802,22 +803,22 @@ These operators query about the current return data buffer.
     syntax BinStackOp ::= LogOp
     syntax LogOp ::= LOG ( Int ) [symbol(LOG)]
  // ------------------------------------------
-    rule <k> LOG(0) MEMSTART MEMWIDTH => Log0(ACCT, #rangeMInt256(LM, MEMSTART, MEMWIDTH)) ...</k>
+    rule <k> LOG(0) MEMSTART MEMWIDTH => Log0(EvmWord(ACCT), #rangeMInt256(LM, MEMSTART, MEMWIDTH)) ...</k>
          <id> ACCT </id>
          <localMem> LM </localMem>
-    rule <k> LOG(1) MEMSTART MEMWIDTH => Log1(ACCT, T1, #rangeMInt256(LM, MEMSTART, MEMWIDTH)) ...</k>
+    rule <k> LOG(1) MEMSTART MEMWIDTH => Log1(EvmWord(ACCT), EvmWord(T1), #rangeMInt256(LM, MEMSTART, MEMWIDTH)) ...</k>
          <id> ACCT </id>
          <wordStack> ListItem(T1) WS => WS </wordStack>
          <localMem> LM </localMem>
-    rule <k> LOG(2) MEMSTART MEMWIDTH => Log2(ACCT, T1, T2, #rangeMInt256(LM, MEMSTART, MEMWIDTH)) ...</k>
+    rule <k> LOG(2) MEMSTART MEMWIDTH => Log2(EvmWord(ACCT), EvmWord(T1), EvmWord(T2), #rangeMInt256(LM, MEMSTART, MEMWIDTH)) ...</k>
          <id> ACCT </id>
          <wordStack> ListItem(T1) ListItem(T2) WS => WS </wordStack>
          <localMem> LM </localMem>
-    rule <k> LOG(3) MEMSTART MEMWIDTH => Log3(ACCT, T1, T2, T3, #rangeMInt256(LM, MEMSTART, MEMWIDTH)) ...</k>
+    rule <k> LOG(3) MEMSTART MEMWIDTH => Log3(EvmWord(ACCT), EvmWord(T1), EvmWord(T2), EvmWord(T3), #rangeMInt256(LM, MEMSTART, MEMWIDTH)) ...</k>
          <id> ACCT </id>
          <wordStack> ListItem(T1) ListItem(T2) ListItem(T3) WS => WS </wordStack>
          <localMem> LM </localMem>
-    rule <k> LOG(4) MEMSTART MEMWIDTH => Log4(ACCT, T1, T2, T3, T4, #rangeMInt256(LM, MEMSTART, MEMWIDTH)) ...</k>
+    rule <k> LOG(4) MEMSTART MEMWIDTH => Log4(EvmWord(ACCT), EvmWord(T1), EvmWord(T2), EvmWord(T3), EvmWord(T4), #rangeMInt256(LM, MEMSTART, MEMWIDTH)) ...</k>
          <id> ACCT </id>
          <wordStack> ListItem(T1) ListItem(T2) ListItem(T3) ListItem(T4) WS => WS </wordStack>
          <localMem> LM </localMem>
@@ -833,23 +834,23 @@ Operators that require access to the rest of the Ethereum network world-state ca
 ```k
     syntax UnStackOp ::= "BALANCE"
  // ------------------------------
-    rule <k> BALANCE ACCT => GetAccountBalance(ACCT) ~> #push ... </k>
+    rule <k> BALANCE ACCT => GetAccountBalance(EvmWord(ACCT)) ~> #push ... </k>
 
     syntax UnStackOp ::= "EXTCODESIZE"
  // ----------------------------------
-    rule <k> EXTCODESIZE ACCT => roundMInt(lengthBytes(GetAccountCode(ACCT)))::MInt{256} ~> #push ... </k>
+    rule <k> EXTCODESIZE ACCT => roundMInt(lengthBytes(GetAccountCode(EvmWord(ACCT))))::MInt{256} ~> #push ... </k>
 
     syntax UnStackOp ::= "EXTCODEHASH"
  // ----------------------------------
-    rule <k> EXTCODEHASH ACCT => GetCodeHash(ACCT) ~> #push ... </k>
-      requires notBool IsAccountEmpty(ACCT)
+    rule <k> EXTCODEHASH ACCT => GetCodeHash(EvmWord(ACCT)) ~> #push ... </k>
+      requires notBool IsAccountEmpty(EvmWord(ACCT))
 
-    rule <k> EXTCODEHASH ACCT => AccessAccount(ACCT) ~> 0p256 ~> #push ... </k> [owise]
+    rule <k> EXTCODEHASH ACCT => AccessAccount(EvmWord(ACCT)) ~> 0p256 ~> #push ... </k> [owise]
 
     syntax QuadStackOp ::= "EXTCODECOPY"
  // ------------------------------------
     rule <k> EXTCODECOPY ACCT MEMSTART PGMSTART WIDTH => .K ... </k>
-         <localMem> LM => LM [ MEMSTART :=MInt256 #rangeMInt256(GetAccountCode(ACCT), PGMSTART, WIDTH) ] </localMem>
+         <localMem> LM => LM [ MEMSTART :=MInt256 #rangeMInt256(GetAccountCode(EvmWord(ACCT)), PGMSTART, WIDTH) ] </localMem>
 ```
 
 ### Account Storage Operations
@@ -860,26 +861,26 @@ These rules reach into the network state and load/store from account storage:
     syntax UnStackOp ::= "SLOAD"
  // ----------------------------
     rule [sload]:
-         <k> SLOAD INDEX => GetAccountStorage(ACCT, INDEX) ~> #push ... </k>
+         <k> SLOAD INDEX => GetAccountStorage(EvmWord(ACCT), EvmWord(INDEX)) ~> #push ... </k>
          <id> ACCT </id>
 
     syntax BinStackOp ::= "SSTORE"
  // ------------------------------
     rule [sstore]:
-         <k> SSTORE INDEX NEW => SetAccountStorage(ACCT, INDEX, NEW) ... </k>
+         <k> SSTORE INDEX NEW => SetAccountStorage(EvmWord(ACCT), EvmWord(INDEX), EvmWord(NEW)) ... </k>
          <id> ACCT </id>
       [preserves-definedness]
 
     syntax UnStackOp ::= "TLOAD"
  // ----------------------------
     rule [tload]:
-         <k> TLOAD INDEX => GetAccountTransientStorage(ACCT, INDEX) ~> #push ... </k>
+         <k> TLOAD INDEX => GetAccountTransientStorage(EvmWord(ACCT), EvmWord(INDEX)) ~> #push ... </k>
          <id> ACCT </id>
 
     syntax BinStackOp ::= "TSTORE"
  // ------------------------------
     rule [tstore]:
-         <k> TSTORE INDEX NEW => SetAccountTransientStorage(ACCT, INDEX, NEW) ... </k>
+         <k> TSTORE INDEX NEW => SetAccountTransientStorage(EvmWord(ACCT), EvmWord(INDEX), EvmWord(NEW)) ... </k>
          <id> ACCT </id>
       [preserves-definedness]
 ```
@@ -890,7 +891,7 @@ These rules reach into the network state and load/store from account storage:
    // -------------------------------------------------------------------------------------------------
     rule [transferFundsFrom.success]:
       <k> #transferFundsFrom ACCTFROM ACCTTO VALUE => .K ... </k>
-      requires TransferFrom(ACCTFROM, ACCTTO, VALUE)
+      requires TransferFrom(EvmWord(ACCTFROM), EvmWord(ACCTTO), EvmWord(VALUE))
 
     rule [transferFundsFrom.failure]:
       <k> #transferFundsFrom _ _ _ => #end EVMC_BALANCE_UNDERFLOW ... </k> [owise]
@@ -920,10 +921,10 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
      rule <k> #checkBalanceUnderflow ACCT VALUE => #refund GCALL ~> #pushCallStack ~> #pushWorldState ~> #end EVMC_BALANCE_UNDERFLOW ... </k>
          <output> _ => .Bytes </output>
          <callGas> GCALL </callGas>
-      requires VALUE >uMInt GetAccountBalance(ACCT)
+      requires VALUE >uMInt unwrapEvmWord(GetAccountBalance(EvmWord(ACCT)))
 
     rule <k> #checkBalanceUnderflow ACCT VALUE => .K ... </k>
-      requires VALUE <=uMInt GetAccountBalance(ACCT)
+      requires VALUE <=uMInt unwrapEvmWord(GetAccountBalance(EvmWord(ACCT)))
 
     rule <k> #checkDepthExceeded => #refund GCALL ~> #pushCallStack ~> #pushWorldState ~> #end EVMC_CALL_DEPTH_EXCEEDED ... </k>
          <output> _ => .Bytes </output>
@@ -938,19 +939,19 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
     rule <k> #checkNonceExceeded ACCT => #refund GCALL ~> #pushCallStack ~> #pushWorldState ~> #end EVMC_NONCE_EXCEEDED ... </k>
          <output> _ => .Bytes </output>
          <callGas> GCALL </callGas>
-      requires notBool #rangeNonceMInt256(GetAccountNonce(ACCT))
+      requires notBool #rangeNonceMInt256(unwrapEvmWord(GetAccountNonce(EvmWord(ACCT))))
 
     rule <k> #checkNonceExceeded ACCT => .K ... </k>
-      requires #rangeNonceMInt256(GetAccountNonce(ACCT))
+      requires #rangeNonceMInt256(unwrapEvmWord(GetAccountNonce(EvmWord(ACCT))))
 
     rule <k> #checkCall ACCT VALUE => #checkBalanceUnderflow ACCT VALUE ~> #checkDepthExceeded ... </k>
 
     rule [call.true]:
          <k> #call ACCTFROM ACCTTO ACCTCODE VALUE APPVALUE ARGS STATIC
-          => #callWithCode ACCTFROM ACCTTO ACCTCODE GetAndResolveCode(ACCTCODE) VALUE APPVALUE ARGS STATIC
+          => #callWithCode ACCTFROM ACCTTO ACCTCODE GetAndResolveCode(EvmWord(ACCTCODE)) VALUE APPVALUE ARGS STATIC
          ...
          </k>
-        requires AccountExists(ACCTCODE)
+        requires AccountExists(EvmWord(ACCTCODE))
 
     rule [call.false]:
          <k> #call ACCTFROM ACCTTO ACCTCODE VALUE APPVALUE ARGS STATIC
@@ -966,7 +967,7 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
          </k>
 
     rule <k> #mkCall ACCTFROM ACCTTO ACCTCODE BYTES APPVALUE ARGS STATIC:Bool
-          => AccessAccount(ACCTFROM) ~> AccessAccount(ACCTTO) ~> #loadProgram BYTES ~> #initVM ~> #precompiled?(MInt2Unsigned(ACCTCODE), SCHED) ~> #execute
+          => AccessAccount(EvmWord(ACCTFROM)) ~> AccessAccount(EvmWord(ACCTTO)) ~> #loadProgram BYTES ~> #initVM ~> #precompiled?(MInt2Unsigned(ACCTCODE), SCHED) ~> #execute
          ...
          </k>
          <callDepth> CD => CD +Int 1 </callDepth>
@@ -1065,7 +1066,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
  // ------------------------
     rule [call]:
          <k> CALL _GCAP ACCTTO VALUE ARGSTART ARGWIDTH RETSTART RETWIDTH
-          => AccessAccount(ACCTTO)
+          => AccessAccount(EvmWord(ACCTTO))
           ~> #checkCall ACCTFROM VALUE
           ~> #call ACCTFROM ACCTTO ACCTTO VALUE VALUE #rangeMInt256(LM, ARGSTART, ARGWIDTH) false
           ~> #return RETSTART RETWIDTH
@@ -1079,7 +1080,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
  // ----------------------------
     rule [callcode]:
          <k> CALLCODE _GCAP ACCTTO VALUE ARGSTART ARGWIDTH RETSTART RETWIDTH
-          => AccessAccount(ACCTTO)
+          => AccessAccount(EvmWord(ACCTTO))
           ~> #checkCall ACCTFROM VALUE
           ~> #call ACCTFROM ACCTFROM ACCTTO VALUE VALUE #rangeMInt256(LM, ARGSTART, ARGWIDTH) false
           ~> #return RETSTART RETWIDTH
@@ -1092,7 +1093,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
  // -----------------------------------
     rule [delegatecall]:
          <k> DELEGATECALL _GCAP ACCTTO ARGSTART ARGWIDTH RETSTART RETWIDTH
-          => AccessAccount(ACCTTO)
+          => AccessAccount(EvmWord(ACCTTO))
           ~> #checkCall ACCTFROM 0p256
           ~> #call ACCTAPPFROM ACCTFROM ACCTTO 0p256 VALUE #rangeMInt256(LM, ARGSTART, ARGWIDTH) false
           ~> #return RETSTART RETWIDTH
@@ -1107,7 +1108,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
  // ---------------------------------
     rule [staticcall]:
          <k> STATICCALL _GCAP ACCTTO ARGSTART ARGWIDTH RETSTART RETWIDTH
-          => AccessAccount(ACCTTO)
+          => AccessAccount(EvmWord(ACCTTO))
           ~> #checkCall ACCTFROM 0p256
           ~> #call ACCTFROM ACCTTO ACCTTO 0p256 0p256 #rangeMInt256(LM, ARGSTART, ARGWIDTH) true
           ~> #return RETSTART RETWIDTH
@@ -1132,7 +1133,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
     // ---------------------------------------------------------------------
     rule [create]:
          <k> #create ACCTFROM ACCTTO VALUE INITCODE
-          => IncrementNonce(ACCTFROM)
+          => IncrementNonce(EvmWord(ACCTFROM))
           ~> #pushCallStack ~> #pushWorldState
           ~> #newAccount ACCTFROM ACCTTO VALUE
           ~> #mkCreate ACCTFROM ACCTTO VALUE INITCODE
@@ -1141,7 +1142,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
 
 
     rule <k> #newAccount ACCTFROM ACCTTO VALUE
-          => #if NewAccount(ACCTFROM, ACCTTO, VALUE) #then .K #else #end EVMC_ACCOUNT_ALREADY_EXISTS #fi
+          => #if NewAccount(EvmWord(ACCTFROM), EvmWord(ACCTTO), EvmWord(VALUE)) #then .K #else #end EVMC_ACCOUNT_ALREADY_EXISTS #fi
          ...
          </k>
 
@@ -1197,7 +1198,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
 
     rule <k> #finishCodeDeposit ACCT OUT
           => #popCallStack ~> #dropWorldState
-          ~> #refund GAVAIL ~> SetAccountCode(ACCT, OUT) ~> ACCT ~> #push
+          ~> #refund GAVAIL ~> SetAccountCode(EvmWord(ACCT), OUT) ~> ACCT ~> #push
          ...
          </k>
          <gas> GAVAIL </gas>
@@ -1224,10 +1225,10 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
  // -------------------------------
     rule [create-valid]:
          <k> CREATE VALUE MEMSTART MEMWIDTH
-          => AccessAccount(#newAddrMInt256(ACCT, GetAccountNonce(ACCT)))
+          => AccessAccount(EvmWord(#newAddrMInt256(ACCT, unwrapEvmWord(GetAccountNonce(EvmWord(ACCT))))))
           ~> #checkCreate ACCT VALUE
-          ~> #create ACCT #newAddrMInt256(ACCT, GetAccountNonce(ACCT)) VALUE #rangeMInt256(LM, MEMSTART, MEMWIDTH)
-          ~> #codeDeposit #newAddrMInt256(ACCT, GetAccountNonce(ACCT))
+          ~> #create ACCT #newAddrMInt256(ACCT, unwrapEvmWord(GetAccountNonce(EvmWord(ACCT)))) VALUE #rangeMInt256(LM, MEMSTART, MEMWIDTH)
+          ~> #codeDeposit #newAddrMInt256(ACCT, unwrapEvmWord(GetAccountNonce(EvmWord(ACCT))))
          ...
          </k>
          <id> ACCT </id>
@@ -1249,7 +1250,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
  // --------------------------------
     rule [create2-valid]:
          <k> CREATE2 VALUE MEMSTART MEMWIDTH SALT
-          => AccessAccount(#newAddrMInt256(ACCT, SALT, #rangeMInt256(LM, MEMSTART, MEMWIDTH)))
+          => AccessAccount(EvmWord(#newAddrMInt256(ACCT, SALT, #rangeMInt256(LM, MEMSTART, MEMWIDTH))))
           ~> #checkCreate ACCT VALUE
           ~> #create ACCT #newAddrMInt256(ACCT, SALT, #rangeMInt256(LM, MEMSTART, MEMWIDTH)) VALUE #rangeMInt256(LM, MEMSTART, MEMWIDTH)
           ~> #codeDeposit #newAddrMInt256(ACCT, SALT, #rangeMInt256(LM, MEMSTART, MEMWIDTH))
@@ -1270,7 +1271,7 @@ Self destructing to yourself, unlike a regular transfer, destroys the balance in
 ```k
     syntax UnStackOp ::= "SELFDESTRUCT"
  // -----------------------------------
-    rule <k> SELFDESTRUCT ACCTTO => SelfDestruct(IDACCT, ACCTTO) ~> #end EVMC_SUCCESS ... </k>
+    rule <k> SELFDESTRUCT ACCTTO => SelfDestruct(EvmWord(IDACCT), EvmWord(ACCTTO)) ~> #end EVMC_SUCCESS ... </k>
          <id> IDACCT </id>
          <output> _ => .Bytes </output>
 ```
@@ -1960,12 +1961,12 @@ Access List Gas
 
     syntax Bool ::= #isAccess ( MInt{256} , OpCode ) [function, total]
  // ------------------------------------------------------------------
-    rule #isAccess(_, EXTCODESIZE ACCT) => AccessedAccount(ACCT)
-    rule #isAccess(_, EXTCODECOPY ACCT _ _ _) => AccessedAccount(ACCT)
-    rule #isAccess(_, EXTCODEHASH ACCT) => AccessedAccount(ACCT)
-    rule #isAccess(_, BALANCE ACCT) => AccessedAccount(ACCT)
-    rule #isAccess(_, SELFDESTRUCT ACCT) => AccessedAccount(ACCT)
-    rule #isAccess(ACCT, SSTORE INDEX _) => AccessedStorage(ACCT, INDEX)
+    rule #isAccess(_, EXTCODESIZE ACCT) => AccessedAccount(EvmWord(ACCT))
+    rule #isAccess(_, EXTCODECOPY ACCT _ _ _) => AccessedAccount(EvmWord(ACCT))
+    rule #isAccess(_, EXTCODEHASH ACCT) => AccessedAccount(EvmWord(ACCT))
+    rule #isAccess(_, BALANCE ACCT) => AccessedAccount(EvmWord(ACCT))
+    rule #isAccess(_, SELFDESTRUCT ACCT) => AccessedAccount(EvmWord(ACCT))
+    rule #isAccess(ACCT, SSTORE INDEX _) => AccessedStorage(EvmWord(ACCT), EvmWord(INDEX))
     rule #isAccess(_, _) => false [owise]
 
     syntax InternalOp ::= #gasAccess ( Schedule, OpCode, Bool ) [symbol(#gasAccess)]
@@ -1997,7 +1998,7 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
     rule <k> #gasExec(SCHED, TLOAD _   ) => Gwarmstorageread < SCHED > ... </k>
     rule <k> #gasExec(SCHED, TSTORE _ _) => Gwarmstoragedirtystore < SCHED > ... </k>
 
-    rule <k> #gasExec(SCHED, SSTORE INDEX NEW) => Csstore(SCHED, MInt2Unsigned(NEW), MInt2Unsigned(GetAccountStorage(ACCT, INDEX)), MInt2Unsigned(GetAccountOrigStorage(ACCT, INDEX))) ... </k>
+    rule <k> #gasExec(SCHED, SSTORE INDEX NEW) => Csstore(SCHED, MInt2Unsigned(NEW), MInt2Unsigned(unwrapEvmWord(GetAccountStorage(EvmWord(ACCT), EvmWord(INDEX)))), MInt2Unsigned(unwrapEvmWord(GetAccountOrigStorage(EvmWord(ACCT), EvmWord(INDEX))))) ... </k>
          <id> ACCT </id>
          <gas> GAVAIL </gas>
       requires notBool Ghassstorestipend << SCHED >>
@@ -2025,32 +2026,32 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
           ~> Ccall(SCHED, ISEMPTY, GCAP, GAVAIL, VALUE, ISWARM, MInt2Unsigned(TGT_ACCT), ACCTTO ==Int MInt2Unsigned(TGT_ACCT))
 
     rule <k> #gasExec(SCHED, CALL GCAP ACCTTO VALUE _ _ _ _)
-          => #handleCallGas(SCHED, #accountNonexistent(ACCTTO), MInt2Unsigned(GCAP), GAVAIL, MInt2Unsigned(VALUE), MInt2Unsigned(ACCTTO), GetAccountInfoAndWarmIt(ACCTTO))
+          => #handleCallGas(SCHED, #accountNonexistent(ACCTTO), MInt2Unsigned(GCAP), GAVAIL, MInt2Unsigned(VALUE), MInt2Unsigned(ACCTTO), GetAccountInfoAndWarmIt(EvmWord(ACCTTO)))
          ...
          </k>
          <gas> GAVAIL </gas>
 
     rule <k> #gasExec(SCHED, CALLCODE GCAP ACCTTO VALUE _ _ _ _)
-          => #handleCallGas(SCHED, #accountNonexistent(ACCTID), MInt2Unsigned(GCAP), GAVAIL, MInt2Unsigned(VALUE), MInt2Unsigned(ACCTTO), GetAccountInfoAndWarmIt(ACCTTO))
+          => #handleCallGas(SCHED, #accountNonexistent(ACCTID), MInt2Unsigned(GCAP), GAVAIL, MInt2Unsigned(VALUE), MInt2Unsigned(ACCTTO), GetAccountInfoAndWarmIt(EvmWord(ACCTTO)))
          ...
          </k>
          <id> ACCTID </id>
          <gas> GAVAIL </gas>
 
     rule <k> #gasExec(SCHED, DELEGATECALL GCAP ACCTTO _ _ _ _)
-          => #handleCallGas(SCHED, #accountNonexistent(ACCTID), MInt2Unsigned(GCAP), GAVAIL, 0, MInt2Unsigned(ACCTTO), GetAccountInfoAndWarmIt(ACCTTO))
+          => #handleCallGas(SCHED, #accountNonexistent(ACCTID), MInt2Unsigned(GCAP), GAVAIL, 0, MInt2Unsigned(ACCTTO), GetAccountInfoAndWarmIt(EvmWord(ACCTTO)))
          ...
          </k>
          <id> ACCTID </id>
          <gas> GAVAIL </gas>
 
     rule <k> #gasExec(SCHED, STATICCALL GCAP ACCTTO _ _ _ _)
-          => #handleCallGas(SCHED, #accountNonexistent(ACCTTO), MInt2Unsigned(GCAP), GAVAIL, 0, MInt2Unsigned(ACCTTO), GetAccountInfoAndWarmIt(ACCTTO))
+          => #handleCallGas(SCHED, #accountNonexistent(ACCTTO), MInt2Unsigned(GCAP), GAVAIL, 0, MInt2Unsigned(ACCTTO), GetAccountInfoAndWarmIt(EvmWord(ACCTTO)))
          ...
          </k>
          <gas> GAVAIL </gas>
 
-    rule <k> #gasExec(SCHED, SELFDESTRUCT ACCTTO) => Cselfdestruct(SCHED, #accountNonexistent(ACCTTO), MInt2Unsigned(GetAccountBalance(ACCT))) ... </k>
+    rule <k> #gasExec(SCHED, SELFDESTRUCT ACCTTO) => Cselfdestruct(SCHED, #accountNonexistent(ACCTTO), MInt2Unsigned(unwrapEvmWord(GetAccountBalance(EvmWord(ACCT))))) ... </k>
          <id> ACCT </id>
 
     rule <k> #gasExec(SCHED, CREATE _ _ WIDTH)
@@ -2067,8 +2068,8 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
 
     rule <k> #gasExec(SCHED, SHA3 _ WIDTH) => Gsha3 < SCHED > +Int (Gsha3word < SCHED > *Int (MInt2Unsigned(WIDTH) up/Int 32)) ... </k>
 
-    rule <k> #gasExec(SCHED, JUMPDEST)    => Gjumpdest < SCHED >                        ... </k>
-    rule <k> #gasExec(SCHED, SLOAD INDEX) => Csload(SCHED, AccessedStorage(ACCT, INDEX)) ... </k> <id> ACCT </id>
+    rule <k> #gasExec(SCHED, JUMPDEST)    => Gjumpdest < SCHED >                                           ... </k>
+    rule <k> #gasExec(SCHED, SLOAD INDEX) => Csload(SCHED, AccessedStorage(EvmWord(ACCT), EvmWord(INDEX))) ... </k> <id> ACCT </id>
 
     // Wzero
     rule <k> #gasExec(SCHED, STOP)       => Gzero < SCHED > ... </k>
@@ -2207,7 +2208,7 @@ There are several helpers for calculating gas (most of them also specified in th
     syntax Bool ::= #isWarmDelegatee(Int, Bool) [macro]
  // ---------------------------------------------------
     rule #isWarmDelegatee(TGT_ACCT, SELF_DLGT)
-      => #isDelegated(TGT_ACCT) andThenBool (SELF_DLGT orElseBool AccessedAccount(Int2MInt(TGT_ACCT)::MInt{256}))
+      => #isDelegated(TGT_ACCT) andThenBool (SELF_DLGT orElseBool AccessedAccount(EvmWord(Int2MInt(TGT_ACCT)::MInt{256})))
 
     syntax Bool ::= #isDelegated(Int) [macro]
  // -----------------------------------------
@@ -2217,9 +2218,9 @@ There are several helpers for calculating gas (most of them also specified in th
     syntax KResult ::= Bool
     syntax BExp ::= #accountNonexistent ( MInt{256} ) [symbol(#accountNonexistent)]
  // -------------------------------------------------------------------------------
-    rule <k> #accountNonexistent(ACCT) => IsAccountEmpty(ACCT) andBool Gemptyisnonexistent << SCHED >> ... </k>
+    rule <k> #accountNonexistent(ACCT) => IsAccountEmpty(EvmWord(ACCT)) andBool Gemptyisnonexistent << SCHED >> ... </k>
          <schedule> SCHED </schedule>
-      requires AccountExists(ACCT)
+      requires AccountExists(EvmWord(ACCT))
 
    rule <k> #accountNonexistent(_) => true ... </k> [owise]
 ```

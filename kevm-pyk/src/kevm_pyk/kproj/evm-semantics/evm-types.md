@@ -54,12 +54,6 @@ We use 256-bit machine integers as our word data type.
     rule #rangeMInt256(WS, START, WIDTH) => substrBytes(padRightBytes(WS, roundMInt(START)::MInt{64} +MInt roundMInt(WIDTH)::MInt{64}, 0p64), roundMInt(START)::MInt{64}, roundMInt(START)::MInt{64} +MInt roundMInt(WIDTH)::MInt{64}) requires START <uMInt roundMInt(lengthBytes(WS))::MInt{256}
     rule #rangeMInt256( _,     _, WIDTH) => padRightBytes(.Bytes, roundMInt(WIDTH)::MInt{64}, 0p64) [owise]
 
-    syntax Bytes ::= #padToWidthMInt256      ( MInt{256} , Bytes ) [function]
-                   | #padRightToWidthMInt256 ( MInt{256} , Bytes ) [function]
- // -------------------------------------------------------------------------
-    rule #padToWidthMInt256(N, BS)      =>  padLeftBytes(BS, roundMInt(N)::MInt{64}, 0)
-    rule #padRightToWidthMInt256(N, BS) => padRightBytes(BS, roundMInt(N)::MInt{64}, 0p64)
-
     syntax MInt{256} ::= bool2MInt256 ( Bool ) [function]
  // -----------------------------------------------------
     rule bool2MInt256( true  ) => 1p256

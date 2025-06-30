@@ -19,6 +19,7 @@ module EVM
     imports NETWORK
     imports GAS
     imports ULM
+    imports K-IO
 ```
 
 Configuration
@@ -204,7 +205,7 @@ OpCode Execution
 
     syntax MaybeOpCode ::= "#lookupOpCode" "(" Bytes "," MInt{256} "," Schedule ")" [function, total]
  // -------------------------------------------------------------------------------------------------
-    rule #lookupOpCode(BA, I, SCHED) => #dasmOpCode(BA[roundMInt(I)::MInt{64}], SCHED) requires 0p256 <=uMInt I andBool I <uMInt roundMInt(lengthBytes(BA))::MInt{256}
+    rule #lookupOpCode(BA, I, SCHED) => #let _ = #log("look up ocode at " +String Int2String(MInt2Unsigned(I)) +String " : " +String Int2String(MInt2Unsigned(BA[roundMInt(I)::MInt{64}]::MInt{64}))) #in #let _ = #log("look up opcode at " +String Int2String(MInt2Unsigned(roundMInt(I)::MInt{64})) +String " : " +String opcode2String(#dasmOpCode(BA[roundMInt(I)::MInt{64}]::MInt{64}, SCHED))) #in #dasmOpCode(BA[roundMInt(I)::MInt{64}]::MInt{64}, SCHED) requires 0p256 <=uMInt I andBool I <uMInt roundMInt(lengthBytes(BA))::MInt{256}
     rule #lookupOpCode(_, _, _)  => .NoOpCode [owise]
 ```
 
@@ -348,9 +349,9 @@ The `#next [_]` operator initiates execution by:
 ```k
     syntax InternalOp ::= "#exec" "[" OpCode "]"
  // --------------------------------------------
-    rule <k> #exec [ IOP:InvalidOp ] => IOP ... </k>
+    rule <k> #exec [ IOP:InvalidOp ] => #log("Invalid opcode: " +String opcode2String(IOP)) ~> IOP ... </k>
 
-    rule <k> #exec [ OP ] => #gas [ OP , OP ] ~> OP ... </k> requires isNullStackOp(OP) orBool isPushOp(OP)
+    rule <k> #exec [ OP ] => #log(opcode2StringBefore(OP)) ~> #gas [ OP , OP ] ~> #log(opcode2StringAfter(OP)) ~> OP ... </k> requires isNullStackOp(OP) orBool isPushOp(OP)
 ```
 
 Here we load the correct number of arguments from the `wordStack` based on the sort of the opcode.
@@ -366,10 +367,10 @@ Here we load the correct number of arguments from the `wordStack` based on the s
                         | TernStackOp MInt{256} MInt{256} MInt{256}
                         | QuadStackOp MInt{256} MInt{256} MInt{256} MInt{256}
  // -------------------------------------------------
-    rule <k> #exec [ UOP:UnStackOp   ] => #gas [ UOP , UOP W0          ] ~> UOP W0          ... </k> <wordStack> ListItem(W0) => .List ...</wordStack>
-    rule <k> #exec [ BOP:BinStackOp  ] => #gas [ BOP , BOP W0 W1       ] ~> BOP W0 W1       ... </k> <wordStack> ListItem(W0) ListItem(W1) => .List ...</wordStack>
-    rule <k> #exec [ TOP:TernStackOp ] => #gas [ TOP , TOP W0 W1 W2    ] ~> TOP W0 W1 W2    ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) => .List ...</wordStack>
-    rule <k> #exec [ QOP:QuadStackOp ] => #gas [ QOP , QOP W0 W1 W2 W3 ] ~> QOP W0 W1 W2 W3 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) => .List ...</wordStack>
+    rule <k> #exec [ UOP:UnStackOp   ] => #log(opcode2StringBefore(UOP)) ~> #gas [ UOP , UOP W0          ] ~> #log(opcode2StringAfter(UOP)) ~> UOP W0          ... </k> <wordStack> ListItem(W0) => .List ...</wordStack>
+    rule <k> #exec [ BOP:BinStackOp  ] => #log(opcode2StringBefore(BOP)) ~> #gas [ BOP , BOP W0 W1       ] ~> #log(opcode2StringAfter(BOP)) ~> BOP W0 W1       ... </k> <wordStack> ListItem(W0) ListItem(W1) => .List ...</wordStack>
+    rule <k> #exec [ TOP:TernStackOp ] => #log(opcode2StringBefore(TOP)) ~> #gas [ TOP , TOP W0 W1 W2    ] ~> #log(opcode2StringAfter(TOP)) ~> TOP W0 W1 W2    ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) => .List ...</wordStack>
+    rule <k> #exec [ QOP:QuadStackOp ] => #log(opcode2StringBefore(QOP)) ~> #gas [ QOP , QOP W0 W1 W2 W3 ] ~> #log(opcode2StringAfter(QOP)) ~> QOP W0 W1 W2 W3 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) => .List ...</wordStack>
 ```
 
 `StackOp` is used for opcodes which require a large portion of the stack.
@@ -377,7 +378,7 @@ Here we load the correct number of arguments from the `wordStack` based on the s
 ```k
     syntax InternalOp ::= StackOp List
  // ----------------------------------
-    rule <k> #exec [ SO:StackOp ] => #gas [ SO , SO WS ] ~> SO WS ... </k> <wordStack> WS </wordStack>
+    rule <k> #exec [ SO:StackOp ] => #log(opcode2StringBefore(SO)) ~> #gas [ SO , SO WS ] ~> #log(opcode2StringAfter(SO)) ~> SO WS ... </k> <wordStack> WS </wordStack>
 ```
 
 The `CallOp` opcodes all interpret their second argument as an address.
@@ -386,8 +387,8 @@ The `CallOp` opcodes all interpret their second argument as an address.
     syntax InternalOp ::= CallSixOp MInt{256} MInt{256}           MInt{256} MInt{256} MInt{256} MInt{256}
                         | CallOp    MInt{256} MInt{256} MInt{256} MInt{256} MInt{256} MInt{256} MInt{256}
  // -----------------------------------------------------------
-    rule <k> #exec [ CSO:CallSixOp ] => #gas [ CSO , CSO W0 W1    W2 W3 W4 W5 ] ~> CSO W0 W1    W2 W3 W4 W5 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) ListItem(W4) ListItem(W5) => .List ...</wordStack>
-    rule <k> #exec [ CO:CallOp     ] => #gas [ CO  , CO  W0 W1 W2 W3 W4 W5 W6 ] ~> CO  W0 W1 W2 W3 W4 W5 W6 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) ListItem(W4) ListItem(W5) ListItem(W6) => .List ...</wordStack>
+    rule <k> #exec [ CSO:CallSixOp ] => #log(opcode2StringBefore(CSO)) ~> #gas [ CSO , CSO W0 W1    W2 W3 W4 W5 ] ~> #log(opcode2StringAfter(CSO)) ~> CSO W0 W1    W2 W3 W4 W5 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) ListItem(W4) ListItem(W5) => .List ...</wordStack>
+    rule <k> #exec [ CO:CallOp     ] => #log(opcode2StringBefore(CO))  ~> #gas [ CO  , CO  W0 W1 W2 W3 W4 W5 W6 ] ~> #log(opcode2StringAfter(CO))  ~> CO  W0 W1 W2 W3 W4 W5 W6 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) ListItem(W4) ListItem(W5) ListItem(W6) => .List ...</wordStack>
 ```
 
 ### Address Conversion
@@ -536,7 +537,7 @@ Some operators don't calculate anything, they just push the stack around a bit.
  // ---------------------------------------------
     rule <k> PUSHZERO => 0p256 ~> #push ... </k>
 
-    rule <k> PUSH(N) => Bytes2MInt(#rangeMInt256(PGM, PCOUNT +MInt 1p256, Int2MInt(N)::MInt{256})) ~> #push ... </k>
+    rule <k> PUSH(N) => Bytes2MInt(padLeftBytes(#rangeMInt256(PGM, PCOUNT +MInt 1p256, Int2MInt(N)::MInt{256}), 32, 0))::MInt{256} ~> #push ... </k>
          <pc> PCOUNT </pc>
          <program> PGM </program>
 ```
@@ -548,13 +549,13 @@ These operations are getters/setters of the local execution memory.
 ```k
     syntax UnStackOp ::= "MLOAD"
  // ----------------------------
-    rule <k> MLOAD INDEX => Bytes2MInt(#rangeMInt256(LM, INDEX, 32p256)) ~> #push ... </k>
+    rule <k> MLOAD INDEX => Bytes2MInt(#rangeMInt256(LM, INDEX, 32p256))::MInt{256} ~> #push ... </k>
          <localMem> LM </localMem>
 
     syntax BinStackOp ::= "MSTORE" | "MSTORE8"
  // ------------------------------------------
     rule <k> MSTORE INDEX VALUE => .K ... </k>
-         <localMem> LM => LM [ INDEX :=MInt256 #padToWidthMInt256(32p256, MInt2Bytes(VALUE)) ] </localMem>
+         <localMem> LM => LM [ INDEX :=MInt256 MInt2Bytes(VALUE) ] </localMem>
 
     rule <k> MSTORE8 INDEX VALUE => .K ... </k>
          <localMem> LM => #writeMInt256(LM, INDEX, VALUE %uMInt 256p256) </localMem>
@@ -621,18 +622,18 @@ NOTE: We have to call the opcode `OR` by `EVMOR` instead, because K has trouble 
 
     syntax BinStackOp ::= "LT" | "GT" | "EQ"
  // ----------------------------------------
-    rule <k> LT W0 W1 => W0 <uMInt W1 ~> #push ... </k>
-    rule <k> GT W0 W1 => W0 >uMInt W1 ~> #push ... </k>
-    rule <k> EQ W0 W1 => W0 ==MInt W1 ~> #push ... </k>
+    rule <k> LT W0 W1 => bool2MInt256(W0 <uMInt W1) ~> #push ... </k>
+    rule <k> GT W0 W1 => bool2MInt256(W0 >uMInt W1) ~> #push ... </k>
+    rule <k> EQ W0 W1 => bool2MInt256(W0 ==MInt W1) ~> #push ... </k>
 
     syntax BinStackOp ::= "SLT" | "SGT"
  // -----------------------------------
-    rule <k> SLT W0 W1 => W0 <sMInt W1 ~> #push ... </k>
-    rule <k> SGT W0 W1 => W0 >sMInt W1 ~> #push ... </k>
+    rule <k> SLT W0 W1 => bool2MInt256(W0 <sMInt W1) ~> #push ... </k>
+    rule <k> SGT W0 W1 => bool2MInt256(W0 >sMInt W1) ~> #push ... </k>
 
     syntax BinStackOp ::= "SHA3"
  // ----------------------------
-    rule <k> SHA3 MEMSTART MEMWIDTH => keccak(#rangeMInt256(LM, MEMSTART, MEMWIDTH)) ~> #push ... </k>
+    rule <k> SHA3 MEMSTART MEMWIDTH => keccakMInt256(#rangeMInt256(LM, MEMSTART, MEMWIDTH)) ~> #push ... </k>
          <localMem> LM </localMem>
 ```
 
@@ -717,7 +718,7 @@ The `JUMP*` family of operations affect the current program counter.
          <k> JUMP DEST => #endBasicBlock ... </k>
          <pc> _ => DEST </pc>
          <jumpDests> DESTS </jumpDests>
-      requires DEST <uMInt roundMInt(lengthBytes(DESTS))::MInt{256} andBool DESTS[roundMInt(DEST)::MInt{64}] ==MInt 1p64
+      requires DEST <uMInt roundMInt(lengthBytes(DESTS))::MInt{256} andBool DESTS[roundMInt(DEST)::MInt{64}]::MInt{64} ==MInt 1p64
 
     rule <k> JUMP _ => #end EVMC_BAD_JUMP_DESTINATION ... </k> [owise]
 
@@ -765,7 +766,7 @@ These operators query about the current `CALL*` state.
 
     syntax UnStackOp ::= "CALLDATALOAD"
  // -----------------------------------
-   rule <k> CALLDATALOAD DATASTART => Bytes2MInt(#rangeMInt256(CD, DATASTART, 32p256)) ~> #push ... </k>
+   rule <k> CALLDATALOAD DATASTART => Bytes2MInt(#rangeMInt256(CD, DATASTART, 32p256))::MInt{256} ~> #push ... </k>
          <callData> CD </callData>
 
     syntax TernStackOp ::= "CALLDATACOPY"
@@ -2021,9 +2022,9 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
 
     syntax Exp ::= #handleCallGas(Schedule, acctNonExistent: BExp, cap: Gas, avail: Gas, value: Int, acct:Int, AccountInfo)  [strict(2)]
  // ------------------------------------------------------------------------------------------------------------------------------------
-    rule #handleCallGas(SCHED, ISEMPTY:Bool, GCAP, GAVAIL, VALUE, ACCTTO, AccountInfo(ISWARM, TGT_ACCT::MInt{256}))
-          => Ccallgas(SCHED, ISEMPTY, GCAP, GAVAIL, VALUE, ISWARM, MInt2Unsigned(TGT_ACCT), ACCTTO ==Int MInt2Unsigned(TGT_ACCT)) ~> #allocateCallGas
-          ~> Ccall(SCHED, ISEMPTY, GCAP, GAVAIL, VALUE, ISWARM, MInt2Unsigned(TGT_ACCT), ACCTTO ==Int MInt2Unsigned(TGT_ACCT))
+    rule #handleCallGas(SCHED, ISEMPTY:Bool, GCAP, GAVAIL, VALUE, ACCTTO, AccountInfo(ISWARM, TGT_ACCT))
+          => Ccallgas(SCHED, ISEMPTY, GCAP, GAVAIL, VALUE, ISWARM, MInt2Unsigned(unwrapEvmWord(TGT_ACCT)), ACCTTO ==Int MInt2Unsigned(unwrapEvmWord(TGT_ACCT))) ~> #allocateCallGas
+          ~> Ccall(SCHED, ISEMPTY, GCAP, GAVAIL, VALUE, ISWARM, MInt2Unsigned(unwrapEvmWord(TGT_ACCT)), ACCTTO ==Int MInt2Unsigned(unwrapEvmWord(TGT_ACCT)))
 
     rule <k> #gasExec(SCHED, CALL GCAP ACCTTO VALUE _ _ _ _)
           => #handleCallGas(SCHED, #accountNonexistent(ACCTTO), MInt2Unsigned(GCAP), GAVAIL, MInt2Unsigned(VALUE), MInt2Unsigned(ACCTTO), GetAccountInfoAndWarmIt(EvmWord(ACCTTO)))
@@ -2400,6 +2401,105 @@ After interpreting the strings representing programs as a `WordStack`, it should
     rule #dasmOpCode( 254p64,     _ ) => INVALID
     rule #dasmOpCode( 255p64,     _ ) => SELFDESTRUCT
     rule #dasmOpCode(      W,     _ ) => UNDEFINED(MInt2Unsigned(W)) [owise]
+
+    syntax String ::= opcode2String(OpCode) [function]
+    rule opcode2String(STOP)           => "STOP"
+    rule opcode2String(ADD)            => "ADD"
+    rule opcode2String(MUL)            => "MUL"
+    rule opcode2String(SUB)            => "SUB"
+    rule opcode2String(DIV)            => "DIV"
+    rule opcode2String(SDIV)           => "SDIV"
+    rule opcode2String(MOD)            => "MOD"
+    rule opcode2String(SMOD)           => "SMOD"
+    rule opcode2String(ADDMOD)         => "ADDMOD"
+    rule opcode2String(MULMOD)         => "MULMOD"
+    rule opcode2String(EXP)            => "EXP"
+    rule opcode2String(SIGNEXTEND)     => "SIGNEXTEND"
+    rule opcode2String(LT)             => "LT"
+    rule opcode2String(GT)             => "GT"
+    rule opcode2String(SLT)            => "SLT"
+    rule opcode2String(SGT)            => "SGT"
+    rule opcode2String(EQ)             => "EQ"
+    rule opcode2String(ISZERO)         => "ISZERO"
+    rule opcode2String(AND)            => "AND"
+    rule opcode2String(EVMOR)          => "EVMOR"
+    rule opcode2String(XOR)            => "XOR"
+    rule opcode2String(NOT)            => "NOT"
+    rule opcode2String(BYTE)           => "BYTE"
+    rule opcode2String(SHL)            => "SHL"
+    rule opcode2String(SHR)            => "SHR"
+    rule opcode2String(SAR)            => "SAR"
+    rule opcode2String(SHA3)           => "SHA3"
+    rule opcode2String(ADDRESS)        => "ADDRESS"
+    rule opcode2String(BALANCE)        => "BALANCE"
+    rule opcode2String(ORIGIN)         => "ORIGIN"
+    rule opcode2String(CALLER)         => "CALLER"
+    rule opcode2String(CALLVALUE)      => "CALLVALUE"
+    rule opcode2String(CALLDATALOAD)   => "CALLDATALOAD"
+    rule opcode2String(CALLDATASIZE)   => "CALLDATASIZE"
+    rule opcode2String(CALLDATACOPY)   => "CALLDATACOPY"
+    rule opcode2String(CODESIZE)       => "CODESIZE"
+    rule opcode2String(CODECOPY)       => "CODECOPY"
+    rule opcode2String(GASPRICE)       => "GASPRICE"
+    rule opcode2String(EXTCODESIZE)    => "EXTCODESIZE"
+    rule opcode2String(EXTCODECOPY)    => "EXTCODECOPY"
+    rule opcode2String(RETURNDATASIZE) => "RETURNDATASIZE"
+    rule opcode2String(RETURNDATACOPY) => "RETURNDATACOPY"
+    rule opcode2String(EXTCODEHASH)    => "EXTCODEHASH"
+    rule opcode2String(BLOCKHASH)      => "BLOCKHASH"
+    rule opcode2String(COINBASE)       => "COINBASE"
+    rule opcode2String(TIMESTAMP)      => "TIMESTAMP"
+    rule opcode2String(NUMBER)         => "NUMBER"
+    rule opcode2String(PREVRANDAO)     => "PREVRANDAO"
+    rule opcode2String(DIFFICULTY)     => "DIFFICULTY"
+    rule opcode2String(GASLIMIT)       => "GASLIMIT"
+    rule opcode2String(CHAINID)        => "CHAINID"
+    rule opcode2String(SELFBALANCE)    => "SELFBALANCE"
+    rule opcode2String(BASEFEE)        => "BASEFEE"
+    rule opcode2String(BLOBHASH)       => "BLOBHASH"
+    rule opcode2String(BLOBBASEFEE)    => "BLOBBASEFEE"
+    rule opcode2String(POP)            => "POP"
+    rule opcode2String(MLOAD)          => "MLOAD"
+    rule opcode2String(MSTORE)         => "MSTORE"
+    rule opcode2String(MSTORE8)        => "MSTORE8"
+    rule opcode2String(SLOAD)          => "SLOAD"
+    rule opcode2String(SSTORE)         => "SSTORE"
+    rule opcode2String(JUMP)           => "JUMP"
+    rule opcode2String(JUMPI)          => "JUMPI"
+    rule opcode2String(PC)             => "PC"
+    rule opcode2String(MSIZE)          => "MSIZE"
+    rule opcode2String(GAS)            => "GAS"
+    rule opcode2String(JUMPDEST)       => "JUMPDEST"
+    rule opcode2String(TLOAD)          => "TLOAD"
+    rule opcode2String(TSTORE)         => "TSTORE"
+    rule opcode2String(MCOPY)          => "MCOPY"
+    rule opcode2String(PUSHZERO)       => "PUSHZERO"
+    rule opcode2String(PUSH(N))        => "PUSH(" +String Int2String(N) +String ")"
+    rule opcode2String(DUP(N))         => "DUP(" +String Int2String(N) +String ")"
+    rule opcode2String(SWAP(N))        => "SWAP(" +String Int2String(N) +String ")"
+    rule opcode2String(LOG(0))         => "LOG(0)"
+    rule opcode2String(LOG(1))         => "LOG(1)"
+    rule opcode2String(LOG(2))         => "LOG(2)"
+    rule opcode2String(LOG(3))         => "LOG(3)"
+    rule opcode2String(LOG(4))         => "LOG(4)"
+    rule opcode2String(CREATE)         => "CREATE"
+    rule opcode2String(CALL)           => "CALL"
+    rule opcode2String(CALLCODE)       => "CALLCODE"
+    rule opcode2String(RETURN)         => "RETURN"
+    rule opcode2String(DELEGATECALL)   => "DELEGATECALL"
+    rule opcode2String(CREATE2)        => "CREATE2"
+    rule opcode2String(STATICCALL)     => "STATICCALL"
+    rule opcode2String(REVERT)         => "REVERT"
+    rule opcode2String(INVALID)        => "INVALID"
+    rule opcode2String(SELFDESTRUCT)   => "SELFDESTRUCT"
+    rule opcode2String(UNDEFINED(N))   => "UNDEFINED(" +String Int2String(N) +String ")"
+    rule opcode2String(_)              => "unknown opcode" [owise]
+
+    syntax String ::= opcode2StringBefore(OpCode) [function]
+    rule opcode2StringBefore(OP) => opcode2String(OP) +String " (before)"
+
+    syntax String ::= opcode2StringAfter(OpCode) [function]
+    rule opcode2StringAfter(OP) => opcode2String(OP) +String " (after)"
 
 endmodule
 ```

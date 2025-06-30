@@ -24,6 +24,10 @@ Address/Hash Helpers
     syntax Int ::= keccak ( Bytes ) [symbol(keccak), function, total, smtlib(smt_keccak)]
  // -------------------------------------------------------------------------------------
     rule [keccak]: keccak(WS) => #parseHexWord(Keccak256(WS)) [concrete]
+
+    syntax MInt{256} ::= keccakMInt256 ( Bytes ) [function]
+ // -------------------------------------------------------
+    rule keccakMInt256(WS) => Bytes2MInt(padLeftBytes(Keccak256raw(WS), 32, 0))::MInt{256}
 ```
 
 -   `#newAddr` computes the address of a new account given the address and nonce of the creating account.

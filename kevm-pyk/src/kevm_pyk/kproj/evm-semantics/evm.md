@@ -1862,7 +1862,7 @@ Overall Gas
     rule <k> MU':Int ~> #deductMemory => (Cmem(SCHED, MU') -Int Cmem(SCHED, MU)) ~> #deductMemoryGas ... </k>
          <memoryUsed> MU => MU' </memoryUsed> <schedule> SCHED </schedule>
 
-    rule <k> LU':Int ~> #deductLog => (Clog(SCHED, LU') -Int Clog(SCHED, LU)) ~> #deductLogGas ... </k>
+    rule <k> LU':Int ~> #deductLog => (Clog(SCHED, LU') -Int Clog(SCHED, LU)):Gas ~> #deductGas ... </k>
          <logUsed> LU => LU' </logUsed> <schedule> SCHED </schedule>
 
     rule <k> _G:Gas ~> (#deductMemoryGas => #deductGas)   ... </k> //Required for verification

@@ -620,9 +620,13 @@ NOTE: We have to call the opcode `OR` by `EVMOR` instead, because K has trouble 
 
     syntax BinStackOp ::= "SHL" | "SHR" | "SAR"
  // -------------------------------------------
-    rule <k> SHL W0 W1 => W1 <<MInt  W0 ~> #push ... </k>
-    rule <k> SHR W0 W1 => W1 >>lMInt W0 ~> #push ... </k>
-    rule <k> SAR W0 W1 => W1 >>aMInt W0 ~> #push ... </k>
+    rule <k> SHL W0 W1 =>  W1 <<MInt  W0 ~> #push ... </k> requires W0 <uMInt  256p256
+    rule <k> SHL W0  _ =>          0p256 ~> #push ... </k> requires W0 >=uMInt 256p256
+    rule <k> SHR W0 W1 =>  W1 >>lMInt W0 ~> #push ... </k> requires W0 <uMInt  256p256
+    rule <k> SHR W0  _ =>          0p256 ~> #push ... </k> requires W0 >=uMInt 256p256
+    rule <k> SAR W0 W1 =>  W1 >>aMInt W0 ~> #push ... </k> requires W0 <uMInt  256p256
+    rule <k> SAR W0 W1 =>          0p256 ~> #push ... </k> requires W0 >=uMInt 256p256 andBool W1 <=uMInt maxSInt256p256
+    rule <k> SAR W0 W1 => maxUInt256p256 ~> #push ... </k> requires W0 >=uMInt 256p256 andBool W1 >uMInt  maxSInt256p256
 
     syntax BinStackOp ::= "AND" | "EVMOR" | "XOR"
  // ---------------------------------------------

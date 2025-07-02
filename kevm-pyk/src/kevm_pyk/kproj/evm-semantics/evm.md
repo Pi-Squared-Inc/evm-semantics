@@ -19,7 +19,7 @@ module EVM
     imports NETWORK
     imports GAS
     imports ULM
-    imports K-IO
+    //imports K-IO
 ```
 
 Configuration
@@ -205,7 +205,8 @@ OpCode Execution
 
     syntax MaybeOpCode ::= "#lookupOpCode" "(" Bytes "," MInt{256} "," Schedule ")" [function, total]
  // -------------------------------------------------------------------------------------------------
-    rule #lookupOpCode(BA, I, SCHED) => #let _ = #log("look up ocode at " +String Int2String(MInt2Unsigned(I)) +String " : " +String Int2String(MInt2Unsigned(BA[roundMInt(I)::MInt{64}]::MInt{64}))) #in #let _ = #log("look up opcode at " +String Int2String(MInt2Unsigned(roundMInt(I)::MInt{64})) +String " : " +String opcode2String(#dasmOpCode(BA[roundMInt(I)::MInt{64}]::MInt{64}, SCHED))) #in #dasmOpCode(BA[roundMInt(I)::MInt{64}]::MInt{64}, SCHED) requires 0p256 <=uMInt I andBool I <uMInt roundMInt(lengthBytes(BA))::MInt{256}
+    //rule #lookupOpCode(BA, I, SCHED) => #let _ = #log("look up ocode at " +String Int2String(MInt2Unsigned(I)) +String " : " +String Int2String(MInt2Unsigned(BA[roundMInt(I)::MInt{64}]::MInt{64}))) #in #let _ = #log("look up opcode at " +String Int2String(MInt2Unsigned(roundMInt(I)::MInt{64})) +String " : " +String opcode2String(#dasmOpCode(BA[roundMInt(I)::MInt{64}]::MInt{64}, SCHED))) #in #dasmOpCode(BA[roundMInt(I)::MInt{64}]::MInt{64}, SCHED) requires 0p256 <=uMInt I andBool I <uMInt roundMInt(lengthBytes(BA))::MInt{256}
+    rule #lookupOpCode(BA, I, SCHED) => #dasmOpCode(BA[roundMInt(I)::MInt{64}]::MInt{64}, SCHED) requires 0p256 <=uMInt I andBool I <uMInt roundMInt(lengthBytes(BA))::MInt{256}
     rule #lookupOpCode(_, _, _)  => .NoOpCode [owise]
 ```
 
@@ -349,9 +350,11 @@ The `#next [_]` operator initiates execution by:
 ```k
     syntax InternalOp ::= "#exec" "[" OpCode "]"
  // --------------------------------------------
-    rule <k> #exec [ IOP:InvalidOp ] => #log("Invalid opcode: " +String opcode2String(IOP)) ~> IOP ... </k>
+    //rule <k> #exec [ IOP:InvalidOp ] => #log("Invalid opcode: " +String opcode2String(IOP)) ~> IOP ... </k>
+    rule <k> #exec [ IOP:InvalidOp ] => IOP ... </k>
 
-    rule <k> #exec [ OP ] => #log(opcode2StringBefore(OP)) ~> #gas [ OP , OP ] ~> #log(opcode2StringAfter(OP)) ~> OP ... </k> requires isNullStackOp(OP) orBool isPushOp(OP)
+    //rule <k> #exec [ OP ] => #log(opcode2StringBefore(OP)) ~> #gas [ OP , OP ] ~> #log(opcode2StringAfter(OP)) ~> OP ... </k> requires isNullStackOp(OP) orBool isPushOp(OP)
+    rule <k> #exec [ OP ] => #gas [ OP , OP ] ~> OP ... </k> requires isNullStackOp(OP) orBool isPushOp(OP)
 ```
 
 Here we load the correct number of arguments from the `wordStack` based on the sort of the opcode.
@@ -367,10 +370,14 @@ Here we load the correct number of arguments from the `wordStack` based on the s
                         | TernStackOp MInt{256} MInt{256} MInt{256}
                         | QuadStackOp MInt{256} MInt{256} MInt{256} MInt{256}
  // -------------------------------------------------
-    rule <k> #exec [ UOP:UnStackOp   ] => #log(opcode2StringBefore(UOP)) ~> #gas [ UOP , UOP W0          ] ~> #log(opcode2StringAfter(UOP)) ~> UOP W0          ... </k> <wordStack> ListItem(W0) => .List ...</wordStack>
-    rule <k> #exec [ BOP:BinStackOp  ] => #log(opcode2StringBefore(BOP)) ~> #gas [ BOP , BOP W0 W1       ] ~> #log(opcode2StringAfter(BOP)) ~> BOP W0 W1       ... </k> <wordStack> ListItem(W0) ListItem(W1) => .List ...</wordStack>
-    rule <k> #exec [ TOP:TernStackOp ] => #log(opcode2StringBefore(TOP)) ~> #gas [ TOP , TOP W0 W1 W2    ] ~> #log(opcode2StringAfter(TOP)) ~> TOP W0 W1 W2    ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) => .List ...</wordStack>
-    rule <k> #exec [ QOP:QuadStackOp ] => #log(opcode2StringBefore(QOP)) ~> #gas [ QOP , QOP W0 W1 W2 W3 ] ~> #log(opcode2StringAfter(QOP)) ~> QOP W0 W1 W2 W3 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) => .List ...</wordStack>
+    //rule <k> #exec [ UOP:UnStackOp   ] => #log(opcode2StringBefore(UOP)) ~> #gas [ UOP , UOP W0          ] ~> #log(opcode2StringAfter(UOP)) ~> UOP W0          ... </k> <wordStack> ListItem(W0) => .List ...</wordStack>
+    //rule <k> #exec [ BOP:BinStackOp  ] => #log(opcode2StringBefore(BOP)) ~> #gas [ BOP , BOP W0 W1       ] ~> #log(opcode2StringAfter(BOP)) ~> BOP W0 W1       ... </k> <wordStack> ListItem(W0) ListItem(W1) => .List ...</wordStack>
+    //rule <k> #exec [ TOP:TernStackOp ] => #log(opcode2StringBefore(TOP)) ~> #gas [ TOP , TOP W0 W1 W2    ] ~> #log(opcode2StringAfter(TOP)) ~> TOP W0 W1 W2    ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) => .List ...</wordStack>
+    //rule <k> #exec [ QOP:QuadStackOp ] => #log(opcode2StringBefore(QOP)) ~> #gas [ QOP , QOP W0 W1 W2 W3 ] ~> #log(opcode2StringAfter(QOP)) ~> QOP W0 W1 W2 W3 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) => .List ...</wordStack>
+    rule <k> #exec [ UOP:UnStackOp   ] => #gas [ UOP , UOP W0          ] ~> UOP W0          ... </k> <wordStack> ListItem(W0) => .List ...</wordStack>
+    rule <k> #exec [ BOP:BinStackOp  ] => #gas [ BOP , BOP W0 W1       ] ~> BOP W0 W1       ... </k> <wordStack> ListItem(W0) ListItem(W1) => .List ...</wordStack>
+    rule <k> #exec [ TOP:TernStackOp ] => #gas [ TOP , TOP W0 W1 W2    ] ~> TOP W0 W1 W2    ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) => .List ...</wordStack>
+    rule <k> #exec [ QOP:QuadStackOp ] => #gas [ QOP , QOP W0 W1 W2 W3 ] ~> QOP W0 W1 W2 W3 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) => .List ...</wordStack>
 ```
 
 `StackOp` is used for opcodes which require a large portion of the stack.
@@ -378,7 +385,8 @@ Here we load the correct number of arguments from the `wordStack` based on the s
 ```k
     syntax InternalOp ::= StackOp List
  // ----------------------------------
-    rule <k> #exec [ SO:StackOp ] => #log(opcode2StringBefore(SO)) ~> #gas [ SO , SO WS ] ~> #log(opcode2StringAfter(SO)) ~> SO WS ... </k> <wordStack> WS </wordStack>
+    //rule <k> #exec [ SO:StackOp ] => #log(opcode2StringBefore(SO)) ~> #gas [ SO , SO WS ] ~> #log(opcode2StringAfter(SO)) ~> SO WS ... </k> <wordStack> WS </wordStack>
+    rule <k> #exec [ SO:StackOp ] => #gas [ SO , SO WS ] ~> SO WS ... </k> <wordStack> WS </wordStack>
 ```
 
 The `CallOp` opcodes all interpret their second argument as an address.
@@ -387,8 +395,10 @@ The `CallOp` opcodes all interpret their second argument as an address.
     syntax InternalOp ::= CallSixOp MInt{256} MInt{256}           MInt{256} MInt{256} MInt{256} MInt{256}
                         | CallOp    MInt{256} MInt{256} MInt{256} MInt{256} MInt{256} MInt{256} MInt{256}
  // -----------------------------------------------------------
-    rule <k> #exec [ CSO:CallSixOp ] => #log(opcode2StringBefore(CSO)) ~> #gas [ CSO , CSO W0 W1    W2 W3 W4 W5 ] ~> #log(opcode2StringAfter(CSO)) ~> CSO W0 W1    W2 W3 W4 W5 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) ListItem(W4) ListItem(W5) => .List ...</wordStack>
-    rule <k> #exec [ CO:CallOp     ] => #log(opcode2StringBefore(CO))  ~> #gas [ CO  , CO  W0 W1 W2 W3 W4 W5 W6 ] ~> #log(opcode2StringAfter(CO))  ~> CO  W0 W1 W2 W3 W4 W5 W6 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) ListItem(W4) ListItem(W5) ListItem(W6) => .List ...</wordStack>
+    //rule <k> #exec [ CSO:CallSixOp ] => #log(opcode2StringBefore(CSO)) ~> #gas [ CSO , CSO W0 W1    W2 W3 W4 W5 ] ~> #log(opcode2StringAfter(CSO)) ~> CSO W0 W1    W2 W3 W4 W5 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) ListItem(W4) ListItem(W5) => .List ...</wordStack>
+    //rule <k> #exec [ CO:CallOp     ] => #log(opcode2StringBefore(CO))  ~> #gas [ CO  , CO  W0 W1 W2 W3 W4 W5 W6 ] ~> #log(opcode2StringAfter(CO))  ~> CO  W0 W1 W2 W3 W4 W5 W6 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) ListItem(W4) ListItem(W5) ListItem(W6) => .List ...</wordStack>
+    rule <k> #exec [ CSO:CallSixOp ] => #gas [ CSO , CSO W0 W1    W2 W3 W4 W5 ] ~> CSO W0 W1    W2 W3 W4 W5 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) ListItem(W4) ListItem(W5) => .List ...</wordStack>
+    rule <k> #exec [ CO:CallOp     ] => #gas [ CO  , CO  W0 W1 W2 W3 W4 W5 W6 ] ~> CO  W0 W1 W2 W3 W4 W5 W6 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) ListItem(W4) ListItem(W5) ListItem(W6) => .List ...</wordStack>
 ```
 
 ### Address Conversion

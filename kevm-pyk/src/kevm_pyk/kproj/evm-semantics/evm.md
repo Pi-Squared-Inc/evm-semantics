@@ -595,7 +595,7 @@ NOTE: We have to call the opcode `OR` by `EVMOR` instead, because K has trouble 
     rule <k> SUB W0 W1 => W0 -MInt W1  ~> #push ... </k>
     rule <k> DIV  _ W1 => 0p256        ~> #push ... </k> requires W1  ==MInt 0p256
     rule <k> DIV W0 W1 => W0 /uMInt W1 ~> #push ... </k> requires W1 =/=MInt 0p256
-    rule <k> EXP W0 W1 => W0 ^uMInt W1 ~> #push ... </k>
+    rule <k> EXP W0 W1 => W0 ^MInt W1  ~> #push ... </k>
     rule <k> MOD  _ W1 => 0p256        ~> #push ... </k> requires W1  ==MInt 0p256
     rule <k> MOD W0 W1 => W0 %uMInt W1 ~> #push ... </k> requires W1 =/=MInt 0p256
 

@@ -64,13 +64,6 @@ We use 256-bit machine integers as our word data type.
     rule mint2562Bool( W ) => false requires W  ==MInt 0p256
     rule mint2562Bool( W ) => true  requires W =/=MInt 0p256
 
-    syntax MInt{256} ::= MInt{256} "^uMInt" MInt{256} [function]
-    syntax MInt{256} ::= expMInt256(base: MInt{256}, exp: MInt{256}, result: MInt{256}) [function]
- // ----------------------------------------------------------------------------------------------
-    rule W ^uMInt N => expMInt256(W, N, 1p256)
-    rule expMInt256(_, N, R) => R                                       requires N ==MInt 0p256
-    rule expMInt256(W, N, R) => expMInt256(W, N -MInt 1p256, W *MInt R) requires N >uMInt 0p256
-
     syntax MInt{256} ::= #nBitsMInt256  ( MInt{256} )  [function]
                        | #nBytesMInt256 ( MInt{256} )  [function]
  // -------------------------------------------------------------
@@ -91,7 +84,7 @@ We use 256-bit machine integers as our word data type.
     rule byteMInt256(N, _) => 0p256 requires N >=uMInt  32p256
 
     rule bitMInt256 (N, W) => bitOfMInt256 (W , (255p256 -MInt N)) requires N <uMInt 256p256
-    rule byteMInt256(N, W) => byteOfMInt256(W , ( 32p256 -MInt N)) requires N <uMInt  32p256
+    rule byteMInt256(N, W) => byteOfMInt256(W , ( 31p256 -MInt N)) requires N <uMInt  32p256
 
     syntax MInt{256} ::= signextendMInt256( MInt{256} , MInt{256} ) [function]
  // --------------------------------------------------------------------------

@@ -79,22 +79,12 @@ For symbolic execution, we create an additional cell, to capture the
 side-effects of impure hooks.
 
 ```symbolic
-        <symbolicWorldState> 0 </symbolicWorldState>
+        <symbolicWorldState> .SymbolicWorldState </symbolicWorldState>
 
-    rule <k> _:SymbolicWorldState => .K ... </k>
-         <symbolicWorldState> WS => WS +Int 1 </symbolicWorldState>
+    rule <k> WS:SymbolicWorldState => .K ... </k>
+         <symbolicWorldState> .K => WS ... </symbolicWorldState>
 
-    syntax Bool ::= AccessedStorageW(Int, Int, Int) [function, total]
-    rule [[ AccessedStorage(ACCT, KEY) => AccessedStorageW(WS, ACCT, KEY) ]]
-         <symbolicWorldState> WS </symbolicWorldState>
-
-    syntax Int ::= GetAccountStorageW(Int, Int, Int) [function, total]
-    rule [[ GetAccountStorage(ACCT, KEY) => GetAccountStorageW(WS, ACCT, KEY) ]]
-         <symbolicWorldState> WS </symbolicWorldState>
-
-    syntax SymbolicWorldState ::= SetAccountStorageW(Int, Int, Int, Int) [function, total]
-    rule [[ SetAccountStorage(ACCT, KEY, VAL) => SetAccountStorageW(WS, ACCT, KEY, VAL) ]]
-         <symbolicWorldState> WS </symbolicWorldState>
+    syntax SymbolicWorldState ::= ".SymbolicWorldState" [function, total]
 ```
 
 ```k

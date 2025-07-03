@@ -41,6 +41,10 @@ We use 256-bit machine integers as our word data type.
  // -------------------------------------------------------------
     rule maxUInt256p256 => 115792089237316195423570985008687907853269984665640564039457584007913129639935p256
 
+    syntax MInt{256} ::= "ethp256" [macro]
+ // --------------------------------------
+    rule ethp256 => 1000000000000000000p256
+
     syntax Bool ::= #rangeNonceMInt256( MInt{256} ) [alias]
  // -------------------------------------------------------
     rule #rangeNonceMInt256(X) => 0p256 <=uMInt X andBool X <uMInt maxUInt64p256
@@ -114,6 +118,23 @@ We use 256-bit machine integers as our word data type.
     rule addmodMInt256Aux(W0, W1, W2) => Int2MInt((MInt2Unsigned(W0) +Int MInt2Unsigned(W1)) modInt MInt2Unsigned(W2))::MInt{256}
 
     rule mulmodMInt256Aux(W0, W1, W2) => Int2MInt((MInt2Unsigned(W0) *Int MInt2Unsigned(W1)) modInt MInt2Unsigned(W2))::MInt{256}
+
+    syntax MInt{256} ::= MInt{256} "up/MInt256" MInt{256} [function]
+ // ----------------------------------------------------------------
+    rule _I1 up/MInt256 0p256 => 0p256
+    rule  I1 up/MInt256 1p256 => I1
+    rule  I1 up/MInt256 I2    => (I1 +MInt (I2 -MInt 1p256)) /uMInt I2 requires 1p256 <uMInt I2
+
+    syntax MInt{256} ::= log256MInt256  ( MInt{256} )            [function]
+    syntax MInt{256} ::= log2MInt256    ( MInt{256} )            [function]
+    syntax MInt{256} ::= log2MInt256Aux ( MInt{256}, MInt{256} ) [function]
+ // -----------------------------------------------------------------------
+    rule log256MInt256(N) => log2MInt256(N) >>lMInt 3p256
+
+    rule log2MInt256(N) => log2MInt256Aux(N, 0p256)
+
+    rule log2MInt256Aux(N, Res) => Res requires N ==MInt 1p256
+    rule log2MInt256Aux(N, Res) => log2MInt256Aux(N >>lMInt 1p256, Res +MInt 1p256) requires N >uMInt 1p256
 ```
 
 Utilities

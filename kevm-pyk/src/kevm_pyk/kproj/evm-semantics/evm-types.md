@@ -99,6 +99,21 @@ We use 256-bit machine integers as our word data type.
     rule signextendMInt256(N, W) => W requires N >=uMInt 32p256
     rule signextendMInt256(N, W) => (#nBytesMInt256(31p256 -MInt N) <<MInt (8p256 *MInt (N +MInt 1p256))) |MInt W requires N <uMInt 32p256 andBool         mint2562Bool(bitMInt256(256p256 -MInt (8p256 *MInt (N +MInt 1p256)), W))
     rule signextendMInt256(N, W) => #nBytesMInt256(N +MInt 1p256)                                         &MInt W requires N <uMInt 32p256 andBool notBool mint2562Bool(bitMInt256(256p256 -MInt (8p256 *MInt (N +MInt 1p256)), W))
+
+    syntax MInt{256} ::= addmodMInt256   ( MInt{256} , MInt{256}, MInt{256} ) [function]
+    syntax MInt{256} ::= mulmodMInt256   ( MInt{256} , MInt{256}, MInt{256} ) [function]
+    syntax MInt{256} ::= addmodMInt256Aux( MInt{256} , MInt{256}, MInt{256} ) [function]
+    syntax MInt{256} ::= mulmodMInt256Aux( MInt{256} , MInt{256}, MInt{256} ) [function]
+ // ------------------------------------------------------------------------------------
+    rule addmodMInt256   ( _,  _, W2) => 0p256                                                                                                             requires W2 ==MInt 0p256
+    rule addmodMInt256   (W0, W1, W2) => #let ADDRES = W0 +MInt W1 #in #if ADDRES <uMInt W0 #then addmodMInt256Aux(W0, W1, W2)  #else ADDRES %uMInt W2 #fi requires W2 =/=MInt 0p256
+
+    rule mulmodMInt256   ( _,  _, W2) => 0p256                        requires W2 ==MInt 0p256
+    rule mulmodMInt256   (W0, W1, W2) => mulmodMInt256Aux(W0, W1, W2) requires W2 =/=MInt 0p256
+
+    rule addmodMInt256Aux(W0, W1, W2) => Int2MInt((MInt2Unsigned(W0) +Int MInt2Unsigned(W1)) modInt MInt2Unsigned(W2))::MInt{256}
+
+    rule mulmodMInt256Aux(W0, W1, W2) => Int2MInt((MInt2Unsigned(W0) *Int MInt2Unsigned(W1)) modInt MInt2Unsigned(W2))::MInt{256}
 ```
 
 Utilities

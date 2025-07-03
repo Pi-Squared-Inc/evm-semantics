@@ -608,10 +608,8 @@ NOTE: We have to call the opcode `OR` by `EVMOR` instead, because K has trouble 
 
     syntax TernStackOp ::= "ADDMOD" | "MULMOD"
  // ------------------------------------------
-    rule <k> ADDMOD  _  _ W2 => 0p256                   ~> #push ... </k> requires W2 ==MInt  0p256
-    rule <k> ADDMOD W0 W1 W2 => (W0 +MInt W1) %uMInt W2 ~> #push ... </k> requires W2 =/=MInt 0p256
-    rule <k> MULMOD  _  _ W2 => 0p256                   ~> #push ... </k> requires W2 ==MInt  0p256
-    rule <k> MULMOD W0 W1 W2 => (W0 *MInt W1) %uMInt W2 ~> #push ... </k> requires W2 =/=MInt 0p256
+    rule <k> ADDMOD W0 W1 W2 => addmodMInt256(W0, W1, W2) ~> #push ... </k>
+    rule <k> MULMOD W0 W1 W2 => mulmodMInt256(W0, W1, W2) ~> #push ... </k>
 
     syntax BinStackOp ::= "BYTE" | "SIGNEXTEND"
  // -------------------------------------------

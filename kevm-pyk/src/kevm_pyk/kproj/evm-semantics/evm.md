@@ -66,7 +66,7 @@ In the comments next to each cell, we've marked which component of the YellowPap
               <localMem>    .Bytes </localMem>            // \mu_m
               <pc>          0p256  </pc>                  // \mu_pc
               <gas>         $GAS:Gas </gas>               // \mau_g
-              <memoryUsed>  0      </memoryUsed>          // \mu_i
+              <memoryUsed>  0p256  </memoryUsed>          // \mu_i
               <callGas>     0:Gas  </callGas>
 
               <static>    $STATIC:Bool </static>
@@ -682,7 +682,7 @@ These operators make queries about the current execution state.
 
     syntax NullStackOp ::= "MSIZE" | "CODESIZE"
  // -------------------------------------------
-    rule <k> MSIZE    => 32p256 *MInt Int2MInt(MU)::MInt{256}   ~> #push ... </k> <memoryUsed> MU </memoryUsed>
+    rule <k> MSIZE    => 32p256 *MInt MU                        ~> #push ... </k> <memoryUsed> MU </memoryUsed>
     rule <k> CODESIZE => roundMInt(lengthBytes(PGM))::MInt{256} ~> #push ... </k> <program> PGM </program>
 
     syntax TernStackOp ::= "CODECOPY"
@@ -1006,7 +1006,7 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
  // --------------------------
     rule <k> #initVM      => .K ... </k>
          <pc>           _ => 0p256  </pc>
-         <memoryUsed>   _ => 0      </memoryUsed>
+         <memoryUsed>   _ => 0p256  </memoryUsed>
          <output>       _ => .Bytes </output>
          <wordStack>    _ => .List  </wordStack>
          <localMem>     _ => .Bytes </localMem>
@@ -1870,7 +1870,7 @@ Overall Gas
     syntax InternalOp ::= "#gas"    "[" OpCode "]" | "#deductGas" | "#deductMemoryGas"
                         | "#memory" "[" OpCode "," OpCode "]" | "#deductMemory"
  // ---------------------------------------------------------------------------
-    rule <k> MU':Int ~> #deductMemory => (Cmem(SCHED, MU') -Int Cmem(SCHED, MU)) ~> #deductMemoryGas ... </k>
+    rule <k> MU':MInt{256} ~> #deductMemory => (Cmem(SCHED, MU') -MInt Cmem(SCHED, MU)) ~> #deductMemoryGas ... </k>
          <memoryUsed> MU => MU' </memoryUsed> <schedule> SCHED </schedule>
 
     rule <k> _G:Gas ~> (#deductMemoryGas => #deductGas)   ... </k> //Required for verification
@@ -1901,28 +1901,28 @@ In the YellowPaper, each opcode is defined to consume zero gas unless specified 
 -   `#memoryUsageUpdate` is the function `M` in appendix H of the YellowPaper which helps track the memory used.
 
 ```k
-    syntax Int ::= #memory ( OpCode , Int ) [symbol(#memory), function, total]
- // --------------------------------------------------------------------------
-    rule #memory ( MLOAD INDEX        , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(INDEX), 32)
-    rule #memory ( MSTORE INDEX _     , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(INDEX), 32)
-    rule #memory ( MSTORE8 INDEX _    , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(INDEX), 1)
-    rule #memory ( MCOPY DST SRC WIDTH, MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(uMaxMInt(DST, SRC)), MInt2Unsigned(WIDTH))
+    syntax MInt{256} ::= #memory ( OpCode , MInt{256} ) [symbol(#memory), function, total]
+ // --------------------------------------------------------------------------------------
+    rule #memory ( MLOAD INDEX        , MU ) => #memoryUsageUpdate(MU, INDEX, 32p256)
+    rule #memory ( MSTORE INDEX _     , MU ) => #memoryUsageUpdate(MU, INDEX, 32p256)
+    rule #memory ( MSTORE8 INDEX _    , MU ) => #memoryUsageUpdate(MU, INDEX, 1p256)
+    rule #memory ( MCOPY DST SRC WIDTH, MU ) => #memoryUsageUpdate(MU, uMaxMInt(DST, SRC), WIDTH)
 
-    rule #memory ( SHA3 START WIDTH   , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
-    rule #memory ( LOG(_) START WIDTH , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
+    rule #memory ( SHA3 START WIDTH   , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
+    rule #memory ( LOG(_) START WIDTH , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
 
-    rule #memory ( CODECOPY START _ WIDTH       , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
-    rule #memory ( EXTCODECOPY _ START _ WIDTH  , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
-    rule #memory ( CALLDATACOPY START _ WIDTH   , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
-    rule #memory ( RETURNDATACOPY START _ WIDTH , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
+    rule #memory ( CODECOPY START _ WIDTH       , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
+    rule #memory ( EXTCODECOPY _ START _ WIDTH  , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
+    rule #memory ( CALLDATACOPY START _ WIDTH   , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
+    rule #memory ( RETURNDATACOPY START _ WIDTH , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
 
-    rule #memory ( CREATE  _ START WIDTH   , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
-    rule #memory ( CREATE2 _ START WIDTH _ , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
-    rule #memory ( RETURN START WIDTH      , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
-    rule #memory ( REVERT START WIDTH      , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
+    rule #memory ( CREATE  _ START WIDTH   , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
+    rule #memory ( CREATE2 _ START WIDTH _ , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
+    rule #memory ( RETURN START WIDTH      , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
+    rule #memory ( REVERT START WIDTH      , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
 
-    rule #memory ( _COP:CallOp     _ _ _ ARGSTART ARGWIDTH RETSTART RETWIDTH , MU ) => #memoryUsageUpdate(#memoryUsageUpdate(MU, MInt2Unsigned(ARGSTART), MInt2Unsigned(ARGWIDTH)), MInt2Unsigned(RETSTART), MInt2Unsigned(RETWIDTH))
-    rule #memory ( _CSOP:CallSixOp _ _   ARGSTART ARGWIDTH RETSTART RETWIDTH , MU ) => #memoryUsageUpdate(#memoryUsageUpdate(MU, MInt2Unsigned(ARGSTART), MInt2Unsigned(ARGWIDTH)), MInt2Unsigned(RETSTART), MInt2Unsigned(RETWIDTH))
+    rule #memory ( _COP:CallOp     _ _ _ ARGSTART ARGWIDTH RETSTART RETWIDTH , MU ) => #memoryUsageUpdate(#memoryUsageUpdate(MU, ARGSTART, ARGWIDTH), RETSTART, RETWIDTH)
+    rule #memory ( _CSOP:CallSixOp _ _   ARGSTART ARGWIDTH RETSTART RETWIDTH , MU ) => #memoryUsageUpdate(#memoryUsageUpdate(MU, ARGSTART, ARGWIDTH), RETSTART, RETWIDTH)
 
     rule #memory ( _ , MU ) => MU [owise]
 
@@ -1946,10 +1946,10 @@ In the YellowPaper, each opcode is defined to consume zero gas unless specified 
     rule #usesMemory(MCOPY)          => true
     rule #usesMemory(_)              => false [owise]
 
-    syntax Int ::= #memoryUsageUpdate ( Int , Int , Int ) [symbol(#memoryUsageUpdate), function, total]
- // ---------------------------------------------------------------------------------------------------
-    rule #memoryUsageUpdate(MU,     _, WIDTH) => MU                                       requires notBool 0 <Int WIDTH [concrete]
-    rule #memoryUsageUpdate(MU, START, WIDTH) => maxInt(MU, (START +Int WIDTH) up/Int 32) requires         0 <Int WIDTH [concrete]
+    syntax MInt{256} ::= #memoryUsageUpdate ( MInt{256} , MInt{256} , MInt{256} ) [symbol(#memoryUsageUpdate), function, total]
+ // ---------------------------------------------------------------------------------------------------------------------------
+    rule #memoryUsageUpdate(MU,     _, WIDTH) => MU                                                  requires notBool 0 <uMInt WIDTH [concrete]
+    rule #memoryUsageUpdate(MU, START, WIDTH) => uMaxMInt(MU, (START +MInt WIDTH) up/MInt256 32p256) requires         0 <uMInt WIDTH [concrete]
 ```
 
 Access List Gas
@@ -1984,14 +1984,14 @@ Access List Gas
 
     syntax InternalOp ::= #gasAccess ( Schedule, OpCode, Bool ) [symbol(#gasAccess)]
  // --------------------------------------------------------------------------
-    rule <k> #gasAccess(SCHED, EXTCODESIZE _ACCT, ACCESS)       => Caddraccess(SCHED, ACCESS)                                ... </k>
-    rule <k> #gasAccess(SCHED, EXTCODECOPY _ACCT _ _ _, ACCESS) => Caddraccess(SCHED, ACCESS)                                ... </k>
-    rule <k> #gasAccess(SCHED, EXTCODEHASH _ACCT, ACCESS)       => Caddraccess(SCHED, ACCESS)                                ... </k>
-    rule <k> #gasAccess(SCHED, BALANCE _ACCT, ACCESS)           => Caddraccess(SCHED, ACCESS)                                ... </k>
-    rule <k> #gasAccess(SCHED, SELFDESTRUCT _ACCT, ACCESS)      => #if ACCESS #then 0 #else Gcoldaccountaccess < SCHED > #fi ... </k>
-    rule <k> #gasAccess(_    , SLOAD _, _ACCESS)                => 0                                                         ... </k>
-    rule <k> #gasAccess(SCHED, SSTORE _INDEX _, ACCESS)         => #if ACCESS #then 0 #else Gcoldsload < SCHED > #fi         ... </k>
-    rule <k> #gasAccess(_    , _, _ACCESS)                      => 0                                                         ... </k> [owise]
+    rule <k> #gasAccess(SCHED, EXTCODESIZE _ACCT, ACCESS)       => Caddraccess(SCHED, ACCESS)                                    ... </k>
+    rule <k> #gasAccess(SCHED, EXTCODECOPY _ACCT _ _ _, ACCESS) => Caddraccess(SCHED, ACCESS)                                    ... </k>
+    rule <k> #gasAccess(SCHED, EXTCODEHASH _ACCT, ACCESS)       => Caddraccess(SCHED, ACCESS)                                    ... </k>
+    rule <k> #gasAccess(SCHED, BALANCE _ACCT, ACCESS)           => Caddraccess(SCHED, ACCESS)                                    ... </k>
+    rule <k> #gasAccess(SCHED, SELFDESTRUCT _ACCT, ACCESS)      => #if ACCESS #then 0p256 #else Gcoldaccountaccess < SCHED > #fi ... </k>
+    rule <k> #gasAccess(_    , SLOAD _, _ACCESS)                => 0p256                                                         ... </k>
+    rule <k> #gasAccess(SCHED, SSTORE _INDEX _, ACCESS)         => #if ACCESS #then 0p256 #else Gcoldsload < SCHED > #fi         ... </k>
+    rule <k> #gasAccess(_    , _, _ACCESS)                      => 0p256                                                         ... </k> [owise]
 
 ```
 
@@ -2011,7 +2011,7 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
     rule <k> #gasExec(SCHED, TLOAD _   ) => Gwarmstorageread < SCHED > ... </k>
     rule <k> #gasExec(SCHED, TSTORE _ _) => Gwarmstoragedirtystore < SCHED > ... </k>
 
-    rule <k> #gasExec(SCHED, SSTORE INDEX NEW) => Csstore(SCHED, MInt2Unsigned(NEW), MInt2Unsigned(unwrapEvmWord(GetAccountStorage(EvmWord(ACCT), EvmWord(INDEX)))), MInt2Unsigned(unwrapEvmWord(GetAccountOrigStorage(EvmWord(ACCT), EvmWord(INDEX))))) ... </k>
+    rule <k> #gasExec(SCHED, SSTORE INDEX NEW) => Csstore(SCHED, NEW, unwrapEvmWord(GetAccountStorage(EvmWord(ACCT), EvmWord(INDEX))), unwrapEvmWord(GetAccountOrigStorage(EvmWord(ACCT), EvmWord(INDEX)))) ... </k>
          <id> ACCT </id>
          <gas> GAVAIL </gas>
       requires notBool Ghassstorestipend << SCHED >>
@@ -2022,15 +2022,15 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
       requires Ghassstorestipend << SCHED >>
        andBool GAVAIL <=Gas Gcallstipend < SCHED >
 
-    rule <k> #gasExec(SCHED, EXP _ W1) => Gexp < SCHED > ... </k>                                                                        requires MInt2Unsigned(W1) <=Int 0
-    rule <k> #gasExec(SCHED, EXP _ W1) => Gexp < SCHED > +Int (Gexpbyte < SCHED > *Int (1 +Int (log256Int(MInt2Unsigned(W1))))) ... </k> requires 0 <Int MInt2Unsigned(W1) [preserves-definedness]
+    rule <k> #gasExec(SCHED, EXP _ W1) => Gexp < SCHED > ... </k>                                                                    requires W1 ==MInt 0p256
+    rule <k> #gasExec(SCHED, EXP _ W1) => Gexp < SCHED > +MInt (Gexpbyte < SCHED > *MInt (1p256 +MInt (log256MInt256(W1)))) ... </k> requires 0p256 <uMInt W1 [preserves-definedness]
 
-    rule <k> #gasExec(SCHED, CALLDATACOPY    _ _ WIDTH) => Gverylow < SCHED > +Int (Gcopy < SCHED > *Int (MInt2Unsigned(WIDTH) up/Int 32)) ... </k>
-    rule <k> #gasExec(SCHED, RETURNDATACOPY  _ _ WIDTH) => Gverylow < SCHED > +Int (Gcopy < SCHED > *Int (MInt2Unsigned(WIDTH) up/Int 32)) ... </k>
-    rule <k> #gasExec(SCHED, CODECOPY        _ _ WIDTH) => Gverylow < SCHED > +Int (Gcopy < SCHED > *Int (MInt2Unsigned(WIDTH) up/Int 32)) ... </k>
-    rule <k> #gasExec(SCHED, MCOPY           _ _ WIDTH) => Gverylow < SCHED > +Int (Gcopy < SCHED > *Int (MInt2Unsigned(WIDTH) up/Int 32)) ... </k>
+    rule <k> #gasExec(SCHED, CALLDATACOPY    _ _ WIDTH) => Gverylow < SCHED > +MInt (Gcopy < SCHED > *MInt (WIDTH up/MInt256 32p256)) ... </k>
+    rule <k> #gasExec(SCHED, RETURNDATACOPY  _ _ WIDTH) => Gverylow < SCHED > +MInt (Gcopy < SCHED > *MInt (WIDTH up/MInt256 32p256)) ... </k>
+    rule <k> #gasExec(SCHED, CODECOPY        _ _ WIDTH) => Gverylow < SCHED > +MInt (Gcopy < SCHED > *MInt (WIDTH up/MInt256 32p256)) ... </k>
+    rule <k> #gasExec(SCHED, MCOPY           _ _ WIDTH) => Gverylow < SCHED > +MInt (Gcopy < SCHED > *MInt (WIDTH up/MInt256 32p256)) ... </k>
 
-    rule <k> #gasExec(SCHED, LOG(N) _ WIDTH) => (Glog < SCHED > +Int (Glogdata < SCHED > *Int MInt2Unsigned(WIDTH)) +Int (N *Int Glogtopic < SCHED >)) ... </k>
+    rule <k> #gasExec(SCHED, LOG(N) _ WIDTH) => (Glog < SCHED > +MInt (Glogdata < SCHED > *MInt WIDTH) +MInt (Int2MInt(N)::MInt{256} *MInt Glogtopic < SCHED >)) ... </k>
 
     syntax Exp ::= #handleCallGas(Schedule, acctNonExistent: BExp, cap: Gas, avail: Gas, value: Int, acct:Int, AccountInfo)  [strict(2)]
  // ------------------------------------------------------------------------------------------------------------------------------------

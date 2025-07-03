@@ -79,7 +79,7 @@ For symbolic execution, we create an additional cell, to capture the
 side-effects of impure hooks.
 
 ```symbolic
-        <symbolicWorldState> .SymbolicWorldState </symbolicWorldState>
+        <symbolicWorldState> .K </symbolicWorldState>
 
     rule <k> WS:SymbolicWorldState => .K ... </k>
          <symbolicWorldState> .K => WS ... </symbolicWorldState>

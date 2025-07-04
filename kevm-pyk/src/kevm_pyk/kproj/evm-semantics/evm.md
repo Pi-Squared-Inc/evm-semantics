@@ -206,7 +206,7 @@ OpCode Execution
 
     syntax MaybeOpCode ::= "#lookupOpCode" "(" Bytes "," MInt{64} "," Schedule ")" [function, total]
  // -------------------------------------------------------------------------------------------
-    rule #lookupOpCode(BA, I, SCHED) => #dasmOpCode(BA[I], SCHED) requires 0p64 <=uMInt I andBool I <uMInt lengthBytes(BA)
+    rule #lookupOpCode(BA, I, SCHED) => #dasmOpCode(MInt2Unsigned(BA[I]), SCHED) requires 0p64 <=uMInt I andBool I <uMInt lengthBytes(BA)
     rule #lookupOpCode(_, _, _)  => .NoOpCode [owise]
 ```
 

@@ -14,6 +14,9 @@ module EVM-TYPES
     imports K-EQUAL
     imports JSON
     imports WORD
+    imports MINT
+
+    syntax MInt{64}
 ```
 
 Utilities
@@ -365,10 +368,16 @@ Bytes helper functions
     rule #asByteStack(W) => Int2Bytes(W, BE, Unsigned) [concrete]
 
     syntax Bytes ::= #range ( Bytes , Int , Int ) [symbol(#range), function, total]
+                   | #range64 ( Bytes , MInt{64} , MInt{64} ) [symbol(#range64), function, total]
  // -------------------------------------------------------------------------------
     rule                #range(_, START, WIDTH)  => .Bytes                                                                       requires notBool (WIDTH >=Int 0 andBool START >=Int 0) [concrete]
     rule [bytesRange] : #range(WS, START, WIDTH) => substrBytes(padRightBytes(WS, START +Int WIDTH, 0), START, START +Int WIDTH) requires WIDTH >=Int 0 andBool START >=Int 0 andBool START <Int lengthBytes(WS) [concrete]
     rule                #range(_, _, WIDTH)      => padRightBytes(.Bytes, WIDTH, 0) [owise, concrete]
+
+    rule                  #range64(_, START, WIDTH)  => .Bytes                                                                            requires notBool (WIDTH >=uMInt 0p64 andBool START >=uMInt 0p64) [concrete]
+    rule [bytesRange64] : #range64(WS, START, WIDTH) => substrBytes(padRightBytes(WS, START +MInt WIDTH, 0p64), START, START +MInt WIDTH) requires WIDTH >=uMInt 0p64 andBool START >=uMInt 0p64 andBool START <uMInt lengthBytes(WS) [concrete]  
+    rule                  #range64(_, _, WIDTH)      => padRightBytes(.Bytes, WIDTH, 0p64) [owise, concrete]                                          
+
 
     syntax Bytes ::= #padToWidth      ( Int , Bytes ) [symbol(#padToWidth), function, total]
                    | #padRightToWidth ( Int , Bytes ) [symbol(#padRightToWidth), function, total]

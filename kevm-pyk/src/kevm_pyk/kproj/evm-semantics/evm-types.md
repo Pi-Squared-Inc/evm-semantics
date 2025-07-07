@@ -52,15 +52,15 @@ We use 256-bit machine integers as our word data type.
     syntax Bytes ::= "#writeMInt256" "(" Bytes "," MInt{256} "," MInt{256} ")" [function]
                    | Bytes "[" MInt{256} ":=MInt256" Bytes "]"                 [function]
  // -------------------------------------------------------------------------------------
-    rule #writeMInt256(WM, IDX, VAL) => padRightBytes(WM, roundMInt(IDX)::MInt{64} +MInt 1p64, 0p64) [ roundMInt(IDX)::MInt{64} <- roundMInt(VAL)::MInt{64} ]
+    rule #writeMInt256(WM, IDX, VAL) => #let BYTES = padRightBytes(WM, (IDX) +MInt 1p256, 0p256) #in BYTES[ IDX <- VAL ]
 
-    rule WS [ _     :=MInt256 WS' ] => WS                                                                                                                          requires lengthBytes(WS')  ==Int 0
-    rule WS [ START :=MInt256 WS' ] => replaceAtBytes(padRightBytes(WS, roundMInt(START)::MInt{64} +MInt lengthBytes(WS'), 0p64), roundMInt(START)::MInt{64}, WS') requires lengthBytes(WS') =/=Int 0
+    rule WS [ _     :=MInt256 WS' ] => WS                                                                                    requires lengthBytes(WS')  ==Int 0
+    rule WS [ START :=MInt256 WS' ] => replaceAtBytes(padRightBytes(WS, (START) +MInt lengthBytes(WS'), 0p256), (START), WS') requires lengthBytes(WS') =/=Int 0
 
     syntax Bytes ::= #rangeMInt256 ( Bytes , MInt{256} , MInt{256} ) [function]
  // ---------------------------------------------------------------------------
-    rule #rangeMInt256(WS, START, WIDTH) => substrBytes(padRightBytes(WS, roundMInt(START)::MInt{64} +MInt roundMInt(WIDTH)::MInt{64}, 0p64), roundMInt(START)::MInt{64}, roundMInt(START)::MInt{64} +MInt roundMInt(WIDTH)::MInt{64}) requires START <uMInt roundMInt(lengthBytes(WS))::MInt{256}
-    rule #rangeMInt256( _,     _, WIDTH) => padRightBytes(.Bytes, roundMInt(WIDTH)::MInt{64}, 0p64) [owise]
+    rule #rangeMInt256(WS, START, WIDTH) => substrBytes(padRightBytes(WS, (START) +MInt (WIDTH), 0p256), START, START +MInt WIDTH) requires START <uMInt lengthBytes(WS)
+    rule #rangeMInt256( _,     _, WIDTH) => padRightBytes(.Bytes, WIDTH, 0p256) [owise]
 
     syntax MInt{256} ::= bool2MInt256 ( Bool ) [function]
  // -----------------------------------------------------

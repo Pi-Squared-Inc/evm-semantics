@@ -206,7 +206,7 @@ OpCode Execution
     syntax MaybeOpCode ::= "#lookupOpCode" "(" Bytes "," MInt{256} "," Schedule ")" [function, total]
  // -------------------------------------------------------------------------------------------------
     //rule #lookupOpCode(BA, I, SCHED) => #let _ = #log("look up ocode at " +String Int2String(MInt2Unsigned(I)) +String " : " +String Int2String(MInt2Unsigned(BA[roundMInt(I)::MInt{64}]::MInt{64}))) #in #let _ = #log("look up opcode at " +String Int2String(MInt2Unsigned(roundMInt(I)::MInt{64})) +String " : " +String opcode2String(#dasmOpCode(BA[roundMInt(I)::MInt{64}]::MInt{64}, SCHED))) #in #dasmOpCode(BA[roundMInt(I)::MInt{64}]::MInt{64}, SCHED) requires 0p256 <=uMInt I andBool I <uMInt roundMInt(lengthBytes(BA))::MInt{256}
-    rule #lookupOpCode(BA, I, SCHED) => #dasmOpCode(BA[roundMInt(I)::MInt{64}]::MInt{64}, SCHED) requires 0p256 <=uMInt I andBool I <uMInt roundMInt(lengthBytes(BA))::MInt{256}
+    rule #lookupOpCode(BA, I, SCHED) => #dasmOpCode(BA[I], SCHED) requires 0p256 <=uMInt I andBool I <uMInt lengthBytes(BA)
     rule #lookupOpCode(_, _, _)  => .NoOpCode [owise]
 ```
 
@@ -683,7 +683,7 @@ These operators make queries about the current execution state.
     syntax NullStackOp ::= "MSIZE" | "CODESIZE"
  // -------------------------------------------
     rule <k> MSIZE    => 32p256 *MInt Int2MInt(MU)::MInt{256}   ~> #push ... </k> <memoryUsed> MU </memoryUsed>
-    rule <k> CODESIZE => roundMInt(lengthBytes(PGM))::MInt{256} ~> #push ... </k> <program> PGM </program>
+    rule <k> CODESIZE => lengthBytes(PGM)::MInt{256} ~> #push ... </k> <program> PGM </program>
 
     syntax TernStackOp ::= "CODECOPY"
  // ---------------------------------
@@ -730,7 +730,7 @@ The `JUMP*` family of operations affect the current program counter.
          <k> JUMP DEST => #endBasicBlock ... </k>
          <pc> _ => DEST </pc>
          <jumpDests> DESTS </jumpDests>
-      requires DEST <uMInt roundMInt(lengthBytes(DESTS))::MInt{256} andBool DESTS[roundMInt(DEST)::MInt{64}]::MInt{64} ==MInt 1p64
+      requires DEST <uMInt lengthBytes(DESTS)::MInt{256} andBool DESTS[DEST] ==MInt 1p256
 
     rule <k> JUMP _ => #end EVMC_BAD_JUMP_DESTINATION ... </k> [owise]
 
@@ -773,7 +773,7 @@ These operators query about the current `CALL*` state.
 ```k
     syntax NullStackOp ::= "CALLDATASIZE"
  // -------------------------------------
-   rule <k> CALLDATASIZE => roundMInt(lengthBytes(CD))::MInt{256} ~> #push ... </k>
+   rule <k> CALLDATASIZE => lengthBytes(CD)::MInt{256} ~> #push ... </k>
          <callData> CD </callData>
 
     syntax UnStackOp ::= "CALLDATALOAD"
@@ -795,7 +795,7 @@ These operators query about the current return data buffer.
 ```k
     syntax NullStackOp ::= "RETURNDATASIZE"
  // ---------------------------------------
-    rule <k> RETURNDATASIZE => roundMInt(lengthBytes(RD))::MInt{256} ~> #push ... </k>
+    rule <k> RETURNDATASIZE => lengthBytes(RD)::MInt{256} ~> #push ... </k>
          <output> RD </output>
 
     syntax TernStackOp ::= "RETURNDATACOPY"
@@ -803,11 +803,11 @@ These operators query about the current return data buffer.
     rule <k> RETURNDATACOPY MEMSTART DATASTART DATAWIDTH => .K ... </k>
          <localMem> LM => LM [ MEMSTART :=MInt256 #rangeMInt256(RD, DATASTART, DATAWIDTH) ] </localMem>
          <output> RD </output>
-      requires DATASTART +MInt DATAWIDTH <=uMInt (roundMInt(lengthBytes(RD))::MInt{256})
+      requires DATASTART +MInt DATAWIDTH <=uMInt (lengthBytes(RD)::MInt{256})
 
     rule <k> RETURNDATACOPY _MEMSTART DATASTART DATAWIDTH => #end EVMC_INVALID_MEMORY_ACCESS ... </k>
          <output> RD </output>
-      requires DATASTART +MInt DATAWIDTH >uMInt (roundMInt(lengthBytes(RD))::MInt{256})
+      requires DATASTART +MInt DATAWIDTH >uMInt (lengthBytes(RD)::MInt{256})
 ```
 
 ### Log Operations
@@ -851,7 +851,7 @@ Operators that require access to the rest of the Ethereum network world-state ca
 
     syntax UnStackOp ::= "EXTCODESIZE"
  // ----------------------------------
-    rule <k> EXTCODESIZE ACCT => roundMInt(lengthBytes(GetAccountCode(EvmWord(ACCT))))::MInt{256} ~> #push ... </k>
+    rule <k> EXTCODESIZE ACCT => lengthBytes(GetAccountCode(EvmWord(ACCT)))::MInt{256} ~> #push ... </k>
 
     syntax UnStackOp ::= "EXTCODEHASH"
  // ----------------------------------
@@ -1063,7 +1063,7 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
 
 
     rule <k> #setLocalMem START WIDTH WS => .K ... </k>
-         <localMem> LM => LM [ START :=MInt256 #rangeMInt256(WS, 0p256, uMinMInt(WIDTH, roundMInt(lengthBytes(WS))::MInt{256})) ] </localMem>
+         <localMem> LM => LM [ START :=MInt256 #rangeMInt256(WS, 0p256, uMinMInt(WIDTH, lengthBytes(WS)::MInt{256})) ] </localMem>
 ```
 
 Ethereum Network OpCodes
@@ -2260,158 +2260,158 @@ After interpreting the strings representing programs as a `WordStack`, it should
 -   `#dasmOpCode` interprets a `Int` as an `OpCode`.
 
 ```k
-    syntax OpCode ::= #dasmOpCode ( MInt{64} , Schedule ) [symbol(#dasmOpCode), function, memo, total]
+    syntax OpCode ::= #dasmOpCode ( MInt{256} , Schedule ) [symbol(#dasmOpCode), function, memo, total]
  // --------------------------------------------------------------------------------------------------
-    rule #dasmOpCode(   0p64,     _ ) => STOP
-    rule #dasmOpCode(   1p64,     _ ) => ADD
-    rule #dasmOpCode(   2p64,     _ ) => MUL
-    rule #dasmOpCode(   3p64,     _ ) => SUB
-    rule #dasmOpCode(   4p64,     _ ) => DIV
-    rule #dasmOpCode(   5p64,     _ ) => SDIV
-    rule #dasmOpCode(   6p64,     _ ) => MOD
-    rule #dasmOpCode(   7p64,     _ ) => SMOD
-    rule #dasmOpCode(   8p64,     _ ) => ADDMOD
-    rule #dasmOpCode(   9p64,     _ ) => MULMOD
-    rule #dasmOpCode(  10p64,     _ ) => EXP
-    rule #dasmOpCode(  11p64,     _ ) => SIGNEXTEND
-    rule #dasmOpCode(  16p64,     _ ) => LT
-    rule #dasmOpCode(  17p64,     _ ) => GT
-    rule #dasmOpCode(  18p64,     _ ) => SLT
-    rule #dasmOpCode(  19p64,     _ ) => SGT
-    rule #dasmOpCode(  20p64,     _ ) => EQ
-    rule #dasmOpCode(  21p64,     _ ) => ISZERO
-    rule #dasmOpCode(  22p64,     _ ) => AND
-    rule #dasmOpCode(  23p64,     _ ) => EVMOR
-    rule #dasmOpCode(  24p64,     _ ) => XOR
-    rule #dasmOpCode(  25p64,     _ ) => NOT
-    rule #dasmOpCode(  26p64,     _ ) => BYTE
-    rule #dasmOpCode(  27p64, SCHED ) => SHL requires Ghasshift << SCHED >>
-    rule #dasmOpCode(  28p64, SCHED ) => SHR requires Ghasshift << SCHED >>
-    rule #dasmOpCode(  29p64, SCHED ) => SAR requires Ghasshift << SCHED >>
-    rule #dasmOpCode(  32p64,     _ ) => SHA3
-    rule #dasmOpCode(  48p64,     _ ) => ADDRESS
-    rule #dasmOpCode(  49p64,     _ ) => BALANCE
-    rule #dasmOpCode(  50p64,     _ ) => ORIGIN
-    rule #dasmOpCode(  51p64,     _ ) => CALLER
-    rule #dasmOpCode(  52p64,     _ ) => CALLVALUE
-    rule #dasmOpCode(  53p64,     _ ) => CALLDATALOAD
-    rule #dasmOpCode(  54p64,     _ ) => CALLDATASIZE
-    rule #dasmOpCode(  55p64,     _ ) => CALLDATACOPY
-    rule #dasmOpCode(  56p64,     _ ) => CODESIZE
-    rule #dasmOpCode(  57p64,     _ ) => CODECOPY
-    rule #dasmOpCode(  58p64,     _ ) => GASPRICE
-    rule #dasmOpCode(  59p64,     _ ) => EXTCODESIZE
-    rule #dasmOpCode(  60p64,     _ ) => EXTCODECOPY
-    rule #dasmOpCode(  61p64, SCHED ) => RETURNDATASIZE requires Ghasreturndata  << SCHED >>
-    rule #dasmOpCode(  62p64, SCHED ) => RETURNDATACOPY requires Ghasreturndata  << SCHED >>
-    rule #dasmOpCode(  63p64, SCHED ) => EXTCODEHASH    requires Ghasextcodehash << SCHED >>
-    rule #dasmOpCode(  64p64,     _ ) => BLOCKHASH
-    rule #dasmOpCode(  65p64,     _ ) => COINBASE
-    rule #dasmOpCode(  66p64,     _ ) => TIMESTAMP
-    rule #dasmOpCode(  67p64,     _ ) => NUMBER
-    rule #dasmOpCode(  68p64, SCHED ) => PREVRANDAO  requires         Ghasprevrandao << SCHED >>
-    rule #dasmOpCode(  68p64, SCHED ) => DIFFICULTY  requires notBool Ghasprevrandao << SCHED >>
-    rule #dasmOpCode(  69p64,     _ ) => GASLIMIT
-    rule #dasmOpCode(  70p64, SCHED ) => CHAINID     requires Ghaschainid     << SCHED >>
-    rule #dasmOpCode(  71p64, SCHED ) => SELFBALANCE requires Ghasselfbalance << SCHED >>
-    rule #dasmOpCode(  72p64, SCHED ) => BASEFEE     requires Ghasbasefee     << SCHED >>
-    rule #dasmOpCode(  73p64, SCHED ) => BLOBHASH    requires Ghasblobhash    << SCHED >>
-    rule #dasmOpCode(  74p64, SCHED ) => BLOBBASEFEE requires Ghasblobbasefee << SCHED >>
-    rule #dasmOpCode(  80p64,     _ ) => POP
-    rule #dasmOpCode(  81p64,     _ ) => MLOAD
-    rule #dasmOpCode(  82p64,     _ ) => MSTORE
-    rule #dasmOpCode(  83p64,     _ ) => MSTORE8
-    rule #dasmOpCode(  84p64,     _ ) => SLOAD
-    rule #dasmOpCode(  85p64,     _ ) => SSTORE
-    rule #dasmOpCode(  86p64,     _ ) => JUMP
-    rule #dasmOpCode(  87p64,     _ ) => JUMPI
-    rule #dasmOpCode(  88p64,     _ ) => PC
-    rule #dasmOpCode(  89p64,     _ ) => MSIZE
-    rule #dasmOpCode(  90p64,     _ ) => GAS
-    rule #dasmOpCode(  91p64,     _ ) => JUMPDEST
-    rule #dasmOpCode(  92p64, SCHED ) => TLOAD    requires Ghastransient << SCHED >>
-    rule #dasmOpCode(  93p64, SCHED ) => TSTORE   requires Ghastransient << SCHED >>
-    rule #dasmOpCode(  94p64, SCHED ) => MCOPY    requires Ghasmcopy     << SCHED >>
-    rule #dasmOpCode(  95p64, SCHED ) => PUSHZERO requires Ghaspushzero  << SCHED >>
-    rule #dasmOpCode(  96p64,     _ ) => PUSH(1)
-    rule #dasmOpCode(  97p64,     _ ) => PUSH(2)
-    rule #dasmOpCode(  98p64,     _ ) => PUSH(3)
-    rule #dasmOpCode(  99p64,     _ ) => PUSH(4)
-    rule #dasmOpCode( 100p64,     _ ) => PUSH(5)
-    rule #dasmOpCode( 101p64,     _ ) => PUSH(6)
-    rule #dasmOpCode( 102p64,     _ ) => PUSH(7)
-    rule #dasmOpCode( 103p64,     _ ) => PUSH(8)
-    rule #dasmOpCode( 104p64,     _ ) => PUSH(9)
-    rule #dasmOpCode( 105p64,     _ ) => PUSH(10)
-    rule #dasmOpCode( 106p64,     _ ) => PUSH(11)
-    rule #dasmOpCode( 107p64,     _ ) => PUSH(12)
-    rule #dasmOpCode( 108p64,     _ ) => PUSH(13)
-    rule #dasmOpCode( 109p64,     _ ) => PUSH(14)
-    rule #dasmOpCode( 110p64,     _ ) => PUSH(15)
-    rule #dasmOpCode( 111p64,     _ ) => PUSH(16)
-    rule #dasmOpCode( 112p64,     _ ) => PUSH(17)
-    rule #dasmOpCode( 113p64,     _ ) => PUSH(18)
-    rule #dasmOpCode( 114p64,     _ ) => PUSH(19)
-    rule #dasmOpCode( 115p64,     _ ) => PUSH(20)
-    rule #dasmOpCode( 116p64,     _ ) => PUSH(21)
-    rule #dasmOpCode( 117p64,     _ ) => PUSH(22)
-    rule #dasmOpCode( 118p64,     _ ) => PUSH(23)
-    rule #dasmOpCode( 119p64,     _ ) => PUSH(24)
-    rule #dasmOpCode( 120p64,     _ ) => PUSH(25)
-    rule #dasmOpCode( 121p64,     _ ) => PUSH(26)
-    rule #dasmOpCode( 122p64,     _ ) => PUSH(27)
-    rule #dasmOpCode( 123p64,     _ ) => PUSH(28)
-    rule #dasmOpCode( 124p64,     _ ) => PUSH(29)
-    rule #dasmOpCode( 125p64,     _ ) => PUSH(30)
-    rule #dasmOpCode( 126p64,     _ ) => PUSH(31)
-    rule #dasmOpCode( 127p64,     _ ) => PUSH(32)
-    rule #dasmOpCode( 128p64,     _ ) => DUP(1)
-    rule #dasmOpCode( 129p64,     _ ) => DUP(2)
-    rule #dasmOpCode( 130p64,     _ ) => DUP(3)
-    rule #dasmOpCode( 131p64,     _ ) => DUP(4)
-    rule #dasmOpCode( 132p64,     _ ) => DUP(5)
-    rule #dasmOpCode( 133p64,     _ ) => DUP(6)
-    rule #dasmOpCode( 134p64,     _ ) => DUP(7)
-    rule #dasmOpCode( 135p64,     _ ) => DUP(8)
-    rule #dasmOpCode( 136p64,     _ ) => DUP(9)
-    rule #dasmOpCode( 137p64,     _ ) => DUP(10)
-    rule #dasmOpCode( 138p64,     _ ) => DUP(11)
-    rule #dasmOpCode( 139p64,     _ ) => DUP(12)
-    rule #dasmOpCode( 140p64,     _ ) => DUP(13)
-    rule #dasmOpCode( 141p64,     _ ) => DUP(14)
-    rule #dasmOpCode( 142p64,     _ ) => DUP(15)
-    rule #dasmOpCode( 143p64,     _ ) => DUP(16)
-    rule #dasmOpCode( 144p64,     _ ) => SWAP(1)
-    rule #dasmOpCode( 145p64,     _ ) => SWAP(2)
-    rule #dasmOpCode( 146p64,     _ ) => SWAP(3)
-    rule #dasmOpCode( 147p64,     _ ) => SWAP(4)
-    rule #dasmOpCode( 148p64,     _ ) => SWAP(5)
-    rule #dasmOpCode( 149p64,     _ ) => SWAP(6)
-    rule #dasmOpCode( 150p64,     _ ) => SWAP(7)
-    rule #dasmOpCode( 151p64,     _ ) => SWAP(8)
-    rule #dasmOpCode( 152p64,     _ ) => SWAP(9)
-    rule #dasmOpCode( 153p64,     _ ) => SWAP(10)
-    rule #dasmOpCode( 154p64,     _ ) => SWAP(11)
-    rule #dasmOpCode( 155p64,     _ ) => SWAP(12)
-    rule #dasmOpCode( 156p64,     _ ) => SWAP(13)
-    rule #dasmOpCode( 157p64,     _ ) => SWAP(14)
-    rule #dasmOpCode( 158p64,     _ ) => SWAP(15)
-    rule #dasmOpCode( 159p64,     _ ) => SWAP(16)
-    rule #dasmOpCode( 160p64,     _ ) => LOG(0)
-    rule #dasmOpCode( 161p64,     _ ) => LOG(1)
-    rule #dasmOpCode( 162p64,     _ ) => LOG(2)
-    rule #dasmOpCode( 163p64,     _ ) => LOG(3)
-    rule #dasmOpCode( 164p64,     _ ) => LOG(4)
-    rule #dasmOpCode( 240p64,     _ ) => CREATE
-    rule #dasmOpCode( 241p64,     _ ) => CALL
-    rule #dasmOpCode( 242p64,     _ ) => CALLCODE
-    rule #dasmOpCode( 243p64,     _ ) => RETURN
-    rule #dasmOpCode( 244p64, SCHED ) => DELEGATECALL requires SCHED =/=K FRONTIER
-    rule #dasmOpCode( 245p64, SCHED ) => CREATE2      requires Ghascreate2    << SCHED >>
-    rule #dasmOpCode( 250p64, SCHED ) => STATICCALL   requires Ghasstaticcall << SCHED >>
-    rule #dasmOpCode( 253p64, SCHED ) => REVERT       requires Ghasrevert     << SCHED >>
-    rule #dasmOpCode( 254p64,     _ ) => INVALID
-    rule #dasmOpCode( 255p64,     _ ) => SELFDESTRUCT
+    rule #dasmOpCode(   0p256,     _ ) => STOP
+    rule #dasmOpCode(   1p256,     _ ) => ADD
+    rule #dasmOpCode(   2p256,     _ ) => MUL
+    rule #dasmOpCode(   3p256,     _ ) => SUB
+    rule #dasmOpCode(   4p256,     _ ) => DIV
+    rule #dasmOpCode(   5p256,     _ ) => SDIV
+    rule #dasmOpCode(   6p256,     _ ) => MOD
+    rule #dasmOpCode(   7p256,     _ ) => SMOD
+    rule #dasmOpCode(   8p256,     _ ) => ADDMOD
+    rule #dasmOpCode(   9p256,     _ ) => MULMOD
+    rule #dasmOpCode(  10p256,     _ ) => EXP
+    rule #dasmOpCode(  11p256,     _ ) => SIGNEXTEND
+    rule #dasmOpCode(  16p256,     _ ) => LT
+    rule #dasmOpCode(  17p256,     _ ) => GT
+    rule #dasmOpCode(  18p256,     _ ) => SLT
+    rule #dasmOpCode(  19p256,     _ ) => SGT
+    rule #dasmOpCode(  20p256,     _ ) => EQ
+    rule #dasmOpCode(  21p256,     _ ) => ISZERO
+    rule #dasmOpCode(  22p256,     _ ) => AND
+    rule #dasmOpCode(  23p256,     _ ) => EVMOR
+    rule #dasmOpCode(  24p256,     _ ) => XOR
+    rule #dasmOpCode(  25p256,     _ ) => NOT
+    rule #dasmOpCode(  26p256,     _ ) => BYTE
+    rule #dasmOpCode(  27p256, SCHED ) => SHL requires Ghasshift << SCHED >>
+    rule #dasmOpCode(  28p256, SCHED ) => SHR requires Ghasshift << SCHED >>
+    rule #dasmOpCode(  29p256, SCHED ) => SAR requires Ghasshift << SCHED >>
+    rule #dasmOpCode(  32p256,     _ ) => SHA3
+    rule #dasmOpCode(  48p256,     _ ) => ADDRESS
+    rule #dasmOpCode(  49p256,     _ ) => BALANCE
+    rule #dasmOpCode(  50p256,     _ ) => ORIGIN
+    rule #dasmOpCode(  51p256,     _ ) => CALLER
+    rule #dasmOpCode(  52p256,     _ ) => CALLVALUE
+    rule #dasmOpCode(  53p256,     _ ) => CALLDATALOAD
+    rule #dasmOpCode(  54p256,     _ ) => CALLDATASIZE
+    rule #dasmOpCode(  55p256,     _ ) => CALLDATACOPY
+    rule #dasmOpCode(  56p256,     _ ) => CODESIZE
+    rule #dasmOpCode(  57p256,     _ ) => CODECOPY
+    rule #dasmOpCode(  58p256,     _ ) => GASPRICE
+    rule #dasmOpCode(  59p256,     _ ) => EXTCODESIZE
+    rule #dasmOpCode(  60p256,     _ ) => EXTCODECOPY
+    rule #dasmOpCode(  61p256, SCHED ) => RETURNDATASIZE requires Ghasreturndata  << SCHED >>
+    rule #dasmOpCode(  62p256, SCHED ) => RETURNDATACOPY requires Ghasreturndata  << SCHED >>
+    rule #dasmOpCode(  63p256, SCHED ) => EXTCODEHASH    requires Ghasextcodehash << SCHED >>
+    rule #dasmOpCode(  64p256,     _ ) => BLOCKHASH
+    rule #dasmOpCode(  65p256,     _ ) => COINBASE
+    rule #dasmOpCode(  66p256,     _ ) => TIMESTAMP
+    rule #dasmOpCode(  67p256,     _ ) => NUMBER
+    rule #dasmOpCode(  68p256, SCHED ) => PREVRANDAO  requires         Ghasprevrandao << SCHED >>
+    rule #dasmOpCode(  68p256, SCHED ) => DIFFICULTY  requires notBool Ghasprevrandao << SCHED >>
+    rule #dasmOpCode(  69p256,     _ ) => GASLIMIT
+    rule #dasmOpCode(  70p256, SCHED ) => CHAINID     requires Ghaschainid     << SCHED >>
+    rule #dasmOpCode(  71p256, SCHED ) => SELFBALANCE requires Ghasselfbalance << SCHED >>
+    rule #dasmOpCode(  72p256, SCHED ) => BASEFEE     requires Ghasbasefee     << SCHED >>
+    rule #dasmOpCode(  73p256, SCHED ) => BLOBHASH    requires Ghasblobhash    << SCHED >>
+    rule #dasmOpCode(  74p256, SCHED ) => BLOBBASEFEE requires Ghasblobbasefee << SCHED >>
+    rule #dasmOpCode(  80p256,     _ ) => POP
+    rule #dasmOpCode(  81p256,     _ ) => MLOAD
+    rule #dasmOpCode(  82p256,     _ ) => MSTORE
+    rule #dasmOpCode(  83p256,     _ ) => MSTORE8
+    rule #dasmOpCode(  84p256,     _ ) => SLOAD
+    rule #dasmOpCode(  85p256,     _ ) => SSTORE
+    rule #dasmOpCode(  86p256,     _ ) => JUMP
+    rule #dasmOpCode(  87p256,     _ ) => JUMPI
+    rule #dasmOpCode(  88p256,     _ ) => PC
+    rule #dasmOpCode(  89p256,     _ ) => MSIZE
+    rule #dasmOpCode(  90p256,     _ ) => GAS
+    rule #dasmOpCode(  91p256,     _ ) => JUMPDEST
+    rule #dasmOpCode(  92p256, SCHED ) => TLOAD    requires Ghastransient << SCHED >>
+    rule #dasmOpCode(  93p256, SCHED ) => TSTORE   requires Ghastransient << SCHED >>
+    rule #dasmOpCode(  94p256, SCHED ) => MCOPY    requires Ghasmcopy     << SCHED >>
+    rule #dasmOpCode(  95p256, SCHED ) => PUSHZERO requires Ghaspushzero  << SCHED >>
+    rule #dasmOpCode(  96p256,     _ ) => PUSH(1)
+    rule #dasmOpCode(  97p256,     _ ) => PUSH(2)
+    rule #dasmOpCode(  98p256,     _ ) => PUSH(3)
+    rule #dasmOpCode(  99p256,     _ ) => PUSH(4)
+    rule #dasmOpCode( 100p256,     _ ) => PUSH(5)
+    rule #dasmOpCode( 101p256,     _ ) => PUSH(6)
+    rule #dasmOpCode( 102p256,     _ ) => PUSH(7)
+    rule #dasmOpCode( 103p256,     _ ) => PUSH(8)
+    rule #dasmOpCode( 104p256,     _ ) => PUSH(9)
+    rule #dasmOpCode( 105p256,     _ ) => PUSH(10)
+    rule #dasmOpCode( 106p256,     _ ) => PUSH(11)
+    rule #dasmOpCode( 107p256,     _ ) => PUSH(12)
+    rule #dasmOpCode( 108p256,     _ ) => PUSH(13)
+    rule #dasmOpCode( 109p256,     _ ) => PUSH(14)
+    rule #dasmOpCode( 110p256,     _ ) => PUSH(15)
+    rule #dasmOpCode( 111p256,     _ ) => PUSH(16)
+    rule #dasmOpCode( 112p256,     _ ) => PUSH(17)
+    rule #dasmOpCode( 113p256,     _ ) => PUSH(18)
+    rule #dasmOpCode( 114p256,     _ ) => PUSH(19)
+    rule #dasmOpCode( 115p256,     _ ) => PUSH(20)
+    rule #dasmOpCode( 116p256,     _ ) => PUSH(21)
+    rule #dasmOpCode( 117p256,     _ ) => PUSH(22)
+    rule #dasmOpCode( 118p256,     _ ) => PUSH(23)
+    rule #dasmOpCode( 119p256,     _ ) => PUSH(24)
+    rule #dasmOpCode( 120p256,     _ ) => PUSH(25)
+    rule #dasmOpCode( 121p256,     _ ) => PUSH(26)
+    rule #dasmOpCode( 122p256,     _ ) => PUSH(27)
+    rule #dasmOpCode( 123p256,     _ ) => PUSH(28)
+    rule #dasmOpCode( 124p256,     _ ) => PUSH(29)
+    rule #dasmOpCode( 125p256,     _ ) => PUSH(30)
+    rule #dasmOpCode( 126p256,     _ ) => PUSH(31)
+    rule #dasmOpCode( 127p256,     _ ) => PUSH(32)
+    rule #dasmOpCode( 128p256,     _ ) => DUP(1)
+    rule #dasmOpCode( 129p256,     _ ) => DUP(2)
+    rule #dasmOpCode( 130p256,     _ ) => DUP(3)
+    rule #dasmOpCode( 131p256,     _ ) => DUP(4)
+    rule #dasmOpCode( 132p256,     _ ) => DUP(5)
+    rule #dasmOpCode( 133p256,     _ ) => DUP(6)
+    rule #dasmOpCode( 134p256,     _ ) => DUP(7)
+    rule #dasmOpCode( 135p256,     _ ) => DUP(8)
+    rule #dasmOpCode( 136p256,     _ ) => DUP(9)
+    rule #dasmOpCode( 137p256,     _ ) => DUP(10)
+    rule #dasmOpCode( 138p256,     _ ) => DUP(11)
+    rule #dasmOpCode( 139p256,     _ ) => DUP(12)
+    rule #dasmOpCode( 140p256,     _ ) => DUP(13)
+    rule #dasmOpCode( 141p256,     _ ) => DUP(14)
+    rule #dasmOpCode( 142p256,     _ ) => DUP(15)
+    rule #dasmOpCode( 143p256,     _ ) => DUP(16)
+    rule #dasmOpCode( 144p256,     _ ) => SWAP(1)
+    rule #dasmOpCode( 145p256,     _ ) => SWAP(2)
+    rule #dasmOpCode( 146p256,     _ ) => SWAP(3)
+    rule #dasmOpCode( 147p256,     _ ) => SWAP(4)
+    rule #dasmOpCode( 148p256,     _ ) => SWAP(5)
+    rule #dasmOpCode( 149p256,     _ ) => SWAP(6)
+    rule #dasmOpCode( 150p256,     _ ) => SWAP(7)
+    rule #dasmOpCode( 151p256,     _ ) => SWAP(8)
+    rule #dasmOpCode( 152p256,     _ ) => SWAP(9)
+    rule #dasmOpCode( 153p256,     _ ) => SWAP(10)
+    rule #dasmOpCode( 154p256,     _ ) => SWAP(11)
+    rule #dasmOpCode( 155p256,     _ ) => SWAP(12)
+    rule #dasmOpCode( 156p256,     _ ) => SWAP(13)
+    rule #dasmOpCode( 157p256,     _ ) => SWAP(14)
+    rule #dasmOpCode( 158p256,     _ ) => SWAP(15)
+    rule #dasmOpCode( 159p256,     _ ) => SWAP(16)
+    rule #dasmOpCode( 160p256,     _ ) => LOG(0)
+    rule #dasmOpCode( 161p256,     _ ) => LOG(1)
+    rule #dasmOpCode( 162p256,     _ ) => LOG(2)
+    rule #dasmOpCode( 163p256,     _ ) => LOG(3)
+    rule #dasmOpCode( 164p256,     _ ) => LOG(4)
+    rule #dasmOpCode( 240p256,     _ ) => CREATE
+    rule #dasmOpCode( 241p256,     _ ) => CALL
+    rule #dasmOpCode( 242p256,     _ ) => CALLCODE
+    rule #dasmOpCode( 243p256,     _ ) => RETURN
+    rule #dasmOpCode( 244p256, SCHED ) => DELEGATECALL requires SCHED =/=K FRONTIER
+    rule #dasmOpCode( 245p256, SCHED ) => CREATE2      requires Ghascreate2    << SCHED >>
+    rule #dasmOpCode( 250p256, SCHED ) => STATICCALL   requires Ghasstaticcall << SCHED >>
+    rule #dasmOpCode( 253p256, SCHED ) => REVERT       requires Ghasrevert     << SCHED >>
+    rule #dasmOpCode( 254p256,     _ ) => INVALID
+    rule #dasmOpCode( 255p256,     _ ) => SELFDESTRUCT
     rule #dasmOpCode(      W,     _ ) => UNDEFINED(MInt2Unsigned(W)) [owise]
 
     syntax String ::= opcode2String(OpCode) [function]

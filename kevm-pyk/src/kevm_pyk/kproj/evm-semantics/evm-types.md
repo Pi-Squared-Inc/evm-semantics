@@ -114,6 +114,12 @@ We use 256-bit machine integers as our word data type.
     rule addmodMInt256Aux(W0, W1, W2) => Int2MInt((MInt2Unsigned(W0) +Int MInt2Unsigned(W1)) modInt MInt2Unsigned(W2))::MInt{256}
 
     rule mulmodMInt256Aux(W0, W1, W2) => Int2MInt((MInt2Unsigned(W0) *Int MInt2Unsigned(W1)) modInt MInt2Unsigned(W2))::MInt{256}
+
+    syntax Bool ::= inBoundsMInt256( MInt{256} , MInt{256}, MInt{256} ) [function]
+ // ------------------------------------------------------------------------------
+    rule inBoundsMInt256(S, W, L) =>
+      #let R::MInt{256} = S +MInt W #in
+      #if R <uMInt S #then false #else R <=uMInt L #fi
 ```
 
 Utilities

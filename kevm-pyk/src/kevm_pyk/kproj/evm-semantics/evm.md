@@ -803,11 +803,11 @@ These operators query about the current return data buffer.
     rule <k> RETURNDATACOPY MEMSTART DATASTART DATAWIDTH => .K ... </k>
          <localMem> LM => LM [ MEMSTART :=MInt256 #rangeMInt256(RD, DATASTART, DATAWIDTH) ] </localMem>
          <output> RD </output>
-      requires DATASTART +MInt DATAWIDTH <=uMInt (lengthBytes(RD)::MInt{256})
+      requires inBoundsMInt256(DATASTART, DATAWIDTH, lengthBytes(RD)::MInt{256})
 
     rule <k> RETURNDATACOPY _MEMSTART DATASTART DATAWIDTH => #end EVMC_INVALID_MEMORY_ACCESS ... </k>
          <output> RD </output>
-      requires DATASTART +MInt DATAWIDTH >uMInt (lengthBytes(RD)::MInt{256})
+      requires notBool inBoundsMInt256(DATASTART, DATAWIDTH, lengthBytes(RD)::MInt{256})
 ```
 
 ### Log Operations

@@ -1964,7 +1964,7 @@ The total size of logs written is tracked to determine the appropriate amount of
 ```k
     syntax Int ::= #log ( OpCode , Int ) [symbol(#log), function, total]
  // --------------------------------------------------------------------
-    rule #log ( LOG(_) _ WIDTH , LU ) => LU +Int WIDTH requires 0 <Int WIDTH
+    rule #log ( LOG(_) _ WIDTH , LU ) => LU +Int MInt2Unsigned(WIDTH) requires 0 <Int MInt2Unsigned(WIDTH)
     rule #log ( _ , LU )              => LU [owise]
 
     syntax Bool ::= #usesLog ( OpCode ) [symbol(#usesLog), function, total]

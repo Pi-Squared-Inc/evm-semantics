@@ -24,9 +24,9 @@ We use 256-bit machine integers as our word data type.
 ```k
     syntax MInt{256}
 
-    syntax MInt{256} ::= "pow160p256" [macro] /* 2^160 */
- // -----------------------------------------------------
-    rule pow160p256 => 1461501637330902918203684832716283019655932542976p256
+    syntax MInt{256} ::= "maxUInt160p256" [macro] /* 2^160 - 1 */
+ // -------------------------------------------------------------
+    rule maxUInt160p256 => 1461501637330902918203684832716283019655932542975p256
 
     syntax MInt{256} ::= "maxUInt64p256" [macro] /* 2^64 - 1 */
  // -----------------------------------------------------------
@@ -46,7 +46,7 @@ We use 256-bit machine integers as our word data type.
 
     syntax MInt{256} ::= #addrAsMInt256 ( MInt{256} ) [function]
  // ------------------------------------------------------------
-    rule #addrAsMInt256(W)   => W %uMInt pow160p256
+    rule #addrAsMInt256(W)   => W &MInt maxUInt160p256
 
     syntax Bytes ::= "#writeMInt256" "(" Bytes "," MInt{256} "," MInt{256} ")" [function]
                    | Bytes "[" MInt{256} ":=MInt256" Bytes "]"                 [function]

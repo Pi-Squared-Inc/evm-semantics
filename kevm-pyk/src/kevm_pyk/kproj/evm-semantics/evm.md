@@ -1120,9 +1120,9 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
     rule #isValidCode( OUT ,  SCHED) => Ghasrejectedfirstbyte << SCHED >> impliesBool OUT[0] =/=Int 239 requires lengthBytes(OUT) >Int 0
     rule #isValidCode(_OUT , _SCHED) => true                                                            [owise]
 
-    syntax Bool ::= #hasValidInitCode ( Int , Schedule ) [symbol(#hasValidInitCode), function]
- // ------------------------------------------------------------------------------------------
-    rule #hasValidInitCode(INITCODELEN, SCHED) => notBool Ghasmaxinitcodesize << SCHED >> orBool INITCODELEN <=Int maxInitCodeSize < SCHED >
+    syntax Bool ::= #hasValidInitCode ( MInt{256} , Schedule ) [symbol(#hasValidInitCode), function]
+ // ------------------------------------------------------------------------------------------------
+    rule #hasValidInitCode(INITCODELEN, SCHED) => notBool Ghasmaxinitcodesize << SCHED >> orBool MInt2Unsigned(INITCODELEN) <=Int maxInitCodeSize < SCHED >
 
    syntax KItem ::= "#codeDeposit" MInt{256}
                    | "#mkCodeDeposit" MInt{256}
@@ -1190,13 +1190,13 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
          <id> ACCT </id>
          <localMem> LM </localMem>
          <schedule> SCHED </schedule>
-      requires #hasValidInitCode(MInt2Unsigned(MEMWIDTH), SCHED)
+      requires #hasValidInitCode(MEMWIDTH, SCHED)
       [preserves-definedness]
 
     rule [create-invalid]:
          <k> CREATE _ _ MEMWIDTH => #end EVMC_OUT_OF_GAS ... </k>
          <schedule> SCHED </schedule>
-      requires notBool #hasValidInitCode(MInt2Unsigned(MEMWIDTH), SCHED)
+      requires notBool #hasValidInitCode(MEMWIDTH, SCHED)
 ```
 
 `CREATE2` will attempt to `#create` the account, but with the new scheme for choosing the account address.
@@ -1215,7 +1215,7 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
          <id> ACCT </id>
          <localMem> LM </localMem>
          <schedule> SCHED </schedule>
-      requires #hasValidInitCode(MInt2Unsigned(MEMWIDTH), SCHED)
+      requires #hasValidInitCode(MEMWIDTH, SCHED)
 
     rule [create2-invalid]:
          <k> CREATE2 _ _ _ _ => #end EVMC_OUT_OF_GAS ... </k> [owise]

@@ -1846,26 +1846,26 @@ In the YellowPaper, each opcode is defined to consume zero gas unless specified 
 ```k
     syntax Int ::= #memory ( OpCode , Int ) [symbol(#memory), function, total]
  // --------------------------------------------------------------------------
-    rule #memory ( MLOAD INDEX        , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(INDEX), 32)
-    rule #memory ( MSTORE INDEX _     , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(INDEX), 32)
-    rule #memory ( MSTORE8 INDEX _    , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(INDEX), 1)
-    rule #memory ( MCOPY DST SRC WIDTH, MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(uMaxMInt(DST, SRC)), MInt2Unsigned(WIDTH))
+    rule #memory ( MLOAD INDEX        , MU ) => #memoryUsageUpdate(MU, INDEX, 32p256)
+    rule #memory ( MSTORE INDEX _     , MU ) => #memoryUsageUpdate(MU, INDEX, 32p256)
+    rule #memory ( MSTORE8 INDEX _    , MU ) => #memoryUsageUpdate(MU, INDEX, 1p256)
+    rule #memory ( MCOPY DST SRC WIDTH, MU ) => #memoryUsageUpdate(MU, uMaxMInt(DST, SRC), WIDTH)
 
-    rule #memory ( SHA3 START WIDTH   , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
-    rule #memory ( LOG(_) START WIDTH , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
+    rule #memory ( SHA3 START WIDTH   , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
+    rule #memory ( LOG(_) START WIDTH , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
 
-    rule #memory ( CODECOPY START _ WIDTH       , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
-    rule #memory ( EXTCODECOPY _ START _ WIDTH  , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
-    rule #memory ( CALLDATACOPY START _ WIDTH   , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
-    rule #memory ( RETURNDATACOPY START _ WIDTH , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
+    rule #memory ( CODECOPY START _ WIDTH       , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
+    rule #memory ( EXTCODECOPY _ START _ WIDTH  , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
+    rule #memory ( CALLDATACOPY START _ WIDTH   , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
+    rule #memory ( RETURNDATACOPY START _ WIDTH , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
 
-    rule #memory ( CREATE  _ START WIDTH   , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
-    rule #memory ( CREATE2 _ START WIDTH _ , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
-    rule #memory ( RETURN START WIDTH      , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
-    rule #memory ( REVERT START WIDTH      , MU ) => #memoryUsageUpdate(MU, MInt2Unsigned(START), MInt2Unsigned(WIDTH))
+    rule #memory ( CREATE  _ START WIDTH   , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
+    rule #memory ( CREATE2 _ START WIDTH _ , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
+    rule #memory ( RETURN START WIDTH      , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
+    rule #memory ( REVERT START WIDTH      , MU ) => #memoryUsageUpdate(MU, START, WIDTH)
 
-    rule #memory ( _COP:CallOp     _ _ _ ARGSTART ARGWIDTH RETSTART RETWIDTH , MU ) => #memoryUsageUpdate(#memoryUsageUpdate(MU, MInt2Unsigned(ARGSTART), MInt2Unsigned(ARGWIDTH)), MInt2Unsigned(RETSTART), MInt2Unsigned(RETWIDTH))
-    rule #memory ( _CSOP:CallSixOp _ _   ARGSTART ARGWIDTH RETSTART RETWIDTH , MU ) => #memoryUsageUpdate(#memoryUsageUpdate(MU, MInt2Unsigned(ARGSTART), MInt2Unsigned(ARGWIDTH)), MInt2Unsigned(RETSTART), MInt2Unsigned(RETWIDTH))
+    rule #memory ( _COP:CallOp     _ _ _ ARGSTART ARGWIDTH RETSTART RETWIDTH , MU ) => #memoryUsageUpdate(#memoryUsageUpdate(MU, ARGSTART, ARGWIDTH), RETSTART, RETWIDTH)
+    rule #memory ( _CSOP:CallSixOp _ _   ARGSTART ARGWIDTH RETSTART RETWIDTH , MU ) => #memoryUsageUpdate(#memoryUsageUpdate(MU, ARGSTART, ARGWIDTH), RETSTART, RETWIDTH)
 
     rule #memory ( _ , MU ) => MU [owise]
 
@@ -1889,10 +1889,10 @@ In the YellowPaper, each opcode is defined to consume zero gas unless specified 
     rule #usesMemory(MCOPY)          => true
     rule #usesMemory(_)              => false [owise]
 
-    syntax Int ::= #memoryUsageUpdate ( Int , Int , Int ) [symbol(#memoryUsageUpdate), function, total]
- // ---------------------------------------------------------------------------------------------------
-    rule #memoryUsageUpdate(MU,     _, WIDTH) => MU                                       requires notBool 0 <Int WIDTH [concrete]
-    rule #memoryUsageUpdate(MU, START, WIDTH) => maxInt(MU, (START +Int WIDTH) up/Int 32) requires         0 <Int WIDTH [concrete]
+    syntax Int ::= #memoryUsageUpdate ( Int , MInt{256} , MInt{256} ) [symbol(#memoryUsageUpdate), function, total]
+ // ---------------------------------------------------------------------------------------------------------------
+    rule #memoryUsageUpdate(MU,     _, WIDTH) => MU                                                                     requires WIDTH ==MInt 0p256 [concrete]
+    rule #memoryUsageUpdate(MU, START, WIDTH) => maxInt(MU, (MInt2Unsigned(START) +Int MInt2Unsigned(WIDTH)) up/Int 32) requires WIDTH >uMInt 0p256 [concrete]
 ```
 
 Access List Gas

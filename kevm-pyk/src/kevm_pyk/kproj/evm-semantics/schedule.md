@@ -46,7 +46,7 @@ module SCHEDULE
                           | "Ghasrejectedfirstbyte"   | "Ghasprevrandao"   | "Ghasmaxinitcodesize" | "Ghaspushzero"
                           | "Ghaswarmcoinbase"        | "Ghaswithdrawals"  | "Ghastransient"       | "Ghasmcopy"
                           | "Ghasbeaconroot"          | "Ghaseip6780"      | "Ghasblobbasefee"     | "Ghasblobhash"
-                          | "Ghasbls12msmdiscount"    | "Ghasdelegation"
+                          | "Ghasbls12msmdiscount"    | "Ghasdelegation"   | "Ghasmip001"
 ```
 
 ### Schedule Constants
@@ -57,16 +57,16 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     syntax Int ::= ScheduleConst "<" Schedule ">" [function, total]
  // ---------------------------------------------------------------
 
-    syntax ScheduleConst ::= "Gzero"         | "Gbase"         | "Gverylow"      | "Glow"              | "Gmid"               | "Ghigh"            | "Gextcodesize"
-                           | "Gextcodecopy"  | "Gbalance"      | "Gsload"        | "Gjumpdest"         | "Gsstoreset"         | "Gsstorereset"     | "Rsstoreclear"
-                           | "Rselfdestruct" | "Gselfdestruct" | "Gcreate"       | "Gcodedeposit"      | "Gcall"              | "Gcallvalue"       | "Gcallstipend"
-                           | "Gnewaccount"   | "Gexp"          | "Gexpbyte"      | "Gmemory"           | "Gtxcreate"          | "Gtxdatazero"      | "Gtxdatanonzero"
-                           | "Gtransaction"  | "Glog"          | "Glogdata"      | "Glogtopic"         | "Gsha3"              | "Gsha3word"        | "Gcopy"
-                           | "Gblockhash"    | "Gquadcoeff"    | "maxCodeSize"   | "Rb"                | "Gquaddivisor"       | "Gecadd"           | "Gecmul"
-                           | "Gecpairconst"  | "Gecpaircoeff"  | "Gfround"       | "Gcoldsload"        | "Gcoldaccountaccess" | "Gwarmstorageread" | "Gaccesslistaddress"
-                           | "Gaccessliststoragekey"           | "Rmaxquotient"  | "Ginitcodewordcost" | "maxInitCodeSize"    | "Gwarmstoragedirtystore"
-                           | "Gpointeval"    | "Gbls12g1add"   | "Gbls12g1mul"   | "Gbls12g2add"       | "Gbls12g2mul"        | "Gbls12PairingCheckMul"
-                           | "Gbls12PairingCheckAdd"           | "Gbls12mapfptog1"                     | "Gbls12mapfp2tog2"
+    syntax ScheduleConst ::= "Gzero"         | "Gbase"         | "Gverylow"      | "Glow"              | "Gmid"               | "Ghigh"              | "Gextcodesize"
+                           | "Gextcodecopy"  | "Gbalance"      | "Gsload"        | "Gjumpdest"         | "Gsstoreset"         | "Gsstorereset"       | "Rsstoreclear"
+                           | "Rselfdestruct" | "Gselfdestruct" | "Gcreate"       | "Gcodedeposit"      | "Gcall"              | "Gcallvalue"         | "Gcallstipend"
+                           | "Gnewaccount"   | "Gexp"          | "Gexpbyte"      | "Gmemory"           | "Gtxcreate"          | "Gtxdatazero"        | "Gtxdatanonzero"
+                           | "Gtransaction"  | "Glog"          | "Glogdata"      | "Glogtopic"         | "Gloglimit"          | "Gsha3"              | "Gsha3word"
+                           | "Gcopy"         | "Gblockhash"    | "Gquadcoeff"    | "maxCodeSize"       | "Rb"                 | "Gquaddivisor"       | "Gecadd"
+                           | "Gecmul"        | "Gecpairconst"  | "Gecpaircoeff"  | "Gfround"           | "Gcoldsload"         | "Gcoldaccountaccess" | "Gwarmstorageread"
+                           | "Gaccesslistaddress"              | "Gaccessliststoragekey"               | "Rmaxquotient"       | "Ginitcodewordcost"  | "maxInitCodeSize"
+                           | "Gwarmstoragedirtystore"          | "Gpointeval"    | "Gbls12g1add"       | "Gbls12g1mul"        | "Gbls12g2add"        | "Gbls12g2mul"
+                           | "Gbls12PairingCheckMul"           | "Gbls12PairingCheckAdd"               | "Gbls12mapfptog1"    | "Gbls12mapfp2tog2"
  // ----------------------------------------------------------------------------------------------------------------------------------------------------
 ```
 
@@ -95,6 +95,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Glog      < FRONTIER > => 375
     rule Glogdata  < FRONTIER > => 8
     rule Glogtopic < FRONTIER > => 375
+    rule Gloglimit < FRONTIER > => 0
 
     rule Gcall        < FRONTIER > => 40
     rule Gcallstipend < FRONTIER > => 2300
@@ -185,6 +186,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << FRONTIER >> => false
     rule Ghasbls12msmdiscount    << FRONTIER >> => false
     rule Ghasdelegation          << FRONTIER >> => false
+    rule Ghasmip001              << FRONTIER >> => false
 ```
 
 ### Homestead Schedule
@@ -212,6 +214,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Glog      < HOMESTEAD > => 375
     rule Glogdata  < HOMESTEAD > => 8
     rule Glogtopic < HOMESTEAD > => 375
+    rule Gloglimit < HOMESTEAD > => 0
 
     rule Gcall        < HOMESTEAD > => 40
     rule Gcallstipend < HOMESTEAD > => 2300
@@ -302,6 +305,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << HOMESTEAD >> => false
     rule Ghasbls12msmdiscount    << HOMESTEAD >> => false
     rule Ghasdelegation          << HOMESTEAD >> => false
+    rule Ghasmip001              << HOMESTEAD >> => false
 ```
 
 ### Tangerine Whistle Schedule
@@ -329,6 +333,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Glog      < TANGERINE_WHISTLE > => 375
     rule Glogdata  < TANGERINE_WHISTLE > => 8
     rule Glogtopic < TANGERINE_WHISTLE > => 375
+    rule Gloglimit < TANGERINE_WHISTLE > => 0
 
     rule Gcall        < TANGERINE_WHISTLE > => 700
     rule Gcallstipend < TANGERINE_WHISTLE > => 2300
@@ -419,6 +424,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << TANGERINE_WHISTLE >> => false
     rule Ghasbls12msmdiscount    << TANGERINE_WHISTLE >> => false
     rule Ghasdelegation          << TANGERINE_WHISTLE >> => false
+    rule Ghasmip001              << TANGERINE_WHISTLE >> => false
 ```
 
 ### Spurious Dragon Schedule
@@ -446,6 +452,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Glog      < SPURIOUS_DRAGON > => 375
     rule Glogdata  < SPURIOUS_DRAGON > => 8
     rule Glogtopic < SPURIOUS_DRAGON > => 375
+    rule Gloglimit < SPURIOUS_DRAGON > => 0
 
     rule Gcall        < SPURIOUS_DRAGON > => 700
     rule Gcallstipend < SPURIOUS_DRAGON > => 2300
@@ -536,6 +543,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << SPURIOUS_DRAGON >> => false
     rule Ghasbls12msmdiscount    << SPURIOUS_DRAGON >> => false
     rule Ghasdelegation          << SPURIOUS_DRAGON >> => false
+    rule Ghasmip001              << SPURIOUS_DRAGON >> => false
 ```
 
 ### Byzantium Schedule
@@ -563,6 +571,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Glog      < BYZANTIUM > => 375
     rule Glogdata  < BYZANTIUM > => 8
     rule Glogtopic < BYZANTIUM > => 375
+    rule Gloglimit < BYZANTIUM > => 0
 
     rule Gcall        < BYZANTIUM > => 700
     rule Gcallstipend < BYZANTIUM > => 2300
@@ -653,6 +662,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << BYZANTIUM >> => false
     rule Ghasbls12msmdiscount    << BYZANTIUM >> => false
     rule Ghasdelegation          << BYZANTIUM >> => false
+    rule Ghasmip001              << BYZANTIUM >> => false
 ```
 
 ### Constantinople Schedule
@@ -680,6 +690,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Glog      < CONSTANTINOPLE > => 375
     rule Glogdata  < CONSTANTINOPLE > => 8
     rule Glogtopic < CONSTANTINOPLE > => 375
+    rule Gloglimit < CONSTANTINOPLE > => 0
 
     rule Gcall        < CONSTANTINOPLE > => 700
     rule Gcallstipend < CONSTANTINOPLE > => 2300
@@ -770,6 +781,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << CONSTANTINOPLE >> => false
     rule Ghasbls12msmdiscount    << CONSTANTINOPLE >> => false
     rule Ghasdelegation          << CONSTANTINOPLE >> => false
+    rule Ghasmip001              << CONSTANTINOPLE >> => false
 ```
 
 ### Petersburg Schedule
@@ -797,6 +809,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Glog      < PETERSBURG > => 375
     rule Glogdata  < PETERSBURG > => 8
     rule Glogtopic < PETERSBURG > => 375
+    rule Gloglimit < PETERSBURG > => 0
 
     rule Gcall        < PETERSBURG > => 700
     rule Gcallstipend < PETERSBURG > => 2300
@@ -887,6 +900,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << PETERSBURG >> => false
     rule Ghasbls12msmdiscount    << PETERSBURG >> => false
     rule Ghasdelegation          << PETERSBURG >> => false
+    rule Ghasmip001              << PETERSBURG >> => false
 ```
 
 ### Istanbul Schedule
@@ -914,6 +928,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Glog      < ISTANBUL > => 375
     rule Glogdata  < ISTANBUL > => 8
     rule Glogtopic < ISTANBUL > => 375
+    rule Gloglimit < ISTANBUL > => 0
 
     rule Gcall        < ISTANBUL > => 700
     rule Gcallstipend < ISTANBUL > => 2300
@@ -1004,6 +1019,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << ISTANBUL >> => false
     rule Ghasbls12msmdiscount    << ISTANBUL >> => false
     rule Ghasdelegation          << ISTANBUL >> => false
+    rule Ghasmip001              << ISTANBUL >> => false
 ```
 
 ### Berlin Schedule
@@ -1031,6 +1047,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Glog      < BERLIN > => 375
     rule Glogdata  < BERLIN > => 8
     rule Glogtopic < BERLIN > => 375
+    rule Gloglimit < BERLIN > => 0
 
     rule Gcall        < BERLIN > => 700
     rule Gcallstipend < BERLIN > => 2300
@@ -1121,6 +1138,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << BERLIN >> => false
     rule Ghasbls12msmdiscount    << BERLIN >> => false
     rule Ghasdelegation          << BERLIN >> => false
+    rule Ghasmip001              << BERLIN >> => false
 ```
 
 ### London Schedule
@@ -1148,6 +1166,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Glog      < LONDON > => 375
     rule Glogdata  < LONDON > => 8
     rule Glogtopic < LONDON > => 375
+    rule Gloglimit < LONDON > => 0
 
     rule Gcall        < LONDON > => 700
     rule Gcallstipend < LONDON > => 2300
@@ -1238,6 +1257,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << LONDON >> => false
     rule Ghasbls12msmdiscount    << LONDON >> => false
     rule Ghasdelegation          << LONDON >> => false
+    rule Ghasmip001              << LONDON >> => false
 ```
 
 ### Merge Schedule
@@ -1265,6 +1285,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Glog      < MERGE > => 375
     rule Glogdata  < MERGE > => 8
     rule Glogtopic < MERGE > => 375
+    rule Gloglimit < MERGE > => 0
 
     rule Gcall        < MERGE > => 700
     rule Gcallstipend < MERGE > => 2300
@@ -1355,6 +1376,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << MERGE >> => false
     rule Ghasbls12msmdiscount    << MERGE >> => false
     rule Ghasdelegation          << MERGE >> => false
+    rule Ghasmip001              << MERGE >> => false
 ```
 
 ### Shanghai Schedule
@@ -1383,6 +1405,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Glog      < SHANGHAI > => 375
     rule Glogdata  < SHANGHAI > => 8
     rule Glogtopic < SHANGHAI > => 375
+    rule Gloglimit < SHANGHAI > => 0
 
     rule Gcall        < SHANGHAI > => 700
     rule Gcallstipend < SHANGHAI > => 2300
@@ -1473,6 +1496,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << SHANGHAI >> => false
     rule Ghasbls12msmdiscount    << SHANGHAI >> => false
     rule Ghasdelegation          << SHANGHAI >> => false
+    rule Ghasmip001              << SHANGHAI >> => false
 ```
 
 ### Cancun Schedule
@@ -1500,7 +1524,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Glog      < CANCUN > => 375
     rule Glogdata  < CANCUN > => 8
-    rule Glogtopic < CANCUN > => 375
+    rule Glogtopic < CANCUN > => 10000
+    rule Gloglimit < CANCUN > => 4096
 
     rule Gcall        < CANCUN > => 700
     rule Gcallstipend < CANCUN > => 2300
@@ -1534,7 +1559,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gecpaircoeff < CANCUN > => 34000
     rule Gfround      < CANCUN > => 1
 
-    rule maxCodeSize < CANCUN > => 24576
+    rule maxCodeSize < CANCUN > => 524288
     rule Rb          < CANCUN > => 0
 
     rule Gcoldsload             < CANCUN > => 2100
@@ -1556,7 +1581,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gaccessliststoragekey < CANCUN > => 1900
     rule Gaccesslistaddress    < CANCUN > => 2400
 
-    rule maxInitCodeSize   < CANCUN > => 49152
+    rule maxInitCodeSize   < CANCUN > => 548864
     rule Ginitcodewordcost < CANCUN > => 2
 
     rule Rmaxquotient < CANCUN > => 5
@@ -1591,7 +1616,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << CANCUN >> => true
     rule Ghasbls12msmdiscount    << CANCUN >> => false
     rule Ghasdelegation          << CANCUN >> => false
-
+    rule Ghasmip001              << CANCUN >> => true
 ```
 
 ### Prague Schedule
@@ -1621,6 +1646,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Glog      < PRAGUE > => 375
     rule Glogdata  < PRAGUE > => 8
     rule Glogtopic < PRAGUE > => 375
+    rule Gloglimit < PRAGUE > => 0
 
     rule Gcall        < PRAGUE > => 700
     rule Gcallstipend < PRAGUE > => 2300
@@ -1711,6 +1737,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << PRAGUE >> => true
     rule Ghasbls12msmdiscount    << PRAGUE >> => true
     rule Ghasdelegation          << PRAGUE >> => true
+    rule Ghasmip001              << PRAGUE >> => false
 
 endmodule
 ```

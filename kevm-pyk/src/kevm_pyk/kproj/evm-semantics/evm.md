@@ -1331,7 +1331,7 @@ Precompiled Contracts
  // ------------------------------------------------------------------------------------------------------------
     rule #precompiledAccountsSet(SCHED) => #precompiledAccountsSetAux(#precompiledAccountsUB(SCHED))
 
-    rule #precompiledAccountsSetAux(N)  => .Set requires N <=uMInt 0p256
+    rule #precompiledAccountsSetAux(N)  => .Set requires N ==MInt 0p256
     rule #precompiledAccountsSetAux(N)  => SetItem(N) #precompiledAccountsSetAux(N -MInt 1p256) [owise, preserves-definedness]
 ```
 

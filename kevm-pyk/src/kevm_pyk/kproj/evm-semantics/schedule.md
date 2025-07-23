@@ -35,6 +35,7 @@ module SCHEDULE
     rule getSchedule(11) => SHANGHAI
     rule getSchedule(12) => CANCUN
     rule getSchedule(13) => PRAGUE
+    rule getSchedule(14) => BEDROCK
 
     syntax Bool ::= ScheduleFlag "<<" Schedule ">>" [function, total]
  // -----------------------------------------------------------------
@@ -1711,6 +1712,124 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << PRAGUE >> => true
     rule Ghasbls12msmdiscount    << PRAGUE >> => true
     rule Ghasdelegation          << PRAGUE >> => true
+
+```
+
+### Bedrock Schedule
+
+```k
+    syntax Schedule ::= "BEDROCK" [symbol(BEDROCK_EVM), smtlib(schedule_BEDROCK)]
+ // -----------------------------------------------------------------------------
+    rule Gzero    < BEDROCK > => 0
+    rule Gbase    < BEDROCK > => 2
+    rule Gverylow < BEDROCK > => 3
+    rule Glow     < BEDROCK > => 5
+    rule Gmid     < BEDROCK > => 8
+    rule Ghigh    < BEDROCK > => 10
+
+    rule Gexp      < BEDROCK > => 10
+    rule Gexpbyte  < BEDROCK > => 50
+    rule Gsha3     < BEDROCK > => 30
+    rule Gsha3word < BEDROCK > => 6
+
+    rule Gsload       < BEDROCK > => 100
+    rule Gsstoreset   < BEDROCK > => 20000
+    rule Gsstorereset < BEDROCK > => 2900
+    rule Rsstoreclear < BEDROCK > => 4800
+
+    rule Glog      < BEDROCK > => 375
+    rule Glogdata  < BEDROCK > => 8
+    rule Glogtopic < BEDROCK > => 375
+
+    rule Gcall        < BEDROCK > => 700
+    rule Gcallstipend < BEDROCK > => 2300
+    rule Gcallvalue   < BEDROCK > => 9000
+    rule Gnewaccount  < BEDROCK > => 25000
+
+    rule Gcreate       < BEDROCK > => 32000
+    rule Gcodedeposit  < BEDROCK > => 200
+    rule Gselfdestruct < BEDROCK > => 5000
+    rule Rselfdestruct < BEDROCK > => 0
+
+    rule Gmemory      < BEDROCK > => 3
+    rule Gquadcoeff   < BEDROCK > => 512
+    rule Gcopy        < BEDROCK > => 3
+    rule Gquaddivisor < BEDROCK > => 3
+
+    rule Gtransaction   < BEDROCK > => 21000
+    rule Gtxcreate      < BEDROCK > => 53000
+    rule Gtxdatazero    < BEDROCK > => 4
+    rule Gtxdatanonzero < BEDROCK > => 16
+
+    rule Gjumpdest    < BEDROCK > => 1
+    rule Gbalance     < BEDROCK > => 700
+    rule Gblockhash   < BEDROCK > => 20
+    rule Gextcodesize < BEDROCK > => 700
+    rule Gextcodecopy < BEDROCK > => 700
+
+    rule Gecadd       < BEDROCK > => 150
+    rule Gecmul       < BEDROCK > => 6000
+    rule Gecpairconst < BEDROCK > => 45000
+    rule Gecpaircoeff < BEDROCK > => 34000
+    rule Gfround      < BEDROCK > => 1
+
+    rule maxCodeSize < BEDROCK > => 24576
+    rule Rb          < BEDROCK > => 0
+
+    rule Gcoldsload             < BEDROCK > => 2100
+    rule Gcoldaccountaccess     < BEDROCK > => 2600
+    rule Gwarmstorageread       < BEDROCK > => 100
+    rule Gwarmstoragedirtystore < BEDROCK > => 0
+
+    rule Gpointeval < BEDROCK > => 0
+
+    rule Gbls12g1add < BEDROCK > => 0
+    rule Gbls12g1mul < BEDROCK > => 0
+    rule Gbls12g2add < BEDROCK > => 0
+    rule Gbls12g2mul < BEDROCK > => 0
+    rule Gbls12PairingCheckMul < BEDROCK > => 0
+    rule Gbls12PairingCheckAdd < BEDROCK > => 0
+    rule Gbls12mapfptog1 < BEDROCK > => 0
+    rule Gbls12mapfp2tog2 < BEDROCK > => 0
+
+    rule Gaccessliststoragekey < BEDROCK > => 1900
+    rule Gaccesslistaddress    < BEDROCK > => 2400
+
+    rule maxInitCodeSize   < BEDROCK > => 0
+    rule Ginitcodewordcost < BEDROCK > => 0
+
+    rule Rmaxquotient < BEDROCK > => 5
+
+    rule Gselfdestructnewaccount << BEDROCK >> => true
+    rule Gstaticcalldepth        << BEDROCK >> => false
+    rule Gemptyisnonexistent     << BEDROCK >> => true
+    rule Gzerovaluenewaccountgas << BEDROCK >> => false
+    rule Ghasrevert              << BEDROCK >> => true
+    rule Ghasreturndata          << BEDROCK >> => true
+    rule Ghasstaticcall          << BEDROCK >> => true
+    rule Ghasshift               << BEDROCK >> => true
+    rule Ghasdirtysstore         << BEDROCK >> => true
+    rule Ghassstorestipend       << BEDROCK >> => true
+    rule Ghascreate2             << BEDROCK >> => true
+    rule Ghasextcodehash         << BEDROCK >> => true
+    rule Ghasselfbalance         << BEDROCK >> => true
+    rule Ghaschainid             << BEDROCK >> => true
+    rule Ghasaccesslist          << BEDROCK >> => true
+    rule Ghasbasefee             << BEDROCK >> => true
+    rule Ghasrejectedfirstbyte   << BEDROCK >> => true
+    rule Ghasprevrandao          << BEDROCK >> => true
+    rule Ghasmaxinitcodesize     << BEDROCK >> => false
+    rule Ghaspushzero            << BEDROCK >> => false
+    rule Ghaswarmcoinbase        << BEDROCK >> => false
+    rule Ghaswithdrawals         << BEDROCK >> => false
+    rule Ghastransient           << BEDROCK >> => false
+    rule Ghasmcopy               << BEDROCK >> => false
+    rule Ghasbeaconroot          << BEDROCK >> => false
+    rule Ghaseip6780             << BEDROCK >> => false
+    rule Ghasblobbasefee         << BEDROCK >> => false
+    rule Ghasblobhash            << BEDROCK >> => false
+    rule Ghasbls12msmdiscount    << BEDROCK >> => false
+    rule Ghasdelegation          << BEDROCK >> => false
 
 endmodule
 ```

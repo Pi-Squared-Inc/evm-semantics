@@ -36,13 +36,14 @@ module SCHEDULE
     rule getSchedule(12) => CANCUN
     rule getSchedule(13) => PRAGUE
     rule getSchedule(14) => BEDROCK
-    rule getSchedule(15) => CANYON
-    rule getSchedule(16) => DELTA
-    rule getSchedule(17) => ECOTONE
-    rule getSchedule(18) => FJORD
-    rule getSchedule(19) => GRANITE
-    rule getSchedule(20) => HOLOCENE
-    rule getSchedule(21) => ISTHMUS
+    rule getSchedule(15) => REGOLITH
+    rule getSchedule(16) => CANYON
+    rule getSchedule(17) => DELTA
+    rule getSchedule(18) => ECOTONE
+    rule getSchedule(19) => FJORD
+    rule getSchedule(20) => GRANITE
+    rule getSchedule(21) => HOLOCENE
+    rule getSchedule(22) => ISTHMUS
 
     syntax Bool ::= ScheduleFlag "<<" Schedule ">>" [function, total]
  // -----------------------------------------------------------------
@@ -1835,6 +1836,123 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << BEDROCK >> => false
     rule Ghasbls12msmdiscount    << BEDROCK >> => false
     rule Ghasdelegation          << BEDROCK >> => false
+```
+
+### Regolith Schedule
+
+```k
+    syntax Schedule ::= "REGOLITH" [symbol(REGOLITH_EVM), smtlib(schedule_REGOLITH)]
+ // --------------------------------------------------------------------------------
+    rule Gzero    < REGOLITH > => 0
+    rule Gbase    < REGOLITH > => 2
+    rule Gverylow < REGOLITH > => 3
+    rule Glow     < REGOLITH > => 5
+    rule Gmid     < REGOLITH > => 8
+    rule Ghigh    < REGOLITH > => 10
+
+    rule Gexp      < REGOLITH > => 10
+    rule Gexpbyte  < REGOLITH > => 50
+    rule Gsha3     < REGOLITH > => 30
+    rule Gsha3word < REGOLITH > => 6
+
+    rule Gsload       < REGOLITH > => 100
+    rule Gsstoreset   < REGOLITH > => 20000
+    rule Gsstorereset < REGOLITH > => 2900
+    rule Rsstoreclear < REGOLITH > => 4800
+
+    rule Glog      < REGOLITH > => 375
+    rule Glogdata  < REGOLITH > => 8
+    rule Glogtopic < REGOLITH > => 375
+
+    rule Gcall        < REGOLITH > => 700
+    rule Gcallstipend < REGOLITH > => 2300
+    rule Gcallvalue   < REGOLITH > => 9000
+    rule Gnewaccount  < REGOLITH > => 25000
+
+    rule Gcreate       < REGOLITH > => 32000
+    rule Gcodedeposit  < REGOLITH > => 200
+    rule Gselfdestruct < REGOLITH > => 5000
+    rule Rselfdestruct < REGOLITH > => 0
+
+    rule Gmemory      < REGOLITH > => 3
+    rule Gquadcoeff   < REGOLITH > => 512
+    rule Gcopy        < REGOLITH > => 3
+    rule Gquaddivisor < REGOLITH > => 3
+
+    rule Gtransaction   < REGOLITH > => 21000
+    rule Gtxcreate      < REGOLITH > => 53000
+    rule Gtxdatazero    < REGOLITH > => 4
+    rule Gtxdatanonzero < REGOLITH > => 16
+
+    rule Gjumpdest    < REGOLITH > => 1
+    rule Gbalance     < REGOLITH > => 700
+    rule Gblockhash   < REGOLITH > => 20
+    rule Gextcodesize < REGOLITH > => 700
+    rule Gextcodecopy < REGOLITH > => 700
+
+    rule Gecadd       < REGOLITH > => 150
+    rule Gecmul       < REGOLITH > => 6000
+    rule Gecpairconst < REGOLITH > => 45000
+    rule Gecpaircoeff < REGOLITH > => 34000
+    rule Gfround      < REGOLITH > => 1
+
+    rule maxCodeSize < REGOLITH > => 24576
+    rule Rb          < REGOLITH > => 0
+
+    rule Gcoldsload             < REGOLITH > => 2100
+    rule Gcoldaccountaccess     < REGOLITH > => 2600
+    rule Gwarmstorageread       < REGOLITH > => 100
+    rule Gwarmstoragedirtystore < REGOLITH > => 0
+
+    rule Gpointeval < REGOLITH > => 0
+
+    rule Gbls12g1add < REGOLITH > => 0
+    rule Gbls12g1mul < REGOLITH > => 0
+    rule Gbls12g2add < REGOLITH > => 0
+    rule Gbls12g2mul < REGOLITH > => 0
+    rule Gbls12PairingCheckMul < REGOLITH > => 0
+    rule Gbls12PairingCheckAdd < REGOLITH > => 0
+    rule Gbls12mapfptog1 < REGOLITH > => 0
+    rule Gbls12mapfp2tog2 < REGOLITH > => 0
+
+    rule Gaccessliststoragekey < REGOLITH > => 1900
+    rule Gaccesslistaddress    < REGOLITH > => 2400
+
+    rule maxInitCodeSize   < REGOLITH > => 0
+    rule Ginitcodewordcost < REGOLITH > => 0
+
+    rule Rmaxquotient < REGOLITH > => 5
+
+    rule Gselfdestructnewaccount << REGOLITH >> => true
+    rule Gstaticcalldepth        << REGOLITH >> => false
+    rule Gemptyisnonexistent     << REGOLITH >> => true
+    rule Gzerovaluenewaccountgas << REGOLITH >> => false
+    rule Ghasrevert              << REGOLITH >> => true
+    rule Ghasreturndata          << REGOLITH >> => true
+    rule Ghasstaticcall          << REGOLITH >> => true
+    rule Ghasshift               << REGOLITH >> => true
+    rule Ghasdirtysstore         << REGOLITH >> => true
+    rule Ghassstorestipend       << REGOLITH >> => true
+    rule Ghascreate2             << REGOLITH >> => true
+    rule Ghasextcodehash         << REGOLITH >> => true
+    rule Ghasselfbalance         << REGOLITH >> => true
+    rule Ghaschainid             << REGOLITH >> => true
+    rule Ghasaccesslist          << REGOLITH >> => true
+    rule Ghasbasefee             << REGOLITH >> => true
+    rule Ghasrejectedfirstbyte   << REGOLITH >> => true
+    rule Ghasprevrandao          << REGOLITH >> => true
+    rule Ghasmaxinitcodesize     << REGOLITH >> => false
+    rule Ghaspushzero            << REGOLITH >> => false
+    rule Ghaswarmcoinbase        << REGOLITH >> => false
+    rule Ghaswithdrawals         << REGOLITH >> => false
+    rule Ghastransient           << REGOLITH >> => false
+    rule Ghasmcopy               << REGOLITH >> => false
+    rule Ghasbeaconroot          << REGOLITH >> => false
+    rule Ghaseip6780             << REGOLITH >> => false
+    rule Ghasblobbasefee         << REGOLITH >> => false
+    rule Ghasblobhash            << REGOLITH >> => false
+    rule Ghasbls12msmdiscount    << REGOLITH >> => false
+    rule Ghasdelegation          << REGOLITH >> => false
 ```
 
 ### Canyon Schedule

@@ -39,6 +39,7 @@ module SCHEDULE
     rule getSchedule(15) => CANYON
     rule getSchedule(16) => DELTA
     rule getSchedule(17) => ECOTONE
+    rule getSchedule(18) => FJORD
 
     syntax Bool ::= ScheduleFlag "<<" Schedule ">>" [function, total]
  // -----------------------------------------------------------------
@@ -2187,6 +2188,124 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << ECOTONE >> => true
     rule Ghasbls12msmdiscount    << ECOTONE >> => false
     rule Ghasdelegation          << ECOTONE >> => false
+```
+
+### Fjord Schedule
+
+```k
+    syntax Schedule ::= "FJORD" [symbol(FJORD_EVM), smtlib(schedule_FJORD)]
+ // -----------------------------------------------------------------------
+    rule Gzero    < FJORD > => 0
+
+    rule Gbase    < FJORD > => 2
+    rule Gverylow < FJORD > => 3
+    rule Glow     < FJORD > => 5
+    rule Gmid     < FJORD > => 8
+    rule Ghigh    < FJORD > => 10
+
+    rule Gexp      < FJORD > => 10
+    rule Gexpbyte  < FJORD > => 50
+    rule Gsha3     < FJORD > => 30
+    rule Gsha3word < FJORD > => 6
+
+    rule Gsload       < FJORD > => 100
+    rule Gsstoreset   < FJORD > => 20000
+    rule Gsstorereset < FJORD > => 2900
+    rule Rsstoreclear < FJORD > => 4800
+
+    rule Glog      < FJORD > => 375
+    rule Glogdata  < FJORD > => 8
+    rule Glogtopic < FJORD > => 375
+
+    rule Gcall        < FJORD > => 700
+    rule Gcallstipend < FJORD > => 2300
+    rule Gcallvalue   < FJORD > => 9000
+    rule Gnewaccount  < FJORD > => 25000
+
+    rule Gcreate       < FJORD > => 32000
+    rule Gcodedeposit  < FJORD > => 200
+    rule Gselfdestruct < FJORD > => 5000
+    rule Rselfdestruct < FJORD > => 0
+
+    rule Gmemory      < FJORD > => 3
+    rule Gquadcoeff   < FJORD > => 512
+    rule Gcopy        < FJORD > => 3
+    rule Gquaddivisor < FJORD > => 3
+
+    rule Gtransaction   < FJORD > => 21000
+    rule Gtxcreate      < FJORD > => 53000
+    rule Gtxdatazero    < FJORD > => 4
+    rule Gtxdatanonzero < FJORD > => 16
+
+    rule Gjumpdest    < FJORD > => 1
+    rule Gbalance     < FJORD > => 700
+    rule Gblockhash   < FJORD > => 20
+    rule Gextcodesize < FJORD > => 700
+    rule Gextcodecopy < FJORD > => 700
+
+    rule Gecadd       < FJORD > => 150
+    rule Gecmul       < FJORD > => 6000
+    rule Gecpairconst < FJORD > => 45000
+    rule Gecpaircoeff < FJORD > => 34000
+    rule Gfround      < FJORD > => 1
+
+    rule maxCodeSize < FJORD > => 24576
+    rule Rb          < FJORD > => 0
+
+    rule Gcoldsload             < FJORD > => 2100
+    rule Gcoldaccountaccess     < FJORD > => 2600
+    rule Gwarmstorageread       < FJORD > => 100
+    rule Gwarmstoragedirtystore < FJORD > => 100
+
+    rule Gpointeval < FJORD > => 50000
+
+    rule Gbls12g1add < FJORD > => 0
+    rule Gbls12g1mul < FJORD > => 0
+    rule Gbls12g2add < FJORD > => 0
+    rule Gbls12g2mul < FJORD > => 0
+    rule Gbls12PairingCheckMul < FJORD > => 0
+    rule Gbls12PairingCheckAdd < FJORD > => 0
+    rule Gbls12mapfptog1 < FJORD > => 0
+    rule Gbls12mapfp2tog2 < FJORD > => 0
+
+    rule Gaccessliststoragekey < FJORD > => 1900
+    rule Gaccesslistaddress    < FJORD > => 2400
+
+    rule maxInitCodeSize   < FJORD > => 49152
+    rule Ginitcodewordcost < FJORD > => 2
+
+    rule Rmaxquotient < FJORD > => 5
+
+    rule Gselfdestructnewaccount << FJORD >> => true
+    rule Gstaticcalldepth        << FJORD >> => false
+    rule Gemptyisnonexistent     << FJORD >> => true
+    rule Gzerovaluenewaccountgas << FJORD >> => false
+    rule Ghasrevert              << FJORD >> => true
+    rule Ghasreturndata          << FJORD >> => true
+    rule Ghasstaticcall          << FJORD >> => true
+    rule Ghasshift               << FJORD >> => true
+    rule Ghasdirtysstore         << FJORD >> => true
+    rule Ghassstorestipend       << FJORD >> => true
+    rule Ghascreate2             << FJORD >> => true
+    rule Ghasextcodehash         << FJORD >> => true
+    rule Ghasselfbalance         << FJORD >> => true
+    rule Ghaschainid             << FJORD >> => true
+    rule Ghasaccesslist          << FJORD >> => true
+    rule Ghasbasefee             << FJORD >> => true
+    rule Ghasrejectedfirstbyte   << FJORD >> => true
+    rule Ghasprevrandao          << FJORD >> => true
+    rule Ghasmaxinitcodesize     << FJORD >> => true
+    rule Ghaspushzero            << FJORD >> => true
+    rule Ghaswarmcoinbase        << FJORD >> => true
+    rule Ghaswithdrawals         << FJORD >> => true
+    rule Ghastransient           << FJORD >> => true
+    rule Ghasmcopy               << FJORD >> => true
+    rule Ghasbeaconroot          << FJORD >> => true
+    rule Ghaseip6780             << FJORD >> => true
+    rule Ghasblobbasefee         << FJORD >> => true
+    rule Ghasblobhash            << FJORD >> => true
+    rule Ghasbls12msmdiscount    << FJORD >> => false
+    rule Ghasdelegation          << FJORD >> => false
 
 endmodule
 ```

@@ -42,6 +42,7 @@ module SCHEDULE
     rule getSchedule(18) => FJORD
     rule getSchedule(19) => GRANITE
     rule getSchedule(20) => HOLOCENE
+    rule getSchedule(21) => ISTHMUS
 
     syntax Bool ::= ScheduleFlag "<<" Schedule ">>" [function, total]
  // -----------------------------------------------------------------
@@ -2544,6 +2545,125 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << HOLOCENE >> => true
     rule Ghasbls12msmdiscount    << HOLOCENE >> => false
     rule Ghasdelegation          << HOLOCENE >> => false
+```
+
+### Isthmus Schedule
+
+```k
+    syntax Schedule ::= "ISTHMUS" [symbol(ISTHMUS_EVM), smtlib(schedule_ISTHMUS)]
+ // -----------------------------------------------------------------------------
+
+    rule Gzero    < ISTHMUS > => 0
+
+    rule Gbase    < ISTHMUS > => 2
+    rule Gverylow < ISTHMUS > => 3
+    rule Glow     < ISTHMUS > => 5
+    rule Gmid     < ISTHMUS > => 8
+    rule Ghigh    < ISTHMUS > => 10
+
+    rule Gexp      < ISTHMUS > => 10
+    rule Gexpbyte  < ISTHMUS > => 50
+    rule Gsha3     < ISTHMUS > => 30
+    rule Gsha3word < ISTHMUS > => 6
+
+    rule Gsload       < ISTHMUS > => 100
+    rule Gsstoreset   < ISTHMUS > => 20000
+    rule Gsstorereset < ISTHMUS > => 2900
+    rule Rsstoreclear < ISTHMUS > => 4800
+
+    rule Glog      < ISTHMUS > => 375
+    rule Glogdata  < ISTHMUS > => 8
+    rule Glogtopic < ISTHMUS > => 375
+
+    rule Gcall        < ISTHMUS > => 700
+    rule Gcallstipend < ISTHMUS > => 2300
+    rule Gcallvalue   < ISTHMUS > => 9000
+    rule Gnewaccount  < ISTHMUS > => 25000
+
+    rule Gcreate       < ISTHMUS > => 32000
+    rule Gcodedeposit  < ISTHMUS > => 200
+    rule Gselfdestruct < ISTHMUS > => 5000
+    rule Rselfdestruct < ISTHMUS > => 0
+
+    rule Gmemory      < ISTHMUS > => 3
+    rule Gquadcoeff   < ISTHMUS > => 512
+    rule Gcopy        < ISTHMUS > => 3
+    rule Gquaddivisor < ISTHMUS > => 3
+
+    rule Gtransaction   < ISTHMUS > => 21000
+    rule Gtxcreate      < ISTHMUS > => 53000
+    rule Gtxdatazero    < ISTHMUS > => 4
+    rule Gtxdatanonzero < ISTHMUS > => 16
+
+    rule Gjumpdest    < ISTHMUS > => 1
+    rule Gbalance     < ISTHMUS > => 700
+    rule Gblockhash   < ISTHMUS > => 20
+    rule Gextcodesize < ISTHMUS > => 700
+    rule Gextcodecopy < ISTHMUS > => 700
+
+    rule Gecadd       < ISTHMUS > => 150
+    rule Gecmul       < ISTHMUS > => 6000
+    rule Gecpairconst < ISTHMUS > => 45000
+    rule Gecpaircoeff < ISTHMUS > => 34000
+    rule Gfround      < ISTHMUS > => 1
+
+    rule maxCodeSize < ISTHMUS > => 24576
+    rule Rb          < ISTHMUS > => 0
+
+    rule Gcoldsload             < ISTHMUS > => 2100
+    rule Gcoldaccountaccess     < ISTHMUS > => 2600
+    rule Gwarmstorageread       < ISTHMUS > => 100
+    rule Gwarmstoragedirtystore < ISTHMUS > => 100
+
+    rule Gpointeval < ISTHMUS > => 50000
+
+    rule Gbls12g1add < ISTHMUS > => 375
+    rule Gbls12g1mul < ISTHMUS > => 12000
+    rule Gbls12g2add < ISTHMUS > => 600
+    rule Gbls12g2mul < ISTHMUS > => 22500
+    rule Gbls12PairingCheckMul < ISTHMUS > => 32600
+    rule Gbls12PairingCheckAdd < ISTHMUS > => 37700
+    rule Gbls12mapfptog1 < ISTHMUS > => 5500
+    rule Gbls12mapfp2tog2 < ISTHMUS > => 23800
+
+    rule Gaccessliststoragekey < ISTHMUS > => 1900
+    rule Gaccesslistaddress    < ISTHMUS > => 2400
+
+    rule maxInitCodeSize   < ISTHMUS > => 49152
+    rule Ginitcodewordcost < ISTHMUS > => 2
+
+    rule Rmaxquotient < ISTHMUS > => 5
+
+    rule Gselfdestructnewaccount << ISTHMUS >> => true
+    rule Gstaticcalldepth        << ISTHMUS >> => false
+    rule Gemptyisnonexistent     << ISTHMUS >> => true
+    rule Gzerovaluenewaccountgas << ISTHMUS >> => false
+    rule Ghasrevert              << ISTHMUS >> => true
+    rule Ghasreturndata          << ISTHMUS >> => true
+    rule Ghasstaticcall          << ISTHMUS >> => true
+    rule Ghasshift               << ISTHMUS >> => true
+    rule Ghasdirtysstore         << ISTHMUS >> => true
+    rule Ghassstorestipend       << ISTHMUS >> => true
+    rule Ghascreate2             << ISTHMUS >> => true
+    rule Ghasextcodehash         << ISTHMUS >> => true
+    rule Ghasselfbalance         << ISTHMUS >> => true
+    rule Ghaschainid             << ISTHMUS >> => true
+    rule Ghasaccesslist          << ISTHMUS >> => true
+    rule Ghasbasefee             << ISTHMUS >> => true
+    rule Ghasrejectedfirstbyte   << ISTHMUS >> => true
+    rule Ghasprevrandao          << ISTHMUS >> => true
+    rule Ghasmaxinitcodesize     << ISTHMUS >> => true
+    rule Ghaspushzero            << ISTHMUS >> => true
+    rule Ghaswarmcoinbase        << ISTHMUS >> => true
+    rule Ghaswithdrawals         << ISTHMUS >> => true
+    rule Ghastransient           << ISTHMUS >> => true
+    rule Ghasmcopy               << ISTHMUS >> => true
+    rule Ghasbeaconroot          << ISTHMUS >> => true
+    rule Ghaseip6780             << ISTHMUS >> => true
+    rule Ghasblobbasefee         << ISTHMUS >> => true
+    rule Ghasblobhash            << ISTHMUS >> => true
+    rule Ghasbls12msmdiscount    << ISTHMUS >> => true
+    rule Ghasdelegation          << ISTHMUS >> => true
 
 endmodule
 ```

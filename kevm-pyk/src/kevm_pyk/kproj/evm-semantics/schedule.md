@@ -40,6 +40,7 @@ module SCHEDULE
     rule getSchedule(16) => DELTA
     rule getSchedule(17) => ECOTONE
     rule getSchedule(18) => FJORD
+    rule getSchedule(19) => GRANITE
 
     syntax Bool ::= ScheduleFlag "<<" Schedule ">>" [function, total]
  // -----------------------------------------------------------------
@@ -2306,6 +2307,124 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << FJORD >> => true
     rule Ghasbls12msmdiscount    << FJORD >> => false
     rule Ghasdelegation          << FJORD >> => false
+```
+
+### Granite Schedule
+
+```k
+    syntax Schedule ::= "GRANITE" [symbol(GRANITE_EVM), smtlib(schedule_GRANITE)]
+ // -----------------------------------------------------------------------------
+    rule Gzero    < GRANITE > => 0
+
+    rule Gbase    < GRANITE > => 2
+    rule Gverylow < GRANITE > => 3
+    rule Glow     < GRANITE > => 5
+    rule Gmid     < GRANITE > => 8
+    rule Ghigh    < GRANITE > => 10
+
+    rule Gexp      < GRANITE > => 10
+    rule Gexpbyte  < GRANITE > => 50
+    rule Gsha3     < GRANITE > => 30
+    rule Gsha3word < GRANITE > => 6
+
+    rule Gsload       < GRANITE > => 100
+    rule Gsstoreset   < GRANITE > => 20000
+    rule Gsstorereset < GRANITE > => 2900
+    rule Rsstoreclear < GRANITE > => 4800
+
+    rule Glog      < GRANITE > => 375
+    rule Glogdata  < GRANITE > => 8
+    rule Glogtopic < GRANITE > => 375
+
+    rule Gcall        < GRANITE > => 700
+    rule Gcallstipend < GRANITE > => 2300
+    rule Gcallvalue   < GRANITE > => 9000
+    rule Gnewaccount  < GRANITE > => 25000
+
+    rule Gcreate       < GRANITE > => 32000
+    rule Gcodedeposit  < GRANITE > => 200
+    rule Gselfdestruct < GRANITE > => 5000
+    rule Rselfdestruct < GRANITE > => 0
+
+    rule Gmemory      < GRANITE > => 3
+    rule Gquadcoeff   < GRANITE > => 512
+    rule Gcopy        < GRANITE > => 3
+    rule Gquaddivisor < GRANITE > => 3
+
+    rule Gtransaction   < GRANITE > => 21000
+    rule Gtxcreate      < GRANITE > => 53000
+    rule Gtxdatazero    < GRANITE > => 4
+    rule Gtxdatanonzero < GRANITE > => 16
+
+    rule Gjumpdest    < GRANITE > => 1
+    rule Gbalance     < GRANITE > => 700
+    rule Gblockhash   < GRANITE > => 20
+    rule Gextcodesize < GRANITE > => 700
+    rule Gextcodecopy < GRANITE > => 700
+
+    rule Gecadd       < GRANITE > => 150
+    rule Gecmul       < GRANITE > => 6000
+    rule Gecpairconst < GRANITE > => 45000
+    rule Gecpaircoeff < GRANITE > => 34000
+    rule Gfround      < GRANITE > => 1
+
+    rule maxCodeSize < GRANITE > => 24576
+    rule Rb          < GRANITE > => 0
+
+    rule Gcoldsload             < GRANITE > => 2100
+    rule Gcoldaccountaccess     < GRANITE > => 2600
+    rule Gwarmstorageread       < GRANITE > => 100
+    rule Gwarmstoragedirtystore < GRANITE > => 100
+
+    rule Gpointeval < GRANITE > => 50000
+
+    rule Gbls12g1add < GRANITE > => 0
+    rule Gbls12g1mul < GRANITE > => 0
+    rule Gbls12g2add < GRANITE > => 0
+    rule Gbls12g2mul < GRANITE > => 0
+    rule Gbls12PairingCheckMul < GRANITE > => 0
+    rule Gbls12PairingCheckAdd < GRANITE > => 0
+    rule Gbls12mapfptog1 < GRANITE > => 0
+    rule Gbls12mapfp2tog2 < GRANITE > => 0
+
+    rule Gaccessliststoragekey < GRANITE > => 1900
+    rule Gaccesslistaddress    < GRANITE > => 2400
+
+    rule maxInitCodeSize   < GRANITE > => 49152
+    rule Ginitcodewordcost < GRANITE > => 2
+
+    rule Rmaxquotient < GRANITE > => 5
+
+    rule Gselfdestructnewaccount << GRANITE >> => true
+    rule Gstaticcalldepth        << GRANITE >> => false
+    rule Gemptyisnonexistent     << GRANITE >> => true
+    rule Gzerovaluenewaccountgas << GRANITE >> => false
+    rule Ghasrevert              << GRANITE >> => true
+    rule Ghasreturndata          << GRANITE >> => true
+    rule Ghasstaticcall          << GRANITE >> => true
+    rule Ghasshift               << GRANITE >> => true
+    rule Ghasdirtysstore         << GRANITE >> => true
+    rule Ghassstorestipend       << GRANITE >> => true
+    rule Ghascreate2             << GRANITE >> => true
+    rule Ghasextcodehash         << GRANITE >> => true
+    rule Ghasselfbalance         << GRANITE >> => true
+    rule Ghaschainid             << GRANITE >> => true
+    rule Ghasaccesslist          << GRANITE >> => true
+    rule Ghasbasefee             << GRANITE >> => true
+    rule Ghasrejectedfirstbyte   << GRANITE >> => true
+    rule Ghasprevrandao          << GRANITE >> => true
+    rule Ghasmaxinitcodesize     << GRANITE >> => true
+    rule Ghaspushzero            << GRANITE >> => true
+    rule Ghaswarmcoinbase        << GRANITE >> => true
+    rule Ghaswithdrawals         << GRANITE >> => true
+    rule Ghastransient           << GRANITE >> => true
+    rule Ghasmcopy               << GRANITE >> => true
+    rule Ghasbeaconroot          << GRANITE >> => true
+    rule Ghaseip6780             << GRANITE >> => true
+    rule Ghasblobbasefee         << GRANITE >> => true
+    rule Ghasblobhash            << GRANITE >> => true
+    rule Ghasbls12msmdiscount    << GRANITE >> => false
+    rule Ghasdelegation          << GRANITE >> => false
 
 endmodule
 ```

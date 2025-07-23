@@ -41,6 +41,7 @@ module SCHEDULE
     rule getSchedule(17) => ECOTONE
     rule getSchedule(18) => FJORD
     rule getSchedule(19) => GRANITE
+    rule getSchedule(20) => HOLOCENE
 
     syntax Bool ::= ScheduleFlag "<<" Schedule ">>" [function, total]
  // -----------------------------------------------------------------
@@ -2425,6 +2426,124 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << GRANITE >> => true
     rule Ghasbls12msmdiscount    << GRANITE >> => false
     rule Ghasdelegation          << GRANITE >> => false
+```
+
+### Holocene Schedule
+
+```k
+    syntax Schedule ::= "HOLOCENE" [symbol(HOLOCENE_EVM), smtlib(schedule_HOLOCENE)]
+ // --------------------------------------------------------------------------------
+    rule Gzero    < HOLOCENE > => 0
+
+    rule Gbase    < HOLOCENE > => 2
+    rule Gverylow < HOLOCENE > => 3
+    rule Glow     < HOLOCENE > => 5
+    rule Gmid     < HOLOCENE > => 8
+    rule Ghigh    < HOLOCENE > => 10
+
+    rule Gexp      < HOLOCENE > => 10
+    rule Gexpbyte  < HOLOCENE > => 50
+    rule Gsha3     < HOLOCENE > => 30
+    rule Gsha3word < HOLOCENE > => 6
+
+    rule Gsload       < HOLOCENE > => 100
+    rule Gsstoreset   < HOLOCENE > => 20000
+    rule Gsstorereset < HOLOCENE > => 2900
+    rule Rsstoreclear < HOLOCENE > => 4800
+
+    rule Glog      < HOLOCENE > => 375
+    rule Glogdata  < HOLOCENE > => 8
+    rule Glogtopic < HOLOCENE > => 375
+
+    rule Gcall        < HOLOCENE > => 700
+    rule Gcallstipend < HOLOCENE > => 2300
+    rule Gcallvalue   < HOLOCENE > => 9000
+    rule Gnewaccount  < HOLOCENE > => 25000
+
+    rule Gcreate       < HOLOCENE > => 32000
+    rule Gcodedeposit  < HOLOCENE > => 200
+    rule Gselfdestruct < HOLOCENE > => 5000
+    rule Rselfdestruct < HOLOCENE > => 0
+
+    rule Gmemory      < HOLOCENE > => 3
+    rule Gquadcoeff   < HOLOCENE > => 512
+    rule Gcopy        < HOLOCENE > => 3
+    rule Gquaddivisor < HOLOCENE > => 3
+
+    rule Gtransaction   < HOLOCENE > => 21000
+    rule Gtxcreate      < HOLOCENE > => 53000
+    rule Gtxdatazero    < HOLOCENE > => 4
+    rule Gtxdatanonzero < HOLOCENE > => 16
+
+    rule Gjumpdest    < HOLOCENE > => 1
+    rule Gbalance     < HOLOCENE > => 700
+    rule Gblockhash   < HOLOCENE > => 20
+    rule Gextcodesize < HOLOCENE > => 700
+    rule Gextcodecopy < HOLOCENE > => 700
+
+    rule Gecadd       < HOLOCENE > => 150
+    rule Gecmul       < HOLOCENE > => 6000
+    rule Gecpairconst < HOLOCENE > => 45000
+    rule Gecpaircoeff < HOLOCENE > => 34000
+    rule Gfround      < HOLOCENE > => 1
+
+    rule maxCodeSize < HOLOCENE > => 24576
+    rule Rb          < HOLOCENE > => 0
+
+    rule Gcoldsload             < HOLOCENE > => 2100
+    rule Gcoldaccountaccess     < HOLOCENE > => 2600
+    rule Gwarmstorageread       < HOLOCENE > => 100
+    rule Gwarmstoragedirtystore < HOLOCENE > => 100
+
+    rule Gpointeval < HOLOCENE > => 50000
+
+    rule Gbls12g1add < HOLOCENE > => 0
+    rule Gbls12g1mul < HOLOCENE > => 0
+    rule Gbls12g2add < HOLOCENE > => 0
+    rule Gbls12g2mul < HOLOCENE > => 0
+    rule Gbls12PairingCheckMul < HOLOCENE > => 0
+    rule Gbls12PairingCheckAdd < HOLOCENE > => 0
+    rule Gbls12mapfptog1 < HOLOCENE > => 0
+    rule Gbls12mapfp2tog2 < HOLOCENE > => 0
+
+    rule Gaccessliststoragekey < HOLOCENE > => 1900
+    rule Gaccesslistaddress    < HOLOCENE > => 2400
+
+    rule maxInitCodeSize   < HOLOCENE > => 49152
+    rule Ginitcodewordcost < HOLOCENE > => 2
+
+    rule Rmaxquotient < HOLOCENE > => 5
+
+    rule Gselfdestructnewaccount << HOLOCENE >> => true
+    rule Gstaticcalldepth        << HOLOCENE >> => false
+    rule Gemptyisnonexistent     << HOLOCENE >> => true
+    rule Gzerovaluenewaccountgas << HOLOCENE >> => false
+    rule Ghasrevert              << HOLOCENE >> => true
+    rule Ghasreturndata          << HOLOCENE >> => true
+    rule Ghasstaticcall          << HOLOCENE >> => true
+    rule Ghasshift               << HOLOCENE >> => true
+    rule Ghasdirtysstore         << HOLOCENE >> => true
+    rule Ghassstorestipend       << HOLOCENE >> => true
+    rule Ghascreate2             << HOLOCENE >> => true
+    rule Ghasextcodehash         << HOLOCENE >> => true
+    rule Ghasselfbalance         << HOLOCENE >> => true
+    rule Ghaschainid             << HOLOCENE >> => true
+    rule Ghasaccesslist          << HOLOCENE >> => true
+    rule Ghasbasefee             << HOLOCENE >> => true
+    rule Ghasrejectedfirstbyte   << HOLOCENE >> => true
+    rule Ghasprevrandao          << HOLOCENE >> => true
+    rule Ghasmaxinitcodesize     << HOLOCENE >> => true
+    rule Ghaspushzero            << HOLOCENE >> => true
+    rule Ghaswarmcoinbase        << HOLOCENE >> => true
+    rule Ghaswithdrawals         << HOLOCENE >> => true
+    rule Ghastransient           << HOLOCENE >> => true
+    rule Ghasmcopy               << HOLOCENE >> => true
+    rule Ghasbeaconroot          << HOLOCENE >> => true
+    rule Ghaseip6780             << HOLOCENE >> => true
+    rule Ghasblobbasefee         << HOLOCENE >> => true
+    rule Ghasblobhash            << HOLOCENE >> => true
+    rule Ghasbls12msmdiscount    << HOLOCENE >> => false
+    rule Ghasdelegation          << HOLOCENE >> => false
 
 endmodule
 ```

@@ -36,6 +36,7 @@ module SCHEDULE
     rule getSchedule(12) => CANCUN
     rule getSchedule(13) => PRAGUE
     rule getSchedule(14) => BEDROCK
+    rule getSchedule(15) => CANYON
 
     syntax Bool ::= ScheduleFlag "<<" Schedule ">>" [function, total]
  // -----------------------------------------------------------------
@@ -1830,6 +1831,124 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << BEDROCK >> => false
     rule Ghasbls12msmdiscount    << BEDROCK >> => false
     rule Ghasdelegation          << BEDROCK >> => false
+```
+
+### Canyon Schedule
+
+```k
+    syntax Schedule ::= "CANYON" [symbol(CANYON_EVM), smtlib(schedule_CANYON)]
+ // --------------------------------------------------------------------------
+    rule Gzero    < CANYON > => 0
+
+    rule Gbase    < CANYON > => 2
+    rule Gverylow < CANYON > => 3
+    rule Glow     < CANYON > => 5
+    rule Gmid     < CANYON > => 8
+    rule Ghigh    < CANYON > => 10
+
+    rule Gexp      < CANYON > => 10
+    rule Gexpbyte  < CANYON > => 50
+    rule Gsha3     < CANYON > => 30
+    rule Gsha3word < CANYON > => 6
+
+    rule Gsload       < CANYON > => 100
+    rule Gsstoreset   < CANYON > => 20000
+    rule Gsstorereset < CANYON > => 2900
+    rule Rsstoreclear < CANYON > => 4800
+
+    rule Glog      < CANYON > => 375
+    rule Glogdata  < CANYON > => 8
+    rule Glogtopic < CANYON > => 375
+
+    rule Gcall        < CANYON > => 700
+    rule Gcallstipend < CANYON > => 2300
+    rule Gcallvalue   < CANYON > => 9000
+    rule Gnewaccount  < CANYON > => 25000
+
+    rule Gcreate       < CANYON > => 32000
+    rule Gcodedeposit  < CANYON > => 200
+    rule Gselfdestruct < CANYON > => 5000
+    rule Rselfdestruct < CANYON > => 0
+
+    rule Gmemory      < CANYON > => 3
+    rule Gquadcoeff   < CANYON > => 512
+    rule Gcopy        < CANYON > => 3
+    rule Gquaddivisor < CANYON > => 3
+
+    rule Gtransaction   < CANYON > => 21000
+    rule Gtxcreate      < CANYON > => 53000
+    rule Gtxdatazero    < CANYON > => 4
+    rule Gtxdatanonzero < CANYON > => 16
+
+    rule Gjumpdest    < CANYON > => 1
+    rule Gbalance     < CANYON > => 700
+    rule Gblockhash   < CANYON > => 20
+    rule Gextcodesize < CANYON > => 700
+    rule Gextcodecopy < CANYON > => 700
+
+    rule Gecadd       < CANYON > => 150
+    rule Gecmul       < CANYON > => 6000
+    rule Gecpairconst < CANYON > => 45000
+    rule Gecpaircoeff < CANYON > => 34000
+    rule Gfround      < CANYON > => 1
+
+    rule maxCodeSize < CANYON > => 24576
+    rule Rb          < CANYON > => 0
+
+    rule Gcoldsload             < CANYON > => 2100
+    rule Gcoldaccountaccess     < CANYON > => 2600
+    rule Gwarmstorageread       < CANYON > => 100
+    rule Gwarmstoragedirtystore < CANYON > => 0
+
+    rule Gpointeval < CANYON > => 0
+
+    rule Gbls12g1add < CANYON > => 0
+    rule Gbls12g1mul < CANYON > => 0
+    rule Gbls12g2add < CANYON > => 0
+    rule Gbls12g2mul < CANYON > => 0
+    rule Gbls12PairingCheckMul < CANYON > => 0
+    rule Gbls12PairingCheckAdd < CANYON > => 0
+    rule Gbls12mapfptog1 < CANYON > => 0
+    rule Gbls12mapfp2tog2 < CANYON > => 0
+
+    rule Gaccessliststoragekey < CANYON > => 1900
+    rule Gaccesslistaddress    < CANYON > => 2400
+
+    rule maxInitCodeSize   < CANYON > => 49152
+    rule Ginitcodewordcost < CANYON > => 2
+
+    rule Rmaxquotient < CANYON > => 5
+
+    rule Gselfdestructnewaccount << CANYON >> => true
+    rule Gstaticcalldepth        << CANYON >> => false
+    rule Gemptyisnonexistent     << CANYON >> => true
+    rule Gzerovaluenewaccountgas << CANYON >> => false
+    rule Ghasrevert              << CANYON >> => true
+    rule Ghasreturndata          << CANYON >> => true
+    rule Ghasstaticcall          << CANYON >> => true
+    rule Ghasshift               << CANYON >> => true
+    rule Ghasdirtysstore         << CANYON >> => true
+    rule Ghassstorestipend       << CANYON >> => true
+    rule Ghascreate2             << CANYON >> => true
+    rule Ghasextcodehash         << CANYON >> => true
+    rule Ghasselfbalance         << CANYON >> => true
+    rule Ghaschainid             << CANYON >> => true
+    rule Ghasaccesslist          << CANYON >> => true
+    rule Ghasbasefee             << CANYON >> => true
+    rule Ghasrejectedfirstbyte   << CANYON >> => true
+    rule Ghasprevrandao          << CANYON >> => true
+    rule Ghasmaxinitcodesize     << CANYON >> => true
+    rule Ghaspushzero            << CANYON >> => true
+    rule Ghaswarmcoinbase        << CANYON >> => true
+    rule Ghaswithdrawals         << CANYON >> => true
+    rule Ghastransient           << CANYON >> => false
+    rule Ghasmcopy               << CANYON >> => false
+    rule Ghasbeaconroot          << CANYON >> => false
+    rule Ghaseip6780             << CANYON >> => false
+    rule Ghasblobbasefee         << CANYON >> => false
+    rule Ghasblobhash            << CANYON >> => false
+    rule Ghasbls12msmdiscount    << CANYON >> => false
+    rule Ghasdelegation          << CANYON >> => false
 
 endmodule
 ```

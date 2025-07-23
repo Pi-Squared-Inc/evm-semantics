@@ -1599,7 +1599,6 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << CANCUN >> => true
     rule Ghasbls12msmdiscount    << CANCUN >> => false
     rule Ghasdelegation          << CANCUN >> => false
-
 ```
 
 ### Prague Schedule
@@ -1719,7 +1718,6 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << PRAGUE >> => true
     rule Ghasbls12msmdiscount    << PRAGUE >> => true
     rule Ghasdelegation          << PRAGUE >> => true
-
 ```
 
 ### Bedrock Schedule

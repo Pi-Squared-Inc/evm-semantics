@@ -38,6 +38,7 @@ module SCHEDULE
     rule getSchedule(14) => BEDROCK
     rule getSchedule(15) => CANYON
     rule getSchedule(16) => DELTA
+    rule getSchedule(17) => ECOTONE
 
     syntax Bool ::= ScheduleFlag "<<" Schedule ">>" [function, total]
  // -----------------------------------------------------------------
@@ -2068,6 +2069,124 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << DELTA >> => false
     rule Ghasbls12msmdiscount    << DELTA >> => false
     rule Ghasdelegation          << DELTA >> => false
+```
+
+### Ecotone Schedule
+
+```k
+    syntax Schedule ::= "ECOTONE" [symbol(ECOTONE_EVM), smtlib(schedule_ECOTONE)]
+ // -----------------------------------------------------------------------------
+    rule Gzero    < ECOTONE > => 0
+
+    rule Gbase    < ECOTONE > => 2
+    rule Gverylow < ECOTONE > => 3
+    rule Glow     < ECOTONE > => 5
+    rule Gmid     < ECOTONE > => 8
+    rule Ghigh    < ECOTONE > => 10
+
+    rule Gexp      < ECOTONE > => 10
+    rule Gexpbyte  < ECOTONE > => 50
+    rule Gsha3     < ECOTONE > => 30
+    rule Gsha3word < ECOTONE > => 6
+
+    rule Gsload       < ECOTONE > => 100
+    rule Gsstoreset   < ECOTONE > => 20000
+    rule Gsstorereset < ECOTONE > => 2900
+    rule Rsstoreclear < ECOTONE > => 4800
+
+    rule Glog      < ECOTONE > => 375
+    rule Glogdata  < ECOTONE > => 8
+    rule Glogtopic < ECOTONE > => 375
+
+    rule Gcall        < ECOTONE > => 700
+    rule Gcallstipend < ECOTONE > => 2300
+    rule Gcallvalue   < ECOTONE > => 9000
+    rule Gnewaccount  < ECOTONE > => 25000
+
+    rule Gcreate       < ECOTONE > => 32000
+    rule Gcodedeposit  < ECOTONE > => 200
+    rule Gselfdestruct < ECOTONE > => 5000
+    rule Rselfdestruct < ECOTONE > => 0
+
+    rule Gmemory      < ECOTONE > => 3
+    rule Gquadcoeff   < ECOTONE > => 512
+    rule Gcopy        < ECOTONE > => 3
+    rule Gquaddivisor < ECOTONE > => 3
+
+    rule Gtransaction   < ECOTONE > => 21000
+    rule Gtxcreate      < ECOTONE > => 53000
+    rule Gtxdatazero    < ECOTONE > => 4
+    rule Gtxdatanonzero < ECOTONE > => 16
+
+    rule Gjumpdest    < ECOTONE > => 1
+    rule Gbalance     < ECOTONE > => 700
+    rule Gblockhash   < ECOTONE > => 20
+    rule Gextcodesize < ECOTONE > => 700
+    rule Gextcodecopy < ECOTONE > => 700
+
+    rule Gecadd       < ECOTONE > => 150
+    rule Gecmul       < ECOTONE > => 6000
+    rule Gecpairconst < ECOTONE > => 45000
+    rule Gecpaircoeff < ECOTONE > => 34000
+    rule Gfround      < ECOTONE > => 1
+
+    rule maxCodeSize < ECOTONE > => 24576
+    rule Rb          < ECOTONE > => 0
+
+    rule Gcoldsload             < ECOTONE > => 2100
+    rule Gcoldaccountaccess     < ECOTONE > => 2600
+    rule Gwarmstorageread       < ECOTONE > => 100
+    rule Gwarmstoragedirtystore < ECOTONE > => 100
+
+    rule Gpointeval < ECOTONE > => 50000
+
+    rule Gbls12g1add < ECOTONE > => 0
+    rule Gbls12g1mul < ECOTONE > => 0
+    rule Gbls12g2add < ECOTONE > => 0
+    rule Gbls12g2mul < ECOTONE > => 0
+    rule Gbls12PairingCheckMul < ECOTONE > => 0
+    rule Gbls12PairingCheckAdd < ECOTONE > => 0
+    rule Gbls12mapfptog1 < ECOTONE > => 0
+    rule Gbls12mapfp2tog2 < ECOTONE > => 0
+
+    rule Gaccessliststoragekey < ECOTONE > => 1900
+    rule Gaccesslistaddress    < ECOTONE > => 2400
+
+    rule maxInitCodeSize   < ECOTONE > => 49152
+    rule Ginitcodewordcost < ECOTONE > => 2
+
+    rule Rmaxquotient < ECOTONE > => 5
+
+    rule Gselfdestructnewaccount << ECOTONE >> => true
+    rule Gstaticcalldepth        << ECOTONE >> => false
+    rule Gemptyisnonexistent     << ECOTONE >> => true
+    rule Gzerovaluenewaccountgas << ECOTONE >> => false
+    rule Ghasrevert              << ECOTONE >> => true
+    rule Ghasreturndata          << ECOTONE >> => true
+    rule Ghasstaticcall          << ECOTONE >> => true
+    rule Ghasshift               << ECOTONE >> => true
+    rule Ghasdirtysstore         << ECOTONE >> => true
+    rule Ghassstorestipend       << ECOTONE >> => true
+    rule Ghascreate2             << ECOTONE >> => true
+    rule Ghasextcodehash         << ECOTONE >> => true
+    rule Ghasselfbalance         << ECOTONE >> => true
+    rule Ghaschainid             << ECOTONE >> => true
+    rule Ghasaccesslist          << ECOTONE >> => true
+    rule Ghasbasefee             << ECOTONE >> => true
+    rule Ghasrejectedfirstbyte   << ECOTONE >> => true
+    rule Ghasprevrandao          << ECOTONE >> => true
+    rule Ghasmaxinitcodesize     << ECOTONE >> => true
+    rule Ghaspushzero            << ECOTONE >> => true
+    rule Ghaswarmcoinbase        << ECOTONE >> => true
+    rule Ghaswithdrawals         << ECOTONE >> => true
+    rule Ghastransient           << ECOTONE >> => true
+    rule Ghasmcopy               << ECOTONE >> => true
+    rule Ghasbeaconroot          << ECOTONE >> => true
+    rule Ghaseip6780             << ECOTONE >> => true
+    rule Ghasblobbasefee         << ECOTONE >> => true
+    rule Ghasblobhash            << ECOTONE >> => true
+    rule Ghasbls12msmdiscount    << ECOTONE >> => false
+    rule Ghasdelegation          << ECOTONE >> => false
 
 endmodule
 ```

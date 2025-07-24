@@ -35,15 +35,15 @@ module SCHEDULE
     rule getSchedule(11) => SHANGHAI
     rule getSchedule(12) => CANCUN
     rule getSchedule(13) => PRAGUE
-    rule getSchedule(14) => BEDROCK
-    rule getSchedule(15) => REGOLITH
-    rule getSchedule(16) => CANYON
-    rule getSchedule(17) => DELTA
-    rule getSchedule(18) => ECOTONE
-    rule getSchedule(19) => FJORD
-    rule getSchedule(20) => GRANITE
-    rule getSchedule(21) => HOLOCENE
-    rule getSchedule(22) => ISTHMUS
+    rule getSchedule(100) => BEDROCK
+    rule getSchedule(101) => REGOLITH
+    rule getSchedule(102) => CANYON
+    rule getSchedule(103) => DELTA
+    rule getSchedule(104) => ECOTONE
+    rule getSchedule(105) => FJORD
+    rule getSchedule(106) => GRANITE
+    rule getSchedule(107) => HOLOCENE
+    rule getSchedule(108) => ISTHMUS
 
     syntax Bool ::= ScheduleFlag "<<" Schedule ">>" [function, total]
  // -----------------------------------------------------------------

@@ -1896,7 +1896,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << PRAGUE >> => true
     rule Ghasdelegation          << PRAGUE >> => true
     rule Gecpairinputcheck       << PRAGUE >> => false
-    rule Ghasmip001              << PRAGUE >> => false
+    rule Ghasmip001              << PRAGUE >> => true
 
     rule #isPrecompiledAccount(1p256, PRAGUE) => true
     rule #isPrecompiledAccount(2p256, PRAGUE) => true

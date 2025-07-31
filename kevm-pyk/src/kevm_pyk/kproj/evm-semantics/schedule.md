@@ -1615,7 +1615,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobbasefee         << CANCUN >> => true
     rule Ghasblobhash            << CANCUN >> => true
     rule Ghasbls12msmdiscount    << CANCUN >> => false
-    rule Ghasdelegation          << CANCUN >> => false
+    rule Ghasdelegation          << CANCUN >> => true
     rule Ghasmip001              << CANCUN >> => true
 ```
 
@@ -1645,8 +1645,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Glog      < PRAGUE > => 375
     rule Glogdata  < PRAGUE > => 8
-    rule Glogtopic < PRAGUE > => 375
-    rule Gloglimit < PRAGUE > => 0
+    rule Glogtopic < PRAGUE > => 10000
+    rule Gloglimit < PRAGUE > => 4096
 
     rule Gcall        < PRAGUE > => 700
     rule Gcallstipend < PRAGUE > => 2300
@@ -1680,7 +1680,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gecpaircoeff < PRAGUE > => 34000
     rule Gfround      < PRAGUE > => 1
 
-    rule maxCodeSize < PRAGUE > => 24576
+    rule maxCodeSize < PRAGUE > => 524288
     rule Rb          < PRAGUE > => 0
 
     rule Gcoldsload             < PRAGUE > => 2100
@@ -1702,7 +1702,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gaccessliststoragekey < PRAGUE > => 1900
     rule Gaccesslistaddress    < PRAGUE > => 2400
 
-    rule maxInitCodeSize   < PRAGUE > => 49152
+    rule maxInitCodeSize   < PRAGUE > => 548864
     rule Ginitcodewordcost < PRAGUE > => 2
 
     rule Rmaxquotient < PRAGUE > => 5
@@ -1737,7 +1737,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash            << PRAGUE >> => true
     rule Ghasbls12msmdiscount    << PRAGUE >> => true
     rule Ghasdelegation          << PRAGUE >> => true
-    rule Ghasmip001              << PRAGUE >> => false
+    rule Ghasmip001              << PRAGUE >> => true
 
 endmodule
 ```

@@ -1691,8 +1691,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Glog      < PRAGUE > => 375
     rule Glogdata  < PRAGUE > => 8
-    rule Glogtopic < PRAGUE > => 375
-    rule Gloglimit < PRAGUE > => 0
+    rule Glogtopic < PRAGUE > => 10000
+    rule Gloglimit < PRAGUE > => 4096
 
     rule Gcall        < PRAGUE > => 700
     rule Gcallstipend < PRAGUE > => 2300
@@ -1726,7 +1726,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gecpaircoeff < PRAGUE > => 34000
     rule Gfround      < PRAGUE > => 1
 
-    rule maxCodeSize < PRAGUE > => 24576
+    rule maxCodeSize < PRAGUE > => 524288
     rule Rb          < PRAGUE > => 0
 
     rule Gcoldsload             < PRAGUE > => 2100
@@ -1748,7 +1748,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gaccessliststoragekey < PRAGUE > => 1900
     rule Gaccesslistaddress    < PRAGUE > => 2400
 
-    rule maxInitCodeSize   < PRAGUE > => 49152
+    rule maxInitCodeSize   < PRAGUE > => 548864
     rule Ginitcodewordcost < PRAGUE > => 2
 
     rule Rmaxquotient < PRAGUE > => 5
@@ -1784,7 +1784,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << PRAGUE >> => true
     rule Ghasdelegation          << PRAGUE >> => true
     rule Gecpairinputcheck       << PRAGUE >> => false
-    rule Ghasmip001              << PRAGUE >> => false
+    rule Ghasmip001              << PRAGUE >> => true
 ```
 
 ### Bedrock Schedule
@@ -1812,6 +1812,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Glog      < BEDROCK > => 375
     rule Glogdata  < BEDROCK > => 8
     rule Glogtopic < BEDROCK > => 375
+    rule Gloglimit < BEDROCK > => 0
 
     rule Gcall        < BEDROCK > => 700
     rule Gcallstipend < BEDROCK > => 2300
@@ -1931,6 +1932,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Glog      < REGOLITH > => 375
     rule Glogdata  < REGOLITH > => 8
     rule Glogtopic < REGOLITH > => 375
+    rule Gloglimit < REGOLITH > => 0
 
     rule Gcall        < REGOLITH > => 700
     rule Gcallstipend < REGOLITH > => 2300
@@ -2051,6 +2053,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Glog      < CANYON > => 375
     rule Glogdata  < CANYON > => 8
     rule Glogtopic < CANYON > => 375
+    rule Gloglimit < CANYON > => 0
 
     rule Gcall        < CANYON > => 700
     rule Gcallstipend < CANYON > => 2300
@@ -2170,7 +2173,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Glog      < ECOTONE > => 375
     rule Glogdata  < ECOTONE > => 8
-    rule Glogtopic < ECOTONE > => 375
+    rule Glogtopic < ECOTONE > => 10000
+    rule Gloglimit < ECOTONE > => 4096
 
     rule Gcall        < ECOTONE > => 700
     rule Gcallstipend < ECOTONE > => 2300
@@ -2290,7 +2294,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Glog      < FJORD > => 375
     rule Glogdata  < FJORD > => 8
-    rule Glogtopic < FJORD > => 375
+    rule Glogtopic < FJORD > => 10000
+    rule Gloglimit < FJORD > => 4096
 
     rule Gcall        < FJORD > => 700
     rule Gcallstipend < FJORD > => 2300
@@ -2410,7 +2415,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Glog      < GRANITE > => 375
     rule Glogdata  < GRANITE > => 8
-    rule Glogtopic < GRANITE > => 375
+    rule Glogtopic < GRANITE > => 10000
+    rule Gloglimit < GRANITE > => 4096
 
     rule Gcall        < GRANITE > => 700
     rule Gcallstipend < GRANITE > => 2300
@@ -2530,7 +2536,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Glog      < HOLOCENE > => 375
     rule Glogdata  < HOLOCENE > => 8
-    rule Glogtopic < HOLOCENE > => 375
+    rule Glogtopic < HOLOCENE > => 10000
+    rule Gloglimit < HOLOCENE > => 4096
 
     rule Gcall        < HOLOCENE > => 700
     rule Gcallstipend < HOLOCENE > => 2300
@@ -2651,7 +2658,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Glog      < ISTHMUS > => 375
     rule Glogdata  < ISTHMUS > => 8
-    rule Glogtopic < ISTHMUS > => 375
+    rule Glogtopic < ISTHMUS > => 10000
+    rule Gloglimit < ISTHMUS > => 4096
 
     rule Gcall        < ISTHMUS > => 700
     rule Gcallstipend < ISTHMUS > => 2300

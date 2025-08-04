@@ -115,6 +115,7 @@ Output Extraction
     rule getStatus(EVMC_STATIC_MODE_VIOLATION) => EVMC_STATIC_MODE_VIOLATION
     rule getStatus(EVMC_PRECOMPILE_FAILURE) => EVMC_PRECOMPILE_FAILURE
     rule getStatus(EVMC_NONCE_EXCEEDED) => EVMC_NONCE_EXCEEDED
+    rule getStatus(EVMC_PRECOMPILE_OOG) => EVMC_PRECOMPILE_OOG
 
     rule getGasLeft(G) => 0 requires getStatus(G) =/=Int EVMC_SUCCESS andBool getStatus(G) =/=Int EVMC_REVERT
     rule getGasLeft(<generatedTop>... <gas> G </gas> ...</generatedTop>) => G [priority(51)]

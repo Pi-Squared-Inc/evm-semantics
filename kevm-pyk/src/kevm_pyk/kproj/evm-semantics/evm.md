@@ -61,6 +61,8 @@ In the comments next to each cell, we've marked which component of the YellowPap
               <callData>  $CALLDATA:Bytes                     </callData>  // I_d
               <callValue> Int2MInt($CALLVALUE:Int)::MInt{256} </callValue> // I_v
 
+              <isPrecompile> false                            </isPrecompile>
+
               // \mu_*
               <wordStack>   .List  </wordStack>           // \mu_s
               <localMem>    .Bytes </localMem>            // \mu_m
@@ -947,7 +949,7 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
 
     syntax InternalOp ::= "#precompiled?" "(" MInt{256} "," Schedule ")"
  // --------------------------------------------------------------
-    rule [precompile.true]:  <k> #precompiled?(ACCTCODE, SCHED) => #next [ #precompiled(ACCTCODE) ] ... </k> requires         #isPrecompiledAccount(ACCTCODE, SCHED) [preserves-definedness]
+    rule [precompile.true]:  <k> #precompiled?(ACCTCODE, SCHED) => #next [ #precompiled(ACCTCODE) ] ... </k> <isPrecompile> _ => true </isPrecompile> requires         #isPrecompiledAccount(ACCTCODE, SCHED) [preserves-definedness]
     rule [precompile.false]: <k> #precompiled?(ACCTCODE, SCHED) => .K                               ... </k> requires notBool #isPrecompiledAccount(ACCTCODE, SCHED)
 
     syntax Bool ::= #isPrecompiledAccount ( MInt{256} , Schedule ) [symbol(isPrecompiledAccount), function, total, smtlib(isPrecompiledAccount)]
@@ -1262,11 +1264,6 @@ Precompiled Contracts
     rule #precompiled(15p256) => BLS12PAIRING_CHECK
     rule #precompiled(16p256) => BLS12MAPFPTOG1
     rule #precompiled(17p256) => BLS12MAPFP2TOG2
-
-    syntax Bool ::= isPrecompiledOP(OpCode) [function]
- // --------------------------------------------------
-    rule isPrecompiledOP(_:PrecompiledOp) => true
-    rule isPrecompiledOP(_) => false [owise]
 
     syntax MInt{256} ::= #precompiledAccountsUB ( Schedule ) [symbol(#precompiledAccountsUB), function, total]
  // ----------------------------------------------------------------------------------------------------
@@ -1832,7 +1829,7 @@ Overall Gas
          <memoryUsed> MU => MU' </memoryUsed> <schedule> SCHED </schedule>
 
     rule <k> _G:Gas ~> (#deductMemoryGas => #deductGas)   ... </k> //Required for verification
-    rule <k>  G:Gas ~> #deductGas ~> #access [ _, _, _ ] ~> OP  => #end #if isOptimismSchedule(SCHED) andBool isPrecompiledOP(OP) #then EVMC_PRECOMPILE_OOG #else EVMC_OUT_OF_GAS #fi ... </k> <gas> GAVAIL                  </gas> <schedule> SCHED </schedule>requires GAVAIL <Gas G
+    rule <k>  G:Gas ~> #deductGas => #end #if ISPREC andBool isOptimismSchedule(SCHED) #then EVMC_PRECOMPILE_OOG #else EVMC_OUT_OF_GAS #fi ... </k> <gas> GAVAIL                  </gas> <isPrecompile> ISPREC </isPrecompile> <schedule> SCHED </schedule> requires GAVAIL <Gas G
     rule <k>  G:Gas ~> #deductGas => .K                   ... </k> <gas> GAVAIL => GAVAIL -Gas G </gas> requires G <=Gas GAVAIL
 
     syntax Bool ::= #inStorage     ( Map   , Account , Int ) [symbol(#inStorage), function, total]

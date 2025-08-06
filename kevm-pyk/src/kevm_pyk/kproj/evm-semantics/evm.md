@@ -19,6 +19,7 @@ module EVM
     imports NETWORK
     imports GAS
     imports KLLVM
+    imports K-IO
     syntax MInt{64}
 ```
 
@@ -352,7 +353,7 @@ The `#next [_]` operator initiates execution by:
  // --------------------------------------------
     rule <k> #exec [ IOP:InvalidOp ] => IOP ... </k>
 
-    rule <k> #exec [ OP ] => #gas [ OP , OP ] ~> OP ... </k> requires isNullStackOp(OP) orBool isPushOp(OP)
+    rule <k> #exec [ OP ] => #log("exec " +String #opCodeToString(OP)) ~> #gas [ OP , OP ] ~> OP ... </k> requires isNullStackOp(OP) orBool isPushOp(OP)
 ```
 
 Here we load the correct number of arguments from the `wordStack` based on the sort of the opcode.
@@ -368,10 +369,10 @@ Here we load the correct number of arguments from the `wordStack` based on the s
                         | TernStackOp MInt{256} MInt{256} MInt{256}
                         | QuadStackOp MInt{256} MInt{256} MInt{256} MInt{256}
  // -------------------------------------------------------------------------
-    rule <k> #exec [ UOP:UnStackOp   ] => #gas [ UOP , UOP W0          ] ~> UOP W0          ... </k> <wordStack> ListItem(W0) => .List ...</wordStack>
-    rule <k> #exec [ BOP:BinStackOp  ] => #gas [ BOP , BOP W0 W1       ] ~> BOP W0 W1       ... </k> <wordStack> ListItem(W0) ListItem(W1) => .List ...</wordStack>
-    rule <k> #exec [ TOP:TernStackOp ] => #gas [ TOP , TOP W0 W1 W2    ] ~> TOP W0 W1 W2    ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) => .List ...</wordStack>
-    rule <k> #exec [ QOP:QuadStackOp ] => #gas [ QOP , QOP W0 W1 W2 W3 ] ~> QOP W0 W1 W2 W3 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) => .List ...</wordStack>
+    rule <k> #exec [ UOP:UnStackOp   ] => #log("exec " +String #opCodeToString(UOP)) ~> #gas [ UOP , UOP W0          ] ~> UOP W0          ... </k> <wordStack> ListItem(W0) => .List ...</wordStack>
+    rule <k> #exec [ BOP:BinStackOp  ] => #log("exec " +String #opCodeToString(BOP)) ~> #gas [ BOP , BOP W0 W1       ] ~> #log("exec_after_gas " +String #opCodeToString(BOP)) ~> BOP W0 W1       ... </k> <wordStack> ListItem(W0) ListItem(W1) => .List ...</wordStack>
+    rule <k> #exec [ TOP:TernStackOp ] => #log("exec " +String #opCodeToString(TOP)) ~> #gas [ TOP , TOP W0 W1 W2    ] ~> TOP W0 W1 W2    ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) => .List ...</wordStack>
+    rule <k> #exec [ QOP:QuadStackOp ] => #log("exec " +String #opCodeToString(QOP)) ~> #gas [ QOP , QOP W0 W1 W2 W3 ] ~> QOP W0 W1 W2 W3 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) => .List ...</wordStack>
 ```
 
 `StackOp` is used for opcodes which require a large portion of the stack.
@@ -379,7 +380,7 @@ Here we load the correct number of arguments from the `wordStack` based on the s
 ```k
     syntax InternalOp ::= StackOp List
  // ----------------------------------
-    rule <k> #exec [ SO:StackOp ] => #gas [ SO , SO WS ] ~> SO WS ... </k> <wordStack> WS </wordStack>
+    rule <k> #exec [ SO:StackOp ] => #log("exec " +String #opCodeToString(SO)) ~> #gas [ SO , SO WS ] ~> SO WS ... </k> <wordStack> WS </wordStack>
 ```
 
 The `CallOp` opcodes all interpret their second argument as an address.
@@ -388,8 +389,8 @@ The `CallOp` opcodes all interpret their second argument as an address.
     syntax InternalOp ::= CallSixOp MInt{256} MInt{256}           MInt{256} MInt{256} MInt{256} MInt{256}
                         | CallOp    MInt{256} MInt{256} MInt{256} MInt{256} MInt{256} MInt{256} MInt{256}
  // -----------------------------------------------------------------------------------------------------
-    rule <k> #exec [ CSO:CallSixOp ] => #gas [ CSO , CSO W0 W1    W2 W3 W4 W5 ] ~> CSO W0 W1    W2 W3 W4 W5 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) ListItem(W4) ListItem(W5) => .List ...</wordStack>
-    rule <k> #exec [ CO:CallOp     ] => #gas [ CO  , CO  W0 W1 W2 W3 W4 W5 W6 ] ~> CO  W0 W1 W2 W3 W4 W5 W6 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) ListItem(W4) ListItem(W5) ListItem(W6) => .List ...</wordStack>
+    rule <k> #exec [ CSO:CallSixOp ] => #log("exec " +String #opCodeToString(CSO)) ~> #gas [ CSO , CSO W0 W1    W2 W3 W4 W5 ] ~> CSO W0 W1    W2 W3 W4 W5 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) ListItem(W4) ListItem(W5) => .List ...</wordStack>
+    rule <k> #exec [ CO:CallOp     ] => #log("exec " +String #opCodeToString(CO)) ~> #gas [ CO  , CO  W0 W1 W2 W3 W4 W5 W6 ] ~> CO  W0 W1 W2 W3 W4 W5 W6 ... </k> <wordStack> ListItem(W0) ListItem(W1) ListItem(W2) ListItem(W3) ListItem(W4) ListItem(W5) ListItem(W6) => .List ...</wordStack>
 ```
 
 ### Address Conversion
@@ -1832,8 +1833,11 @@ Overall Gas
          <memoryUsed> MU => MU' </memoryUsed> <schedule> SCHED </schedule>
 
     rule <k> _G:Gas ~> (#deductMemoryGas => #deductGas)   ... </k> //Required for verification
-    rule <k>  G:Gas ~> #deductGas ~> #access [ _, _, _ ] ~> OP  => #end #if isOptimismSchedule(SCHED) andBool isPrecompiledOP(OP) #then EVMC_PRECOMPILE_OOG #else EVMC_OUT_OF_GAS #fi ... </k> <gas> GAVAIL                  </gas> <schedule> SCHED </schedule>requires GAVAIL <Gas G
-    rule <k>  G:Gas ~> #deductGas => .K                   ... </k> <gas> GAVAIL => GAVAIL -Gas G </gas> requires G <=Gas GAVAIL
+    rule <k>  (G:Gas ~> #deductGas  => #log("oog_rule " +String #opCodeToString(OP)) ~> #end #if isOptimismSchedule(SCHED) andBool isPrecompiledOP(OP) #then EVMC_PRECOMPILE_OOG #else EVMC_OUT_OF_GAS #fi) ~> #access [ OP, _, _ ] ... </k> <gas> GAVAIL                  </gas> <schedule> SCHED </schedule> requires GAVAIL <Gas G
+//    rule <k>  G:Gas ~> #deductGas => #log("oog_rule ") ~> #end EVMC_OUT_OF_GAS ... </k> <gas> GAVAIL                  </gas> requires GAVAIL <Gas G
+//    rule <k>  (G:Gas ~> #deductGas => #log("oog_rule ") ~> #end EVMC_OUT_OF_GAS) ~> #access [ _, _, _ ] ... </k> <gas> GAVAIL                  </gas> requires GAVAIL <Gas G
+//    rule <k>  G:Gas ~> #deductGas ~> #access [ _, _, _ ] => #log("oog_rule ") ~> #end EVMC_OUT_OF_GAS ... </k> <gas> GAVAIL                  </gas> requires GAVAIL <Gas G
+    rule <k>  G:Gas ~> #deductGas => #log("not_oog_rule") ~> .K                   ... </k> <gas> GAVAIL => GAVAIL -Gas G </gas> requires G <=Gas GAVAIL
 
     syntax Bool ::= #inStorage     ( Map   , Account , Int ) [symbol(#inStorage), function, total]
                   | #inStorageAux1 ( KItem ,           Int ) [symbol(#inStorageAux1), function, total]
@@ -2373,5 +2377,175 @@ After interpreting the strings representing programs as a `WordStack`, it should
     rule #dasmOpCode( 255p256,     _ ) => SELFDESTRUCT
     rule #dasmOpCode(       W,     _ ) => UNDEFINED(MInt2Unsigned(W)) [owise]
 
+    syntax String ::= #opCodeToString ( OpCode ) [function]
+ // -------------------------------------------------------
+    rule #opCodeToString( STOP           ) => "STOP"
+    rule #opCodeToString( ADD            ) => "ADD"
+    rule #opCodeToString( MUL            ) => "MUL"
+    rule #opCodeToString( SUB            ) => "SUB"
+    rule #opCodeToString( DIV            ) => "DIV"
+    rule #opCodeToString( SDIV           ) => "SDIV"
+    rule #opCodeToString( MOD            ) => "MOD"
+    rule #opCodeToString( SMOD           ) => "SMOD"
+    rule #opCodeToString( ADDMOD         ) => "ADDMOD"
+    rule #opCodeToString( MULMOD         ) => "MULMOD"
+    rule #opCodeToString( EXP            ) => "EXP"
+    rule #opCodeToString( SIGNEXTEND     ) => "SIGNEXTEND"
+    rule #opCodeToString( LT             ) => "LT"
+    rule #opCodeToString( GT             ) => "GT"
+    rule #opCodeToString( SLT            ) => "SLT"
+    rule #opCodeToString( SGT            ) => "SGT"
+    rule #opCodeToString( EQ             ) => "EQ"
+    rule #opCodeToString( ISZERO         ) => "ISZERO"
+    rule #opCodeToString( AND            ) => "AND"
+    rule #opCodeToString( EVMOR          ) => "EVMOR"
+    rule #opCodeToString( XOR            ) => "XOR"
+    rule #opCodeToString( NOT            ) => "NOT"
+    rule #opCodeToString( BYTE           ) => "BYTE"
+    rule #opCodeToString( SHL            ) => "SHL"
+    rule #opCodeToString( SHR            ) => "SHR"
+    rule #opCodeToString( SAR            ) => "SAR"
+    rule #opCodeToString( SHA3           ) => "SHA3"
+    rule #opCodeToString( ADDRESS        ) => "ADDRESS"
+    rule #opCodeToString( BALANCE        ) => "BALANCE"
+    rule #opCodeToString( ORIGIN         ) => "ORIGIN"
+    rule #opCodeToString( CALLER         ) => "CALLER"
+    rule #opCodeToString( CALLVALUE      ) => "CALLVALUE"
+    rule #opCodeToString( CALLDATALOAD   ) => "CALLDATALOAD"
+    rule #opCodeToString( CALLDATASIZE   ) => "CALLDATASIZE"
+    rule #opCodeToString( CALLDATACOPY   ) => "CALLDATACOPY"
+    rule #opCodeToString( CODESIZE       ) => "CODESIZE"
+    rule #opCodeToString( CODECOPY       ) => "CODECOPY"
+    rule #opCodeToString( GASPRICE       ) => "GASPRICE"
+    rule #opCodeToString( EXTCODESIZE    ) => "EXTCODESIZE"
+    rule #opCodeToString( EXTCODECOPY    ) => "EXTCODECOPY"
+    rule #opCodeToString( RETURNDATASIZE ) => "RETURNDATASIZE"
+    rule #opCodeToString( RETURNDATACOPY ) => "RETURNDATACOPY"
+    rule #opCodeToString( EXTCODEHASH    ) => "EXTCODEHASH"
+    rule #opCodeToString( BLOCKHASH      ) => "BLOCKHASH"
+    rule #opCodeToString( COINBASE       ) => "COINBASE"
+    rule #opCodeToString( TIMESTAMP      ) => "TIMESTAMP"
+    rule #opCodeToString( NUMBER         ) => "NUMBER"
+    rule #opCodeToString( PREVRANDAO     ) => "PREVRANDAO"
+    rule #opCodeToString( DIFFICULTY     ) => "DIFFICULTY"
+    rule #opCodeToString( GASLIMIT       ) => "GASLIMIT"
+    rule #opCodeToString( CHAINID        ) => "CHAINID"
+    rule #opCodeToString( SELFBALANCE    ) => "SELFBALANCE"
+    rule #opCodeToString( BASEFEE        ) => "BASEFEE"
+    rule #opCodeToString( BLOBHASH       ) => "BLOBHASH"
+    rule #opCodeToString( BLOBBASEFEE    ) => "BLOBBASEFEE"
+    rule #opCodeToString( POP            ) => "POP"
+    rule #opCodeToString( MLOAD          ) => "MLOAD"
+    rule #opCodeToString( MSTORE         ) => "MSTORE"
+    rule #opCodeToString( MSTORE8        ) => "MSTORE8"
+    rule #opCodeToString( SLOAD          ) => "SLOAD"
+    rule #opCodeToString( SSTORE         ) => "SSTORE"
+    rule #opCodeToString( JUMP           ) => "JUMP"
+    rule #opCodeToString( JUMPI          ) => "JUMPI"
+    rule #opCodeToString( PC             ) => "PC"
+    rule #opCodeToString( MSIZE          ) => "MSIZE"
+    rule #opCodeToString( GAS            ) => "GAS"
+    rule #opCodeToString( JUMPDEST       ) => "JUMPDEST"
+    rule #opCodeToString( TLOAD          ) => "TLOAD"
+    rule #opCodeToString( TSTORE         ) => "TSTORE"
+    rule #opCodeToString( MCOPY          ) => "MCOPY"
+    rule #opCodeToString( PUSHZERO       ) => "PUSHZERO"
+    rule #opCodeToString( PUSH(1p256)    ) => "PUSH(1p256)"
+    rule #opCodeToString( PUSH(2p256)    ) => "PUSH(2p256)"
+    rule #opCodeToString( PUSH(3p256)    ) => "PUSH(3p256)"
+    rule #opCodeToString( PUSH(4p256)    ) => "PUSH(4p256)"
+    rule #opCodeToString( PUSH(5p256)    ) => "PUSH(5p256)"
+    rule #opCodeToString( PUSH(6p256)    ) => "PUSH(6p256)"
+    rule #opCodeToString( PUSH(7p256)    ) => "PUSH(7p256)"
+    rule #opCodeToString( PUSH(8p256)    ) => "PUSH(8p256)"
+    rule #opCodeToString( PUSH(9p256)    ) => "PUSH(9p256)"
+    rule #opCodeToString( PUSH(10p256)   ) => "PUSH(10p256)"
+    rule #opCodeToString( PUSH(11p256)   ) => "PUSH(11p256)"
+    rule #opCodeToString( PUSH(12p256)   ) => "PUSH(12p256)"
+    rule #opCodeToString( PUSH(13p256)   ) => "PUSH(13p256)"
+    rule #opCodeToString( PUSH(14p256)   ) => "PUSH(14p256)"
+    rule #opCodeToString( PUSH(15p256)   ) => "PUSH(15p256)"
+    rule #opCodeToString( PUSH(16p256)   ) => "PUSH(16p256)"
+    rule #opCodeToString( PUSH(17p256)   ) => "PUSH(17p256)"
+    rule #opCodeToString( PUSH(18p256)   ) => "PUSH(18p256)"
+    rule #opCodeToString( PUSH(19p256)   ) => "PUSH(19p256)"
+    rule #opCodeToString( PUSH(20p256)   ) => "PUSH(20p256)"
+    rule #opCodeToString( PUSH(21p256)   ) => "PUSH(21p256)"
+    rule #opCodeToString( PUSH(22p256)   ) => "PUSH(22p256)"
+    rule #opCodeToString( PUSH(23p256)   ) => "PUSH(23p256)"
+    rule #opCodeToString( PUSH(24p256)   ) => "PUSH(24p256)"
+    rule #opCodeToString( PUSH(25p256)   ) => "PUSH(25p256)"
+    rule #opCodeToString( PUSH(26p256)   ) => "PUSH(26p256)"
+    rule #opCodeToString( PUSH(27p256)   ) => "PUSH(27p256)"
+    rule #opCodeToString( PUSH(28p256)   ) => "PUSH(28p256)"
+    rule #opCodeToString( PUSH(29p256)   ) => "PUSH(29p256)"
+    rule #opCodeToString( PUSH(30p256)   ) => "PUSH(30p256)"
+    rule #opCodeToString( PUSH(31p256)   ) => "PUSH(31p256)"
+    rule #opCodeToString( PUSH(32p256)   ) => "PUSH(32p256)"
+    rule #opCodeToString( DUP(1p256)     ) => "DUP(1p256)"
+    rule #opCodeToString( DUP(2p256)     ) => "DUP(2p256)"
+    rule #opCodeToString( DUP(3p256)     ) => "DUP(3p256)"
+    rule #opCodeToString( DUP(4p256)     ) => "DUP(4p256)"
+    rule #opCodeToString( DUP(5p256)     ) => "DUP(5p256)"
+    rule #opCodeToString( DUP(6p256)     ) => "DUP(6p256)"
+    rule #opCodeToString( DUP(7p256)     ) => "DUP(7p256)"
+    rule #opCodeToString( DUP(8p256)     ) => "DUP(8p256)"
+    rule #opCodeToString( DUP(9p256)     ) => "DUP(9p256)"
+    rule #opCodeToString( DUP(10p256)    ) => "DUP(10p256)"
+    rule #opCodeToString( DUP(11p256)    ) => "DUP(11p256)"
+    rule #opCodeToString( DUP(12p256)    ) => "DUP(12p256)"
+    rule #opCodeToString( DUP(13p256)    ) => "DUP(13p256)"
+    rule #opCodeToString( DUP(14p256)    ) => "DUP(14p256)"
+    rule #opCodeToString( DUP(15p256)    ) => "DUP(15p256)"
+    rule #opCodeToString( DUP(16p256)    ) => "DUP(16p256)"
+    rule #opCodeToString( SWAP(1p256)    ) => "SWAP(1p256)"
+    rule #opCodeToString( SWAP(2p256)    ) => "SWAP(2p256)"
+    rule #opCodeToString( SWAP(3p256)    ) => "SWAP(3p256)"
+    rule #opCodeToString( SWAP(4p256)    ) => "SWAP(4p256)"
+    rule #opCodeToString( SWAP(5p256)    ) => "SWAP(5p256)"
+    rule #opCodeToString( SWAP(6p256)    ) => "SWAP(6p256)"
+    rule #opCodeToString( SWAP(7p256)    ) => "SWAP(7p256)"
+    rule #opCodeToString( SWAP(8p256)    ) => "SWAP(8p256)"
+    rule #opCodeToString( SWAP(9p256)    ) => "SWAP(9p256)"
+    rule #opCodeToString( SWAP(10p256)   ) => "SWAP(10p256)"
+    rule #opCodeToString( SWAP(11p256)   ) => "SWAP(11p256)"
+    rule #opCodeToString( SWAP(12p256)   ) => "SWAP(12p256)"
+    rule #opCodeToString( SWAP(13p256)   ) => "SWAP(13p256)"
+    rule #opCodeToString( SWAP(14p256)   ) => "SWAP(14p256)"
+    rule #opCodeToString( SWAP(15p256)   ) => "SWAP(15p256)"
+    rule #opCodeToString( SWAP(16p256)   ) => "SWAP(16p256)"
+    rule #opCodeToString( LOG(0p256)     ) => "LOG(0p256)"
+    rule #opCodeToString( LOG(1p256)     ) => "LOG(1p256)"
+    rule #opCodeToString( LOG(2p256)     ) => "LOG(2p256)"
+    rule #opCodeToString( LOG(3p256)     ) => "LOG(3p256)"
+    rule #opCodeToString( LOG(4p256)     ) => "LOG(4p256)"
+    rule #opCodeToString( CREATE         ) => "CREATE"
+    rule #opCodeToString( CALL           ) => "CALL"
+    rule #opCodeToString( CALLCODE       ) => "CALLCODE"
+    rule #opCodeToString( RETURN         ) => "RETURN"
+    rule #opCodeToString( DELEGATECALL   ) => "DELEGATECALL"
+    rule #opCodeToString( CREATE2        ) => "CREATE2"
+    rule #opCodeToString( STATICCALL     ) => "STATICCALL"
+    rule #opCodeToString( REVERT         ) => "REVERT"
+    rule #opCodeToString( INVALID        ) => "INVALID"
+    rule #opCodeToString( SELFDESTRUCT   ) => "SELFDESTRUCT"
+    rule #opCodeToString(ECREC             ) => "ECREC"
+    rule #opCodeToString(SHA256            ) => "SHA256"
+    rule #opCodeToString(RIP160            ) => "RIP160"
+    rule #opCodeToString(ID                ) => "ID"
+    rule #opCodeToString(MODEXP            ) => "MODEXP"
+    rule #opCodeToString(ECADD             ) => "ECADD"
+    rule #opCodeToString(ECMUL             ) => "ECMUL"
+    rule #opCodeToString(ECPAIRING         ) => "ECPAIRING"
+    rule #opCodeToString(BLAKE2F           ) => "BLAKE2F"
+    rule #opCodeToString(KZGPOINTEVAL      ) => "KZGPOINTEVAL"
+    rule #opCodeToString(BLS12G1ADD        ) => "BLS12G1ADD"
+    rule #opCodeToString(BLS12G1MSM        ) => "BLS12G1MSM"
+    rule #opCodeToString(BLS12G2ADD        ) => "BLS12G2ADD"
+    rule #opCodeToString(BLS12G2MSM        ) => "BLS12G2MSM"
+    rule #opCodeToString(BLS12PAIRING_CHECK) => "BLS12PAIRING_CHECK"
+    rule #opCodeToString(BLS12MAPFPTOG1    ) => "BLS12MAPFPTOG1"
+    rule #opCodeToString(BLS12MAPFP2TOG2   ) => "BLS12MAPFP2TOG2"
+    rule #opCodeToString( _              ) => "UNDEFINED" [owise]
 endmodule
 ```

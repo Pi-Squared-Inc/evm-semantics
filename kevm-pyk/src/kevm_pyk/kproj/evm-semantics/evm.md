@@ -235,8 +235,9 @@ The `#next [_]` operator initiates execution by:
 
 1.  checking if there will be a stack over/underflow, or a static mode violation,
 2.  calculate any address conversions needed for items on the wordstack,
-3.  executing the opcode (which includes any gas deduction needed), and
-4.  adjusting the program counter.
+3.  perform input checks as needed for certain precompiled contracts,
+4.  executing the opcode (which includes any gas deduction needed), and
+5.  adjusting the program counter.
 
 ```k
     syntax InternalOp ::= "#next" "[" MaybeOpCode "]"
@@ -246,6 +247,7 @@ The `#next [_]` operator initiates execution by:
 
     rule <k> #next [ OP:OpCode ]
           => #addr [ OP ]
+          ~> #validateInput [ OP ]
           ~> #exec [ OP ]
           ~> #pc   [ OP ]
          ...
@@ -426,6 +428,27 @@ We make sure the given arguments (to be interpreted as addresses) are with 160 b
     rule isAddr2Op(_:CallOp)    => true
     rule isAddr2Op(_:CallSixOp) => true
     rule isAddr2Op(_)           => false [owise]
+
+    syntax KItem ::= "#validateInput" "[" OpCode "]" [symbol(validateInput)]
+ // ------------------------------------------------------------------------
+    rule <k> #validateInput [ ECPAIRING ] => #end EVMC_PRECOMPILE_FAILURE ... </k>
+         <callData> CD </callData>
+         <schedule> SCHED </schedule>
+      requires hasInputValidation(ECPAIRING, SCHED) andBool lengthBytes(CD) >Int graniteMaxInputSize
+    rule <k> #validateInput [ ECPAIRING ] => .K ... </k>
+         <callData> CD </callData>
+         <schedule> SCHED </schedule>
+      requires notBool hasInputValidation(ECPAIRING, SCHED) orBool lengthBytes(CD) <=Int graniteMaxInputSize
+    rule <k> #validateInput [ OP:OpCode ] => .K ... </k>
+         <schedule> SCHED </schedule>
+      requires notBool hasInputValidation(OP, SCHED)
+
+    syntax Bool ::= hasInputValidation ( OpCode , Schedule ) [symbol(hasInputValidation), function, total]
+ // ------------------------------------------------------------------------------------------------------
+    rule hasInputValidation(ECPAIRING, GRANITE ) => true
+    rule hasInputValidation(ECPAIRING, HOLOCENE) => true
+    rule hasInputValidation(ECPAIRING, ISTHMUS ) => true
+    rule hasInputValidation(        _,       _ ) => false [owise]
 ```
 
 ### Program Counter

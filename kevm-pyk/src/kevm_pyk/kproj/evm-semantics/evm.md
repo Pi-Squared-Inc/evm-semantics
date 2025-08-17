@@ -439,9 +439,7 @@ We make sure the given arguments (to be interpreted as addresses) are with 160 b
          <callData> CD </callData>
          <schedule> SCHED </schedule>
       requires notBool hasInputValidation(ECPAIRING, SCHED) orBool lengthBytes(CD) <=Int graniteMaxInputSize
-    rule <k> #validateInput [ OP:OpCode ] => .K ... </k>
-         <schedule> SCHED </schedule>
-      requires notBool hasInputValidation(OP, SCHED)
+    rule <k> #validateInput [ _ ] => .K ... </k> [owise]
 
     syntax Bool ::= hasInputValidation ( OpCode , Schedule ) [symbol(hasInputValidation), function, total]
  // ------------------------------------------------------------------------------------------------------

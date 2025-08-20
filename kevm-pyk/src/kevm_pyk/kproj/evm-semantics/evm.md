@@ -2023,7 +2023,7 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
     rule <k> #gasExec(SCHED, CODECOPY        _ _ WIDTH) => Gverylow < SCHED > +Int (Gcopy < SCHED > *Int (MInt2Unsigned(WIDTH) up/Int 32)) ... </k>
     rule <k> #gasExec(SCHED, MCOPY           _ _ WIDTH) => Gverylow < SCHED > +Int (Gcopy < SCHED > *Int (MInt2Unsigned(WIDTH) up/Int 32)) ... </k>
 
-    rule <k> #gasExec(SCHED, LOG(N) _ _) => (Glog < SCHED > +Int (N *Int Glogtopic < SCHED >)) ... </k>
+    rule <k> #gasExec(SCHED, LOG(N) _ _) => (Glog < SCHED > +Int (MInt2Unsigned(N) *Int Glogtopic < SCHED >)) ... </k>
 
     syntax Exp ::= #handleCallGas(Schedule, acctNonExistent: BExp, cap: Gas, avail: Gas, value: Int, acct:Int, AccountInfo)  [strict(2)]
  // ------------------------------------------------------------------------------------------------------------------------------------

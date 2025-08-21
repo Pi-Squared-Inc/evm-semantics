@@ -1755,9 +1755,25 @@ Precompiled Contracts
 
 
     syntax PrecompiledOp ::= "P256VERIFY"
- // ---------------------------------------
+ // -------------------------------------
+    rule <k> P256VERIFY => #end EVMC_SUCCESS ... </k>
+         <callData> CD </callData>
+      requires lengthBytes( CD ) =/=Int 160
+
+    rule <k> P256VERIFY => #end EVMC_SUCCESS ... </k>
+         <callData> CD </callData>
+      requires lengthBytes( CD ) ==Int 160
+       andBool notBool #p256verify(substrBytes(CD, 0, 32), Bytes2Int(substrBytes(CD, 32, 64), BE, Unsigned), Bytes2Int(substrBytes(CD, 64, 96), BE, Unsigned), Bytes2Int(substrBytes(CD, 96, 128), BE, Unsigned), Bytes2Int(substrBytes(CD, 128, 160), BE, Unsigned)) // verify(h, r, s, x, y)
+
     rule <k> P256VERIFY => #end EVMC_SUCCESS ... </k>
          <output> _ => Int2Bytes(32, 1, BE) </output>
+         <callData> CD </callData>
+      requires lengthBytes( CD ) ==Int 160
+       andBool #p256verify(substrBytes(CD, 0, 32), Bytes2Int(substrBytes(CD, 32, 64), BE, Unsigned), Bytes2Int(substrBytes(CD, 64, 96), BE, Unsigned), Bytes2Int(substrBytes(CD, 96, 128), BE, Unsigned), Bytes2Int(substrBytes(CD, 128, 160), BE, Unsigned)) // verify(h, r, s, x, y)
+
+    syntax Bool ::= #p256verify ( Bytes, Int, Int, Int, Int ) [symbol(#p256verify), function, total]
+ // ------------------------------------------------------------------------------------------------
+    rule #p256verify ( _, _, _, _, _ ) => true
 
 
 ```

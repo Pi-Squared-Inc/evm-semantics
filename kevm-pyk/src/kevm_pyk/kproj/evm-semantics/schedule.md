@@ -1670,8 +1670,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Glog      < CANCUN > => 375
     rule Glogdata  < CANCUN > => 8
-    rule Glogtopic < CANCUN > => 10000
-    rule Gloglimit < CANCUN > => 4096
+    rule Glogtopic < CANCUN > => 375
+    rule Gloglimit < CANCUN > => 0
 
     rule Gcall        < CANCUN > => 700
     rule Gcallstipend < CANCUN > => 2300
@@ -1705,7 +1705,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gecpaircoeff < CANCUN > => 34000
     rule Gfround      < CANCUN > => 1
 
-    rule maxCodeSize < CANCUN > => 524288
+    rule maxCodeSize < CANCUN > => 24576
     rule Rb          < CANCUN > => 0
 
     rule Gcoldsload             < CANCUN > => 2100
@@ -1727,7 +1727,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gaccessliststoragekey < CANCUN > => 1900
     rule Gaccesslistaddress    < CANCUN > => 2400
 
-    rule maxInitCodeSize   < CANCUN > => 548864
+    rule maxInitCodeSize   < CANCUN > => 49152
     rule Ginitcodewordcost < CANCUN > => 2
 
     rule Rmaxquotient < CANCUN > => 5
@@ -1763,7 +1763,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << CANCUN >> => false
     rule Ghasdelegation          << CANCUN >> => false
     rule Gecpairinputcheck       << CANCUN >> => false
-    rule Ghasmip001              << CANCUN >> => true
+    rule Ghasmip001              << CANCUN >> => false
 
     rule #isPrecompiledAccount(1p256, CANCUN) => true
     rule #isPrecompiledAccount(2p256, CANCUN) => true
@@ -1803,8 +1803,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Glog      < PRAGUE > => 375
     rule Glogdata  < PRAGUE > => 8
-    rule Glogtopic < PRAGUE > => 10000
-    rule Gloglimit < PRAGUE > => 4096
+    rule Glogtopic < PRAGUE > => 375
+    rule Gloglimit < PRAGUE > => 0
 
     rule Gcall        < PRAGUE > => 700
     rule Gcallstipend < PRAGUE > => 2300
@@ -1838,7 +1838,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gecpaircoeff < PRAGUE > => 34000
     rule Gfround      < PRAGUE > => 1
 
-    rule maxCodeSize < PRAGUE > => 524288
+    rule maxCodeSize < PRAGUE > => 24576
     rule Rb          < PRAGUE > => 0
 
     rule Gcoldsload             < PRAGUE > => 2100
@@ -1860,7 +1860,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gaccessliststoragekey < PRAGUE > => 1900
     rule Gaccesslistaddress    < PRAGUE > => 2400
 
-    rule maxInitCodeSize   < PRAGUE > => 548864
+    rule maxInitCodeSize   < PRAGUE > => 49152
     rule Ginitcodewordcost < PRAGUE > => 2
 
     rule Rmaxquotient < PRAGUE > => 5
@@ -1896,7 +1896,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << PRAGUE >> => true
     rule Ghasdelegation          << PRAGUE >> => true
     rule Gecpairinputcheck       << PRAGUE >> => false
-    rule Ghasmip001              << PRAGUE >> => true
+    rule Ghasmip001              << PRAGUE >> => false
 
     rule #isPrecompiledAccount(1p256, PRAGUE) => true
     rule #isPrecompiledAccount(2p256, PRAGUE) => true
@@ -2333,8 +2333,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Glog      < ECOTONE > => 375
     rule Glogdata  < ECOTONE > => 8
-    rule Glogtopic < ECOTONE > => 10000
-    rule Gloglimit < ECOTONE > => 4096
+    rule Glogtopic < ECOTONE > => 375
+    rule Gloglimit < ECOTONE > => 0
 
     rule Gcall        < ECOTONE > => 700
     rule Gcallstipend < ECOTONE > => 2300
@@ -2426,7 +2426,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << ECOTONE >> => false
     rule Ghasdelegation          << ECOTONE >> => false
     rule Gecpairinputcheck       << ECOTONE >> => false
-    rule Ghasmip001              << ECOTONE >> => true
+    rule Ghasmip001              << ECOTONE >> => false
 
     rule #isPrecompiledAccount(1p256, ECOTONE) => true
     rule #isPrecompiledAccount(2p256, ECOTONE) => true
@@ -2465,8 +2465,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Glog      < FJORD > => 375
     rule Glogdata  < FJORD > => 8
-    rule Glogtopic < FJORD > => 10000
-    rule Gloglimit < FJORD > => 4096
+    rule Glogtopic < FJORD > => 375
+    rule Gloglimit < FJORD > => 0
 
     rule Gcall        < FJORD > => 700
     rule Gcallstipend < FJORD > => 2300
@@ -2558,7 +2558,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << FJORD >> => false
     rule Ghasdelegation          << FJORD >> => false
     rule Gecpairinputcheck       << FJORD >> => false
-    rule Ghasmip001              << FJORD >> => true
+    rule Ghasmip001              << FJORD >> => false
 
     rule #isPrecompiledAccount(1p256, FJORD) => true
     rule #isPrecompiledAccount(2p256, FJORD) => true
@@ -2597,8 +2597,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Glog      < GRANITE > => 375
     rule Glogdata  < GRANITE > => 8
-    rule Glogtopic < GRANITE > => 10000
-    rule Gloglimit < GRANITE > => 4096
+    rule Glogtopic < GRANITE > => 375
+    rule Gloglimit < GRANITE > => 0
 
     rule Gcall        < GRANITE > => 700
     rule Gcallstipend < GRANITE > => 2300
@@ -2690,7 +2690,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << GRANITE >> => false
     rule Ghasdelegation          << GRANITE >> => false
     rule Gecpairinputcheck       << GRANITE >> => true
-    rule Ghasmip001              << GRANITE >> => true
+    rule Ghasmip001              << GRANITE >> => false
 
     rule #isPrecompiledAccount(1p256, GRANITE) => true
     rule #isPrecompiledAccount(2p256, GRANITE) => true
@@ -2729,8 +2729,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Glog      < HOLOCENE > => 375
     rule Glogdata  < HOLOCENE > => 8
-    rule Glogtopic < HOLOCENE > => 10000
-    rule Gloglimit < HOLOCENE > => 4096
+    rule Glogtopic < HOLOCENE > => 375
+    rule Gloglimit < HOLOCENE > => 0
 
     rule Gcall        < HOLOCENE > => 700
     rule Gcallstipend < HOLOCENE > => 2300
@@ -2822,7 +2822,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << HOLOCENE >> => false
     rule Ghasdelegation          << HOLOCENE >> => false
     rule Gecpairinputcheck       << HOLOCENE >> => true
-    rule Ghasmip001              << HOLOCENE >> => true
+    rule Ghasmip001              << HOLOCENE >> => false
 
     rule #isPrecompiledAccount(1p256, HOLOCENE) => true
     rule #isPrecompiledAccount(2p256, HOLOCENE) => true
@@ -2862,8 +2862,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Glog      < ISTHMUS > => 375
     rule Glogdata  < ISTHMUS > => 8
-    rule Glogtopic < ISTHMUS > => 10000
-    rule Gloglimit < ISTHMUS > => 4096
+    rule Glogtopic < ISTHMUS > => 375
+    rule Gloglimit < ISTHMUS > => 0
 
     rule Gcall        < ISTHMUS > => 700
     rule Gcallstipend < ISTHMUS > => 2300
@@ -2955,7 +2955,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << ISTHMUS >> => true
     rule Ghasdelegation          << ISTHMUS >> => true
     rule Gecpairinputcheck       << ISTHMUS >> => true
-    rule Ghasmip001              << ISTHMUS >> => true
+    rule Ghasmip001              << ISTHMUS >> => false
 
     rule #isPrecompiledAccount(1p256, ISTHMUS) => true
     rule #isPrecompiledAccount(2p256, ISTHMUS) => true

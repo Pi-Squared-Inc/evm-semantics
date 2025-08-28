@@ -2961,6 +2961,126 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 ## MegaETH Schedules
 ### EQUIVALENCE Schedule
 
+```k
+    syntax Schedule ::= "EQUIVALENCE" [symbol(EQUIVALENCE_EVM), smtlib(schedule_EQUIVALENCE)]
+ // -----------------------------------------------------------------------------------------
+
+    rule Gzero    < EQUIVALENCE > => 0
+
+    rule Gbase    < EQUIVALENCE > => 2
+    rule Gverylow < EQUIVALENCE > => 3
+    rule Glow     < EQUIVALENCE > => 5
+    rule Gmid     < EQUIVALENCE > => 8
+    rule Ghigh    < EQUIVALENCE > => 10
+
+    rule Gexp      < EQUIVALENCE > => 10
+    rule Gexpbyte  < EQUIVALENCE > => 50
+    rule Gsha3     < EQUIVALENCE > => 30
+    rule Gsha3word < EQUIVALENCE > => 6
+
+    rule Gsload       < EQUIVALENCE > => 100
+    rule Gsstoreset   < EQUIVALENCE > => 20000
+    rule Gsstorereset < EQUIVALENCE > => 2900
+    rule Rsstoreclear < EQUIVALENCE > => 4800
+
+    rule Glog      < EQUIVALENCE > => 375
+    rule Glogdata  < EQUIVALENCE > => 8
+    rule Glogtopic < EQUIVALENCE > => 10000
+    rule Gloglimit < EQUIVALENCE > => 4096
+
+    rule Gcall        < EQUIVALENCE > => 700
+    rule Gcallstipend < EQUIVALENCE > => 2300
+    rule Gcallvalue   < EQUIVALENCE > => 9000
+    rule Gnewaccount  < EQUIVALENCE > => 25000
+
+    rule Gcreate       < EQUIVALENCE > => 32000
+    rule Gcodedeposit  < EQUIVALENCE > => 200
+    rule Gselfdestruct < EQUIVALENCE > => 5000
+    rule Rselfdestruct < EQUIVALENCE > => 0
+
+    rule Gmemory      < EQUIVALENCE > => 3
+    rule Gquadcoeff   < EQUIVALENCE > => 512
+    rule Gcopy        < EQUIVALENCE > => 3
+    rule Gquaddivisor < EQUIVALENCE > => 3
+
+    rule Gtransaction   < EQUIVALENCE > => 21000
+    rule Gtxcreate      < EQUIVALENCE > => 53000
+    rule Gtxdatazero    < EQUIVALENCE > => 4
+    rule Gtxdatanonzero < EQUIVALENCE > => 16
+
+    rule Gjumpdest    < EQUIVALENCE > => 1
+    rule Gbalance     < EQUIVALENCE > => 700
+    rule Gblockhash   < EQUIVALENCE > => 20
+    rule Gextcodesize < EQUIVALENCE > => 700
+    rule Gextcodecopy < EQUIVALENCE > => 700
+
+    rule Gecadd       < EQUIVALENCE > => 150
+    rule Gecmul       < EQUIVALENCE > => 6000
+    rule Gecpairconst < EQUIVALENCE > => 45000
+    rule Gecpaircoeff < EQUIVALENCE > => 34000
+    rule Gfround      < EQUIVALENCE > => 1
+
+    rule maxCodeSize < EQUIVALENCE > => 24576
+    rule Rb          < EQUIVALENCE > => 0
+
+    rule Gcoldsload             < EQUIVALENCE > => 2100
+    rule Gcoldaccountaccess     < EQUIVALENCE > => 2600
+    rule Gwarmstorageread       < EQUIVALENCE > => 100
+    rule Gwarmstoragedirtystore < EQUIVALENCE > => 100
+
+    rule Gpointeval < EQUIVALENCE > => 50000
+
+    rule Gbls12g1add < EQUIVALENCE > => 375
+    rule Gbls12g1mul < EQUIVALENCE > => 12000
+    rule Gbls12g2add < EQUIVALENCE > => 600
+    rule Gbls12g2mul < EQUIVALENCE > => 22500
+    rule Gbls12PairingCheckMul < EQUIVALENCE > => 32600
+    rule Gbls12PairingCheckAdd < EQUIVALENCE > => 37700
+    rule Gbls12mapfptog1 < EQUIVALENCE > => 5500
+    rule Gbls12mapfp2tog2 < EQUIVALENCE > => 23800
+
+    rule Gaccessliststoragekey < EQUIVALENCE > => 1900
+    rule Gaccesslistaddress    < EQUIVALENCE > => 2400
+
+    rule maxInitCodeSize   < EQUIVALENCE > => 49152
+    rule Ginitcodewordcost < EQUIVALENCE > => 2
+
+    rule Rmaxquotient < EQUIVALENCE > => 5
+
+    rule Gselfdestructnewaccount << EQUIVALENCE >> => true
+    rule Gstaticcalldepth        << EQUIVALENCE >> => false
+    rule Gemptyisnonexistent     << EQUIVALENCE >> => true
+    rule Gzerovaluenewaccountgas << EQUIVALENCE >> => false
+    rule Ghasrevert              << EQUIVALENCE >> => true
+    rule Ghasreturndata          << EQUIVALENCE >> => true
+    rule Ghasstaticcall          << EQUIVALENCE >> => true
+    rule Ghasshift               << EQUIVALENCE >> => true
+    rule Ghasdirtysstore         << EQUIVALENCE >> => true
+    rule Ghassstorestipend       << EQUIVALENCE >> => true
+    rule Ghascreate2             << EQUIVALENCE >> => true
+    rule Ghasextcodehash         << EQUIVALENCE >> => true
+    rule Ghasselfbalance         << EQUIVALENCE >> => true
+    rule Ghaschainid             << EQUIVALENCE >> => true
+    rule Ghasaccesslist          << EQUIVALENCE >> => true
+    rule Ghasbasefee             << EQUIVALENCE >> => true
+    rule Ghasrejectedfirstbyte   << EQUIVALENCE >> => true
+    rule Ghasprevrandao          << EQUIVALENCE >> => true
+    rule Ghasmaxinitcodesize     << EQUIVALENCE >> => true
+    rule Ghaspushzero            << EQUIVALENCE >> => true
+    rule Ghaswarmcoinbase        << EQUIVALENCE >> => true
+    rule Ghaswithdrawals         << EQUIVALENCE >> => true
+    rule Ghastransient           << EQUIVALENCE >> => true
+    rule Ghasmcopy               << EQUIVALENCE >> => true
+    rule Ghasbeaconroot          << EQUIVALENCE >> => true
+    rule Ghaseip6780             << EQUIVALENCE >> => true
+    rule Ghasblobbasefee         << EQUIVALENCE >> => true
+    rule Ghasblobhash            << EQUIVALENCE >> => true
+    rule Ghasbls12msmdiscount    << EQUIVALENCE >> => true
+    rule Ghasdelegation          << EQUIVALENCE >> => true
+    rule Gecpairinputcheck       << EQUIVALENCE >> => true
+    rule Ghasmip001              << EQUIVALENCE >> => false
+```
+
 ### MINI_REX Schedule
 
     rule #isPrecompiledAccount(1p256, ISTHMUS) => true

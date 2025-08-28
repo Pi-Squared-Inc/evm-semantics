@@ -106,7 +106,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
                            | "Gbls12PairingCheckMul"           | "Gbls12PairingCheckAdd"               | "Gbls12mapfptog1"    | "Gbls12mapfp2tog2"
  // ----------------------------------------------------------------------------------------------------------------------------------------------------
 ```
-
+## Ethereum Schedules
 ### Frontier Schedule
 
 ```k
@@ -1917,6 +1917,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule #isPrecompiledAccount(17p256, PRAGUE) => true
 ```
 
+## Optimism Schedules
 ### Bedrock Schedule
 
 ```k
@@ -2956,6 +2957,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasdelegation          << ISTHMUS >> => true
     rule Gecpairinputcheck       << ISTHMUS >> => true
     rule Ghasmip001              << ISTHMUS >> => false
+```
+## MegaETH Schedules
+### EQUIVALENCE Schedule
+
+### MINI_REX Schedule
 
     rule #isPrecompiledAccount(1p256, ISTHMUS) => true
     rule #isPrecompiledAccount(2p256, ISTHMUS) => true

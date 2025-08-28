@@ -43,9 +43,13 @@ module SCHEDULE
     rule getSchedule(105) => GRANITE
     rule getSchedule(106) => HOLOCENE
     rule getSchedule(107) => ISTHMUS
+    rule getSchedule(201) => EQUIVALENCE
+    rule getSchedule(202) => MINI_REX
 
     syntax Bool ::= isOptimismSchedule(Schedule) [function]
  // -------------------------------------------------------
+    rule isOptimismSchedule(EQUIVALENCE) => true
+    rule isOptimismSchedule(MINI_REX) => true
     rule isOptimismSchedule(BEDROCK) => true
     rule isOptimismSchedule(REGOLITH) => true
     rule isOptimismSchedule(CANYON) => true
@@ -2957,6 +2961,24 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasdelegation          << ISTHMUS >> => true
     rule Gecpairinputcheck       << ISTHMUS >> => true
     rule Ghasmip001              << ISTHMUS >> => false
+
+    rule #isPrecompiledAccount(1p256, ISTHMUS) => true
+    rule #isPrecompiledAccount(2p256, ISTHMUS) => true
+    rule #isPrecompiledAccount(3p256, ISTHMUS) => true
+    rule #isPrecompiledAccount(4p256, ISTHMUS) => true
+    rule #isPrecompiledAccount(5p256, ISTHMUS) => true
+    rule #isPrecompiledAccount(6p256, ISTHMUS) => true
+    rule #isPrecompiledAccount(7p256, ISTHMUS) => true
+    rule #isPrecompiledAccount(8p256, ISTHMUS) => true
+    rule #isPrecompiledAccount(9p256, ISTHMUS) => true
+    rule #isPrecompiledAccount(10p256, ISTHMUS) => true
+    rule #isPrecompiledAccount(11p256, ISTHMUS) => true
+    rule #isPrecompiledAccount(12p256, ISTHMUS) => true
+    rule #isPrecompiledAccount(13p256, ISTHMUS) => true
+    rule #isPrecompiledAccount(14p256, ISTHMUS) => true
+    rule #isPrecompiledAccount(15p256, ISTHMUS) => true
+    rule #isPrecompiledAccount(16p256, ISTHMUS) => true
+    rule #isPrecompiledAccount(17p256, ISTHMUS) => true
 ```
 ## MegaETH Schedules
 ### EQUIVALENCE Schedule
@@ -3079,27 +3101,164 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasdelegation          << EQUIVALENCE >> => true
     rule Gecpairinputcheck       << EQUIVALENCE >> => true
     rule Ghasmip001              << EQUIVALENCE >> => false
+
+    rule #isPrecompiledAccount(1p256, EQUIVALENCE) => true
+    rule #isPrecompiledAccount(2p256, EQUIVALENCE) => true
+    rule #isPrecompiledAccount(3p256, EQUIVALENCE) => true
+    rule #isPrecompiledAccount(4p256, EQUIVALENCE) => true
+    rule #isPrecompiledAccount(5p256, EQUIVALENCE) => true
+    rule #isPrecompiledAccount(6p256, EQUIVALENCE) => true
+    rule #isPrecompiledAccount(7p256, EQUIVALENCE) => true
+    rule #isPrecompiledAccount(8p256, EQUIVALENCE) => true
+    rule #isPrecompiledAccount(9p256, EQUIVALENCE) => true
+    rule #isPrecompiledAccount(10p256, EQUIVALENCE) => true
+    rule #isPrecompiledAccount(11p256, EQUIVALENCE) => true
+    rule #isPrecompiledAccount(12p256, EQUIVALENCE) => true
+    rule #isPrecompiledAccount(13p256, EQUIVALENCE) => true
+    rule #isPrecompiledAccount(14p256, EQUIVALENCE) => true
+    rule #isPrecompiledAccount(15p256, EQUIVALENCE) => true
+    rule #isPrecompiledAccount(16p256, EQUIVALENCE) => true
+    rule #isPrecompiledAccount(17p256, EQUIVALENCE) => true
 ```
 
 ### MINI_REX Schedule
 
-    rule #isPrecompiledAccount(1p256, ISTHMUS) => true
-    rule #isPrecompiledAccount(2p256, ISTHMUS) => true
-    rule #isPrecompiledAccount(3p256, ISTHMUS) => true
-    rule #isPrecompiledAccount(4p256, ISTHMUS) => true
-    rule #isPrecompiledAccount(5p256, ISTHMUS) => true
-    rule #isPrecompiledAccount(6p256, ISTHMUS) => true
-    rule #isPrecompiledAccount(7p256, ISTHMUS) => true
-    rule #isPrecompiledAccount(8p256, ISTHMUS) => true
-    rule #isPrecompiledAccount(9p256, ISTHMUS) => true
-    rule #isPrecompiledAccount(10p256, ISTHMUS) => true
-    rule #isPrecompiledAccount(11p256, ISTHMUS) => true
-    rule #isPrecompiledAccount(12p256, ISTHMUS) => true
-    rule #isPrecompiledAccount(13p256, ISTHMUS) => true
-    rule #isPrecompiledAccount(14p256, ISTHMUS) => true
-    rule #isPrecompiledAccount(15p256, ISTHMUS) => true
-    rule #isPrecompiledAccount(16p256, ISTHMUS) => true
-    rule #isPrecompiledAccount(17p256, ISTHMUS) => true
+```k
+    syntax Schedule ::= "MINI_REX" [symbol(MINI_REX_EVM), smtlib(schedule_MINI_REX)]
+ // --------------------------------------------------------------------------------
+
+    rule Gzero    < MINI_REX > => 0
+
+    rule Gbase    < MINI_REX > => 2
+    rule Gverylow < MINI_REX > => 3
+    rule Glow     < MINI_REX > => 5
+    rule Gmid     < MINI_REX > => 8
+    rule Ghigh    < MINI_REX > => 10
+
+    rule Gexp      < MINI_REX > => 10
+    rule Gexpbyte  < MINI_REX > => 50
+    rule Gsha3     < MINI_REX > => 30
+    rule Gsha3word < MINI_REX > => 6
+
+    rule Gsload       < MINI_REX > => 100
+    rule Gsstoreset   < MINI_REX > => 20000
+    rule Gsstorereset < MINI_REX > => 2900
+    rule Rsstoreclear < MINI_REX > => 4800
+
+    rule Glog      < MINI_REX > => 375
+    rule Glogdata  < MINI_REX > => 8
+    rule Glogtopic < MINI_REX > => 10000
+    rule Gloglimit < MINI_REX > => 4096
+
+    rule Gcall        < MINI_REX > => 700
+    rule Gcallstipend < MINI_REX > => 2300
+    rule Gcallvalue   < MINI_REX > => 9000
+    rule Gnewaccount  < MINI_REX > => 25000
+
+    rule Gcreate       < MINI_REX > => 32000
+    rule Gcodedeposit  < MINI_REX > => 200
+    rule Gselfdestruct < MINI_REX > => 5000
+    rule Rselfdestruct < MINI_REX > => 0
+
+    rule Gmemory      < MINI_REX > => 3
+    rule Gquadcoeff   < MINI_REX > => 512
+    rule Gcopy        < MINI_REX > => 3
+    rule Gquaddivisor < MINI_REX > => 3
+
+    rule Gtransaction   < MINI_REX > => 21000
+    rule Gtxcreate      < MINI_REX > => 53000
+    rule Gtxdatazero    < MINI_REX > => 4
+    rule Gtxdatanonzero < MINI_REX > => 16
+
+    rule Gjumpdest    < MINI_REX > => 1
+    rule Gbalance     < MINI_REX > => 700
+    rule Gblockhash   < MINI_REX > => 20
+    rule Gextcodesize < MINI_REX > => 700
+    rule Gextcodecopy < MINI_REX > => 700
+
+    rule Gecadd       < MINI_REX > => 150
+    rule Gecmul       < MINI_REX > => 6000
+    rule Gecpairconst < MINI_REX > => 45000
+    rule Gecpaircoeff < MINI_REX > => 34000
+    rule Gfround      < MINI_REX > => 1
+
+    rule maxCodeSize < MINI_REX > => 524288
+    rule Rb          < MINI_REX > => 0
+
+    rule Gcoldsload             < MINI_REX > => 2100
+    rule Gcoldaccountaccess     < MINI_REX > => 2600
+    rule Gwarmstorageread       < MINI_REX > => 100
+    rule Gwarmstoragedirtystore < MINI_REX > => 100
+
+    rule Gpointeval < MINI_REX > => 50000
+
+    rule Gbls12g1add < MINI_REX > => 375
+    rule Gbls12g1mul < MINI_REX > => 12000
+    rule Gbls12g2add < MINI_REX > => 600
+    rule Gbls12g2mul < MINI_REX > => 22500
+    rule Gbls12PairingCheckMul < MINI_REX > => 32600
+    rule Gbls12PairingCheckAdd < MINI_REX > => 37700
+    rule Gbls12mapfptog1 < MINI_REX > => 5500
+    rule Gbls12mapfp2tog2 < MINI_REX > => 23800
+
+    rule Gaccessliststoragekey < MINI_REX > => 1900
+    rule Gaccesslistaddress    < MINI_REX > => 2400
+
+    rule maxInitCodeSize   < MINI_REX > => 548864
+    rule Ginitcodewordcost < MINI_REX > => 2
+
+    rule Rmaxquotient < MINI_REX > => 5
+
+    rule Gselfdestructnewaccount << MINI_REX >> => true
+    rule Gstaticcalldepth        << MINI_REX >> => false
+    rule Gemptyisnonexistent     << MINI_REX >> => true
+    rule Gzerovaluenewaccountgas << MINI_REX >> => false
+    rule Ghasrevert              << MINI_REX >> => true
+    rule Ghasreturndata          << MINI_REX >> => true
+    rule Ghasstaticcall          << MINI_REX >> => true
+    rule Ghasshift               << MINI_REX >> => true
+    rule Ghasdirtysstore         << MINI_REX >> => true
+    rule Ghassstorestipend       << MINI_REX >> => true
+    rule Ghascreate2             << MINI_REX >> => true
+    rule Ghasextcodehash         << MINI_REX >> => true
+    rule Ghasselfbalance         << MINI_REX >> => true
+    rule Ghaschainid             << MINI_REX >> => true
+    rule Ghasaccesslist          << MINI_REX >> => true
+    rule Ghasbasefee             << MINI_REX >> => true
+    rule Ghasrejectedfirstbyte   << MINI_REX >> => true
+    rule Ghasprevrandao          << MINI_REX >> => true
+    rule Ghasmaxinitcodesize     << MINI_REX >> => true
+    rule Ghaspushzero            << MINI_REX >> => true
+    rule Ghaswarmcoinbase        << MINI_REX >> => true
+    rule Ghaswithdrawals         << MINI_REX >> => true
+    rule Ghastransient           << MINI_REX >> => true
+    rule Ghasmcopy               << MINI_REX >> => true
+    rule Ghasbeaconroot          << MINI_REX >> => true
+    rule Ghaseip6780             << MINI_REX >> => true
+    rule Ghasblobbasefee         << MINI_REX >> => true
+    rule Ghasblobhash            << MINI_REX >> => true
+    rule Ghasbls12msmdiscount    << MINI_REX >> => true
+    rule Ghasdelegation          << MINI_REX >> => true
+    rule Gecpairinputcheck       << MINI_REX >> => true
+    rule Ghasmip001              << MINI_REX >> => true
+
+    rule #isPrecompiledAccount(1p256, MINI_REX) => true
+    rule #isPrecompiledAccount(2p256, MINI_REX) => true
+    rule #isPrecompiledAccount(3p256, MINI_REX) => true
+    rule #isPrecompiledAccount(4p256, MINI_REX) => true
+    rule #isPrecompiledAccount(5p256, MINI_REX) => true
+    rule #isPrecompiledAccount(6p256, MINI_REX) => true
+    rule #isPrecompiledAccount(7p256, MINI_REX) => true
+    rule #isPrecompiledAccount(8p256, MINI_REX) => true
+    rule #isPrecompiledAccount(9p256, MINI_REX) => true
+    rule #isPrecompiledAccount(10p256, MINI_REX) => true
+    rule #isPrecompiledAccount(11p256, MINI_REX) => true
+    rule #isPrecompiledAccount(12p256, MINI_REX) => true
+    rule #isPrecompiledAccount(13p256, MINI_REX) => true
+    rule #isPrecompiledAccount(14p256, MINI_REX) => true
+    rule #isPrecompiledAccount(15p256, MINI_REX) => true
+    rule #isPrecompiledAccount(16p256, MINI_REX) => true
+    rule #isPrecompiledAccount(17p256, MINI_REX) => true
 
 endmodule
 ```

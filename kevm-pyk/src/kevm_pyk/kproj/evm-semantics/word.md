@@ -474,6 +474,14 @@ The maximum and minimum values of each type are defined below.
     syntax Int ::= "graniteMaxInputSize" [macro]
  // -----------------------------------
     rule graniteMaxInputSize => 112687
+
+    syntax Int ::= "isthmusG1msmMaxInputSize"   [macro]
+                 | "isthmusG2msmMaxInputSize"   [macro]
+                 | "isthmusPairingMaxInputSize" [macro]
+ // ---------------------------------------------------
+    rule isthmusG1msmMaxInputSize => 513760
+    rule isthmusG2msmMaxInputSize => 488448
+    rule isthmusPairingMaxInputSize => 235008
 ```
 
 Range of types

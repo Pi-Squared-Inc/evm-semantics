@@ -472,7 +472,7 @@ The maximum and minimum values of each type are defined below.
     rule blsModulus => 52435875175126190479447740508185965837690552500527637822603658699938581184513
 
     syntax Int ::= "graniteMaxInputSize" [macro]
- // -----------------------------------
+ // --------------------------------------------
     rule graniteMaxInputSize => 112687
 
     syntax Int ::= "isthmusG1msmMaxInputSize"   [macro]

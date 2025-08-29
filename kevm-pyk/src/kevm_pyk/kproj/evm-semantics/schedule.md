@@ -79,7 +79,8 @@ module SCHEDULE
                           | "Ghasrejectedfirstbyte"   | "Ghasprevrandao"   | "Ghasmaxinitcodesize" | "Ghaspushzero"
                           | "Ghaswarmcoinbase"        | "Ghaswithdrawals"  | "Ghastransient"       | "Ghasmcopy"
                           | "Ghasbeaconroot"          | "Ghaseip6780"      | "Ghasblobbasefee"     | "Ghasblobhash"
-                          | "Ghasbls12msmdiscount"    | "Ghasdelegation"   | "Gecpairinputcheck"
+                          | "Ghasbls12msmdiscount"    | "Ghasdelegation"   | "Gecpairinputcheck"   | "Gbls12g1msminputcheck"
+                          | "Gbls12g2msminputcheck"   | "Gbls12pairingcheckinputcheck"
 
     syntax Bool ::= #isPrecompiledAccount ( MInt{256} , Schedule ) [symbol(isPrecompiledAccount), function, total, smtlib(isPrecompiledAccount)]
  // --------------------------------------------------------------------------------------------------------------------------------------------
@@ -225,6 +226,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << FRONTIER >> => false
     rule Ghasdelegation          << FRONTIER >> => false
     rule Gecpairinputcheck       << FRONTIER >> => false
+    rule Gbls12g1msminputcheck   << FRONTIER >> => false
+    rule Gbls12g2msminputcheck   << FRONTIER >> => false
+    rule Gbls12pairingcheckinputcheck << FRONTIER >> => false
 
     rule #isPrecompiledAccount(1p256, FRONTIER) => true
     rule #isPrecompiledAccount(2p256, FRONTIER) => true
@@ -350,6 +354,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << HOMESTEAD >> => false
     rule Ghasdelegation          << HOMESTEAD >> => false
     rule Gecpairinputcheck       << HOMESTEAD >> => false
+    rule Gbls12g1msminputcheck   << HOMESTEAD >> => false
+    rule Gbls12g2msminputcheck   << HOMESTEAD >> => false
+    rule Gbls12pairingcheckinputcheck << HOMESTEAD >> => false
 
     rule #isPrecompiledAccount(1p256, HOMESTEAD) => true
     rule #isPrecompiledAccount(2p256, HOMESTEAD) => true
@@ -475,6 +482,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << TANGERINE_WHISTLE >> => false
     rule Ghasdelegation          << TANGERINE_WHISTLE >> => false
     rule Gecpairinputcheck       << TANGERINE_WHISTLE >> => false
+    rule Gbls12g1msminputcheck   << TANGERINE_WHISTLE >> => false
+    rule Gbls12g2msminputcheck   << TANGERINE_WHISTLE >> => false
+    rule Gbls12pairingcheckinputcheck << TANGERINE_WHISTLE >> => false
 
     rule #isPrecompiledAccount(1p256, TANGERINE_WHISTLE) => true
     rule #isPrecompiledAccount(2p256, TANGERINE_WHISTLE) => true
@@ -600,6 +610,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << SPURIOUS_DRAGON >> => false
     rule Ghasdelegation          << SPURIOUS_DRAGON >> => false
     rule Gecpairinputcheck       << SPURIOUS_DRAGON >> => false
+    rule Gbls12g1msminputcheck   << SPURIOUS_DRAGON >> => false
+    rule Gbls12g2msminputcheck   << SPURIOUS_DRAGON >> => false
+    rule Gbls12pairingcheckinputcheck << SPURIOUS_DRAGON >> => false
 
     rule #isPrecompiledAccount(1p256, SPURIOUS_DRAGON) => true
     rule #isPrecompiledAccount(2p256, SPURIOUS_DRAGON) => true
@@ -725,6 +738,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << BYZANTIUM >> => false
     rule Ghasdelegation          << BYZANTIUM >> => false
     rule Gecpairinputcheck       << BYZANTIUM >> => false
+    rule Gbls12g1msminputcheck   << BYZANTIUM >> => false
+    rule Gbls12g2msminputcheck   << BYZANTIUM >> => false
+    rule Gbls12pairingcheckinputcheck << BYZANTIUM >> => false
 
     rule #isPrecompiledAccount(1p256, BYZANTIUM) => true
     rule #isPrecompiledAccount(2p256, BYZANTIUM) => true
@@ -854,6 +870,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << CONSTANTINOPLE >> => false
     rule Ghasdelegation          << CONSTANTINOPLE >> => false
     rule Gecpairinputcheck       << CONSTANTINOPLE >> => false
+    rule Gbls12g1msminputcheck   << CONSTANTINOPLE >> => false
+    rule Gbls12g2msminputcheck   << CONSTANTINOPLE >> => false
+    rule Gbls12pairingcheckinputcheck << CONSTANTINOPLE >> => false
 
     rule #isPrecompiledAccount(1p256, CONSTANTINOPLE) => true
     rule #isPrecompiledAccount(2p256, CONSTANTINOPLE) => true
@@ -983,6 +1002,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << PETERSBURG >> => false
     rule Ghasdelegation          << PETERSBURG >> => false
     rule Gecpairinputcheck       << PETERSBURG >> => false
+    rule Gbls12g1msminputcheck   << PETERSBURG >> => false
+    rule Gbls12g2msminputcheck   << PETERSBURG >> => false
+    rule Gbls12pairingcheckinputcheck << PETERSBURG >> => false
 
     rule #isPrecompiledAccount(1p256, PETERSBURG) => true
     rule #isPrecompiledAccount(2p256, PETERSBURG) => true
@@ -1112,6 +1134,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << ISTANBUL >> => false
     rule Ghasdelegation          << ISTANBUL >> => false
     rule Gecpairinputcheck       << ISTANBUL >> => false
+    rule Gbls12g1msminputcheck   << ISTANBUL >> => false
+    rule Gbls12g2msminputcheck   << ISTANBUL >> => false
+    rule Gbls12pairingcheckinputcheck << ISTANBUL >> => false
 
     rule #isPrecompiledAccount(1p256, ISTANBUL) => true
     rule #isPrecompiledAccount(2p256, ISTANBUL) => true
@@ -1242,6 +1267,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << BERLIN >> => false
     rule Ghasdelegation          << BERLIN >> => false
     rule Gecpairinputcheck       << BERLIN >> => false
+    rule Gbls12g1msminputcheck   << BERLIN >> => false
+    rule Gbls12g2msminputcheck   << BERLIN >> => false
+    rule Gbls12pairingcheckinputcheck << BERLIN >> => false
 
     rule #isPrecompiledAccount(1p256, BERLIN) => true
     rule #isPrecompiledAccount(2p256, BERLIN) => true
@@ -1372,6 +1400,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << LONDON >> => false
     rule Ghasdelegation          << LONDON >> => false
     rule Gecpairinputcheck       << LONDON >> => false
+    rule Gbls12g1msminputcheck   << LONDON >> => false
+    rule Gbls12g2msminputcheck   << LONDON >> => false
+    rule Gbls12pairingcheckinputcheck << LONDON >> => false
 
     rule #isPrecompiledAccount(1p256, LONDON) => true
     rule #isPrecompiledAccount(2p256, LONDON) => true
@@ -1502,6 +1533,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << MERGE >> => false
     rule Ghasdelegation          << MERGE >> => false
     rule Gecpairinputcheck       << MERGE >> => false
+    rule Gbls12g1msminputcheck   << MERGE >> => false
+    rule Gbls12g2msminputcheck   << MERGE >> => false
+    rule Gbls12pairingcheckinputcheck << MERGE >> => false
 
     rule #isPrecompiledAccount(1p256, MERGE) => true
     rule #isPrecompiledAccount(2p256, MERGE) => true
@@ -1633,6 +1667,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << SHANGHAI >> => false
     rule Ghasdelegation          << SHANGHAI >> => false
     rule Gecpairinputcheck       << SHANGHAI >> => false
+    rule Gbls12g1msminputcheck   << SHANGHAI >> => false
+    rule Gbls12g2msminputcheck   << SHANGHAI >> => false
+    rule Gbls12pairingcheckinputcheck << SHANGHAI >> => false
 
     rule #isPrecompiledAccount(1p256, SHANGHAI) => true
     rule #isPrecompiledAccount(2p256, SHANGHAI) => true
@@ -1764,6 +1801,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << CANCUN >> => false
     rule Ghasdelegation          << CANCUN >> => false
     rule Gecpairinputcheck       << CANCUN >> => false
+    rule Gbls12g1msminputcheck   << CANCUN >> => false
+    rule Gbls12g2msminputcheck   << CANCUN >> => false
+    rule Gbls12pairingcheckinputcheck << CANCUN >> => false
 
     rule #isPrecompiledAccount(1p256, CANCUN) => true
     rule #isPrecompiledAccount(2p256, CANCUN) => true
@@ -1897,6 +1937,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << PRAGUE >> => true
     rule Ghasdelegation          << PRAGUE >> => true
     rule Gecpairinputcheck       << PRAGUE >> => false
+    rule Gbls12g1msminputcheck   << PRAGUE >> => false
+    rule Gbls12g2msminputcheck   << PRAGUE >> => false
+    rule Gbls12pairingcheckinputcheck << PRAGUE >> => false
 
     rule #isPrecompiledAccount(1p256, PRAGUE) => true
     rule #isPrecompiledAccount(2p256, PRAGUE) => true
@@ -2035,6 +2078,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << BEDROCK >> => false
     rule Ghasdelegation          << BEDROCK >> => false
     rule Gecpairinputcheck       << BEDROCK >> => false
+    rule Gbls12g1msminputcheck   << BEDROCK >> => false
+    rule Gbls12g2msminputcheck   << BEDROCK >> => false
+    rule Gbls12pairingcheckinputcheck << BEDROCK >> => false
 
     rule #isPrecompiledAccount(1p256, BEDROCK) => true
     rule #isPrecompiledAccount(2p256, BEDROCK) => true
@@ -2165,6 +2211,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << REGOLITH >> => false
     rule Ghasdelegation          << REGOLITH >> => false
     rule Gecpairinputcheck       << REGOLITH >> => false
+    rule Gbls12g1msminputcheck   << REGOLITH >> => false
+    rule Gbls12g2msminputcheck   << REGOLITH >> => false
+    rule Gbls12pairingcheckinputcheck << REGOLITH >> => false
 
     rule #isPrecompiledAccount(1p256, REGOLITH) => true
     rule #isPrecompiledAccount(2p256, REGOLITH) => true
@@ -2296,6 +2345,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << CANYON >> => false
     rule Ghasdelegation          << CANYON >> => false
     rule Gecpairinputcheck       << CANYON >> => false
+    rule Gbls12g1msminputcheck   << CANYON >> => false
+    rule Gbls12g2msminputcheck   << CANYON >> => false
+    rule Gbls12pairingcheckinputcheck << CANYON >> => false
 
     rule #isPrecompiledAccount(1p256, CANYON) => true
     rule #isPrecompiledAccount(2p256, CANYON) => true
@@ -2427,6 +2479,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << ECOTONE >> => false
     rule Ghasdelegation          << ECOTONE >> => false
     rule Gecpairinputcheck       << ECOTONE >> => false
+    rule Gbls12g1msminputcheck   << ECOTONE >> => false
+    rule Gbls12g2msminputcheck   << ECOTONE >> => false
+    rule Gbls12pairingcheckinputcheck << ECOTONE >> => false
 
     rule #isPrecompiledAccount(1p256, ECOTONE) => true
     rule #isPrecompiledAccount(2p256, ECOTONE) => true
@@ -2559,6 +2614,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << FJORD >> => false
     rule Ghasdelegation          << FJORD >> => false
     rule Gecpairinputcheck       << FJORD >> => false
+    rule Gbls12g1msminputcheck   << FJORD >> => false
+    rule Gbls12g2msminputcheck   << FJORD >> => false
+    rule Gbls12pairingcheckinputcheck << FJORD >> => false
 
     rule #isPrecompiledAccount(1p256, FJORD) => true
     rule #isPrecompiledAccount(2p256, FJORD) => true
@@ -2692,6 +2750,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << GRANITE >> => false
     rule Ghasdelegation          << GRANITE >> => false
     rule Gecpairinputcheck       << GRANITE >> => true
+    rule Gbls12g1msminputcheck   << GRANITE >> => false
+    rule Gbls12g2msminputcheck   << GRANITE >> => false
+    rule Gbls12pairingcheckinputcheck << GRANITE >> => false
 
     rule #isPrecompiledAccount(1p256, GRANITE) => true
     rule #isPrecompiledAccount(2p256, GRANITE) => true
@@ -2825,6 +2886,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << HOLOCENE >> => false
     rule Ghasdelegation          << HOLOCENE >> => false
     rule Gecpairinputcheck       << HOLOCENE >> => true
+    rule Gbls12g1msminputcheck   << HOLOCENE >> => false
+    rule Gbls12g2msminputcheck   << HOLOCENE >> => false
+    rule Gbls12pairingcheckinputcheck << HOLOCENE >> => false
 
     rule #isPrecompiledAccount(1p256, HOLOCENE) => true
     rule #isPrecompiledAccount(2p256, HOLOCENE) => true
@@ -2959,6 +3023,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount    << ISTHMUS >> => true
     rule Ghasdelegation          << ISTHMUS >> => true
     rule Gecpairinputcheck       << ISTHMUS >> => true
+    rule Gbls12g1msminputcheck   << ISTHMUS >> => true
+    rule Gbls12g2msminputcheck   << ISTHMUS >> => true
+    rule Gbls12pairingcheckinputcheck << ISTHMUS >> => true
 
     rule #isPrecompiledAccount(1p256, ISTHMUS) => true
     rule #isPrecompiledAccount(2p256, ISTHMUS) => true

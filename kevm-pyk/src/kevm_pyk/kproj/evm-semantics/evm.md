@@ -1233,6 +1233,12 @@ Self destructing to yourself, unlike a regular transfer, destroys the balance in
     rule <k> SELFDESTRUCT ACCTTO => SelfDestruct(EvmWord(IDACCT), EvmWord(ACCTTO)) ~> #end EVMC_SUCCESS ... </k>
          <id> IDACCT </id>
          <output> _ => .Bytes </output>
+         <schedule> SCHED </schedule>
+      requires SCHED =/=K MINI_REX
+
+   rule <k> SELFDESTRUCT _ => #end EVMC_INVALID_INSTRUCTION ... </k>
+         <schedule> SCHED </schedule>
+      requires SCHED ==K MINI_REX
 ```
 
 Precompiled Contracts
@@ -1261,6 +1267,7 @@ Precompiled Contracts
     rule #precompiled(15p256) => BLS12PAIRING_CHECK
     rule #precompiled(16p256) => BLS12MAPFPTOG1
     rule #precompiled(17p256) => BLS12MAPFP2TOG2
+    rule #precompiled(256p256) => P256VERIFY
 ```
 
 -   `ECREC` performs ECDSA public key recovery.
@@ -1753,6 +1760,25 @@ Precompiled Contracts
         orBool notBool isValidBLS12Fp(Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned))
         orBool notBool isValidBLS12Fp(Bytes2Int(substrBytes(CD, 64, 128), BE, Unsigned))
 
+
+    syntax PrecompiledOp ::= "P256VERIFY"
+ // -------------------------------------
+    rule <k> P256VERIFY => #end EVMC_SUCCESS ... </k>
+         <output> _ => Int2Bytes(32, 1, BE) </output>
+         <callData> CD </callData>
+      requires lengthBytes( CD ) ==Int 160
+       andBool P256Verify( CD )
+
+    rule <k> P256VERIFY => #end EVMC_SUCCESS ... </k>
+         <callData> CD </callData>
+      requires lengthBytes( CD ) =/=Int 160
+
+    rule <k> P256VERIFY => #end EVMC_SUCCESS ... </k>
+         <callData> CD </callData>
+      requires lengthBytes( CD ) ==Int 160
+       andBool notBool P256Verify( CD )
+
+
 ```
 
 Ethereum Gas Calculation
@@ -2133,12 +2159,13 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
     rule <k> #gasExec(SCHED, BLAKE2F)   => Gfround < SCHED > *Int #asWord(#range(CD, 0, 4) ) ... </k> <callData> CD </callData>
     rule <k> #gasExec(SCHED, KZGPOINTEVAL)  => Gpointeval < SCHED > ... </k>
     rule <k> #gasExec(SCHED, BLS12G1ADD)    => Gbls12g1add < SCHED > ... </k>
-    rule <k> #gasExec(SCHED, BLS12G1MSM)    => #let N = lengthBytes(CD) /Int 160 #in N *Int Gbls12g1mul < SCHED > *Int Cbls12g1MsmDiscount(SCHED, N) /Int 1000 ... </k> <callData> CD </callData>
+    rule <k> #gasExec(SCHED, BLS12G1MSM)    => #if Gbls12g1msminputcheck << SCHED >> andBool lengthBytes(CD) >Int isthmusG1msmMaxInputSize #then #end EVMC_PRECOMPILE_FAILURE #else #let N = lengthBytes(CD) /Int 160 #in N *Int Gbls12g1mul < SCHED > *Int Cbls12g1MsmDiscount(SCHED, N) /Int 1000 #fi ... </k> <callData> CD </callData>
     rule <k> #gasExec(SCHED, BLS12G2ADD)    => Gbls12g2add < SCHED > ... </k>
-    rule <k> #gasExec(SCHED, BLS12G2MSM)    => #let N = lengthBytes(CD) /Int 288 #in N *Int Gbls12g2mul < SCHED > *Int Cbls12g2MsmDiscount(SCHED, N) /Int 1000 ... </k> <callData> CD </callData>
-    rule <k> #gasExec(SCHED, BLS12PAIRING_CHECK)    => #let N = lengthBytes(CD) /Int 384 #in N *Int Gbls12PairingCheckMul < SCHED > +Int Gbls12PairingCheckAdd < SCHED > ... </k> <callData> CD </callData>
+    rule <k> #gasExec(SCHED, BLS12G2MSM)    => #if Gbls12g2msminputcheck << SCHED >> andBool lengthBytes(CD) >Int isthmusG2msmMaxInputSize #then #end EVMC_PRECOMPILE_FAILURE #else #let N = lengthBytes(CD) /Int 288 #in N *Int Gbls12g2mul < SCHED > *Int Cbls12g2MsmDiscount(SCHED, N) /Int 1000 #fi ... </k> <callData> CD </callData>
+    rule <k> #gasExec(SCHED, BLS12PAIRING_CHECK)    => #if Gbls12pairingcheckinputcheck << SCHED >> andBool lengthBytes(CD) >Int isthmusPairingMaxInputSize #then #end EVMC_PRECOMPILE_FAILURE #else #let N = lengthBytes(CD) /Int 384 #in N *Int Gbls12PairingCheckMul < SCHED > +Int Gbls12PairingCheckAdd < SCHED > #fi ... </k> <callData> CD </callData>
     rule <k> #gasExec(SCHED, BLS12MAPFPTOG1) => Gbls12mapfptog1 < SCHED > ... </k>
     rule <k> #gasExec(SCHED, BLS12MAPFP2TOG2) => Gbls12mapfp2tog2 < SCHED > ... </k>
+    rule <k> #gasExec(SCHED, P256VERIFY)  => Gp256verify < SCHED > ... </k>
     syntax InternalOp ::= "#allocateCallGas"
  // ----------------------------------------
     rule <k> GCALL:Gas ~> #allocateCallGas => .K ... </k>
@@ -2365,7 +2392,7 @@ After interpreting the strings representing programs as a `WordStack`, it should
     rule #dasmOpCode( 250p256, SCHED ) => STATICCALL   requires Ghasstaticcall << SCHED >>
     rule #dasmOpCode( 253p256, SCHED ) => REVERT       requires Ghasrevert     << SCHED >>
     rule #dasmOpCode( 254p256,     _ ) => INVALID
-    rule #dasmOpCode( 255p256,     _ ) => SELFDESTRUCT
+    rule #dasmOpCode( 255p256, SCHED ) => #if SCHED =/=K MINI_REX #then SELFDESTRUCT #else INVALID #fi
     rule #dasmOpCode(       W,     _ ) => UNDEFINED(MInt2Unsigned(W)) [owise]
 
 endmodule

@@ -1232,6 +1232,12 @@ Self destructing to yourself, unlike a regular transfer, destroys the balance in
     rule <k> SELFDESTRUCT ACCTTO => SelfDestruct(EvmWord(IDACCT), EvmWord(ACCTTO)) ~> #end EVMC_SUCCESS ... </k>
          <id> IDACCT </id>
          <output> _ => .Bytes </output>
+         <schedule> SCHED </schedule>
+      requires SCHED =/=K MINI_REX
+
+   rule <k> SELFDESTRUCT _ => #end EVMC_INVALID_INSTRUCTION ... </k>
+         <schedule> SCHED </schedule>
+      requires SCHED ==K MINI_REX
 ```
 
 Precompiled Contracts
@@ -2350,7 +2356,7 @@ After interpreting the strings representing programs as a `WordStack`, it should
     rule #dasmOpCode( 250p256, SCHED ) => STATICCALL   requires Ghasstaticcall << SCHED >>
     rule #dasmOpCode( 253p256, SCHED ) => REVERT       requires Ghasrevert     << SCHED >>
     rule #dasmOpCode( 254p256,     _ ) => INVALID
-    rule #dasmOpCode( 255p256,     _ ) => SELFDESTRUCT
+    rule #dasmOpCode( 255p256, SCHED ) => #if SCHED =/=K MINI_REX #then SELFDESTRUCT #else INVALID #fi
     rule #dasmOpCode(       W,     _ ) => UNDEFINED(MInt2Unsigned(W)) [owise]
 
 endmodule

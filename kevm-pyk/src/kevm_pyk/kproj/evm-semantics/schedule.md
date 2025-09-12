@@ -83,7 +83,8 @@ module SCHEDULE
                           | "Ghasrejectedfirstbyte"   | "Ghasprevrandao"   | "Ghasmaxinitcodesize" | "Ghaspushzero"
                           | "Ghaswarmcoinbase"        | "Ghaswithdrawals"  | "Ghastransient"       | "Ghasmcopy"
                           | "Ghasbeaconroot"          | "Ghaseip6780"      | "Ghasblobbasefee"     | "Ghasblobhash"
-                          | "Ghasbls12msmdiscount"    | "Ghasdelegation"   | "Gecpairinputcheck"   | "Ghasmip001"
+                          | "Ghasbls12msmdiscount"    | "Ghasdelegation"   | "Gecpairinputcheck"   | "Gbls12g1msminputcheck"
+                          | "Gbls12g2msminputcheck"   | "Gbls12pairingcheckinputcheck"             | "Ghasmip001"
 
     syntax Bool ::= #isPrecompiledAccount ( MInt{256} , Schedule ) [symbol(isPrecompiledAccount), function, total, smtlib(isPrecompiledAccount)]
  // --------------------------------------------------------------------------------------------------------------------------------------------
@@ -106,8 +107,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
                            | "Gcopy"         | "Gblockhash"    | "Gquadcoeff"    | "maxCodeSize"       | "Rb"                 | "Gquaddivisor"       | "Gecadd"
                            | "Gecmul"        | "Gecpairconst"  | "Gecpaircoeff"  | "Gfround"           | "Gcoldsload"         | "Gcoldaccountaccess" | "Gwarmstorageread"
                            | "Gaccesslistaddress"              | "Gaccessliststoragekey"               | "Rmaxquotient"       | "Ginitcodewordcost"  | "maxInitCodeSize"
-                           | "Gwarmstoragedirtystore"          | "Gpointeval"    | "Gbls12g1add"       | "Gbls12g1mul"        | "Gbls12g2add"        | "Gbls12g2mul"
-                           | "Gbls12PairingCheckMul"           | "Gbls12PairingCheckAdd"               | "Gbls12mapfptog1"    | "Gbls12mapfp2tog2"
+                           | "Gwarmstoragedirtystore"          | "Gpointeval"    | "Gbls12g1add"       | "Gbls12g1mul"        | "Gbls12g2add"        | "Gbls12g2mul" 
+                           | "Gbls12PairingCheckMul"           | "Gbls12PairingCheckAdd"               | "Gbls12mapfptog1"    | "Gbls12mapfp2tog2"   | "Gp256verify"
  // ----------------------------------------------------------------------------------------------------------------------------------------------------
 ```
 ## Ethereum Schedules
@@ -189,6 +190,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < FRONTIER > => 0
     rule Gbls12mapfp2tog2 < FRONTIER > => 0
 
+    rule Gp256verify < FRONTIER > => 0
+
     rule Gaccessliststoragekey < FRONTIER > => 0
     rule Gaccesslistaddress    < FRONTIER > => 0
 
@@ -197,38 +200,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < FRONTIER > => 2
 
-    rule Gselfdestructnewaccount << FRONTIER >> => false
-    rule Gstaticcalldepth        << FRONTIER >> => true
-    rule Gemptyisnonexistent     << FRONTIER >> => false
-    rule Gzerovaluenewaccountgas << FRONTIER >> => true
-    rule Ghasrevert              << FRONTIER >> => false
-    rule Ghasreturndata          << FRONTIER >> => false
-    rule Ghasstaticcall          << FRONTIER >> => false
-    rule Ghasshift               << FRONTIER >> => false
-    rule Ghasdirtysstore         << FRONTIER >> => false
-    rule Ghassstorestipend       << FRONTIER >> => false
-    rule Ghascreate2             << FRONTIER >> => false
-    rule Ghasextcodehash         << FRONTIER >> => false
-    rule Ghasselfbalance         << FRONTIER >> => false
-    rule Ghaschainid             << FRONTIER >> => false
-    rule Ghasaccesslist          << FRONTIER >> => false
-    rule Ghasbasefee             << FRONTIER >> => false
-    rule Ghasrejectedfirstbyte   << FRONTIER >> => false
-    rule Ghasprevrandao          << FRONTIER >> => false
-    rule Ghasmaxinitcodesize     << FRONTIER >> => false
-    rule Ghaspushzero            << FRONTIER >> => false
-    rule Ghaswarmcoinbase        << FRONTIER >> => false
-    rule Ghaswithdrawals         << FRONTIER >> => false
-    rule Ghastransient           << FRONTIER >> => false
-    rule Ghasmcopy               << FRONTIER >> => false
-    rule Ghasbeaconroot          << FRONTIER >> => false
-    rule Ghaseip6780             << FRONTIER >> => false
-    rule Ghasblobbasefee         << FRONTIER >> => false
-    rule Ghasblobhash            << FRONTIER >> => false
-    rule Ghasbls12msmdiscount    << FRONTIER >> => false
-    rule Ghasdelegation          << FRONTIER >> => false
-    rule Gecpairinputcheck       << FRONTIER >> => false
-    rule Ghasmip001              << FRONTIER >> => false
+    rule Gselfdestructnewaccount      << FRONTIER >> => false
+    rule Gstaticcalldepth             << FRONTIER >> => true
+    rule Gemptyisnonexistent          << FRONTIER >> => false
+    rule Gzerovaluenewaccountgas      << FRONTIER >> => true
+    rule Ghasrevert                   << FRONTIER >> => false
+    rule Ghasreturndata               << FRONTIER >> => false
+    rule Ghasstaticcall               << FRONTIER >> => false
+    rule Ghasshift                    << FRONTIER >> => false
+    rule Ghasdirtysstore              << FRONTIER >> => false
+    rule Ghassstorestipend            << FRONTIER >> => false
+    rule Ghascreate2                  << FRONTIER >> => false
+    rule Ghasextcodehash              << FRONTIER >> => false
+    rule Ghasselfbalance              << FRONTIER >> => false
+    rule Ghaschainid                  << FRONTIER >> => false
+    rule Ghasaccesslist               << FRONTIER >> => false
+    rule Ghasbasefee                  << FRONTIER >> => false
+    rule Ghasrejectedfirstbyte        << FRONTIER >> => false
+    rule Ghasprevrandao               << FRONTIER >> => false
+    rule Ghasmaxinitcodesize          << FRONTIER >> => false
+    rule Ghaspushzero                 << FRONTIER >> => false
+    rule Ghaswarmcoinbase             << FRONTIER >> => false
+    rule Ghaswithdrawals              << FRONTIER >> => false
+    rule Ghastransient                << FRONTIER >> => false
+    rule Ghasmcopy                    << FRONTIER >> => false
+    rule Ghasbeaconroot               << FRONTIER >> => false
+    rule Ghaseip6780                  << FRONTIER >> => false
+    rule Ghasblobbasefee              << FRONTIER >> => false
+    rule Ghasblobhash                 << FRONTIER >> => false
+    rule Ghasbls12msmdiscount         << FRONTIER >> => false
+    rule Ghasdelegation               << FRONTIER >> => false
+    rule Gecpairinputcheck            << FRONTIER >> => false
+    rule Gbls12g1msminputcheck        << FRONTIER >> => false
+    rule Gbls12g2msminputcheck        << FRONTIER >> => false
+    rule Gbls12pairingcheckinputcheck << FRONTIER >> => false
+     rule Ghasmip001                  << FRONTIER >> => false
 
     rule #isPrecompiledAccount(1p256, FRONTIER) => true
     rule #isPrecompiledAccount(2p256, FRONTIER) => true
@@ -314,6 +320,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < HOMESTEAD > => 0
     rule Gbls12mapfp2tog2 < HOMESTEAD > => 0
 
+    rule Gp256verify < HOMESTEAD > => 0
+
     rule Gaccessliststoragekey < HOMESTEAD > => 0
     rule Gaccesslistaddress    < HOMESTEAD > => 0
 
@@ -322,38 +330,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < HOMESTEAD > => 2
 
-    rule Gselfdestructnewaccount << HOMESTEAD >> => false
-    rule Gstaticcalldepth        << HOMESTEAD >> => true
-    rule Gemptyisnonexistent     << HOMESTEAD >> => false
-    rule Gzerovaluenewaccountgas << HOMESTEAD >> => true
-    rule Ghasrevert              << HOMESTEAD >> => false
-    rule Ghasreturndata          << HOMESTEAD >> => false
-    rule Ghasstaticcall          << HOMESTEAD >> => false
-    rule Ghasshift               << HOMESTEAD >> => false
-    rule Ghasdirtysstore         << HOMESTEAD >> => false
-    rule Ghassstorestipend       << HOMESTEAD >> => false
-    rule Ghascreate2             << HOMESTEAD >> => false
-    rule Ghasextcodehash         << HOMESTEAD >> => false
-    rule Ghasselfbalance         << HOMESTEAD >> => false
-    rule Ghaschainid             << HOMESTEAD >> => false
-    rule Ghasaccesslist          << HOMESTEAD >> => false
-    rule Ghasbasefee             << HOMESTEAD >> => false
-    rule Ghasrejectedfirstbyte   << HOMESTEAD >> => false
-    rule Ghasprevrandao          << HOMESTEAD >> => false
-    rule Ghasmaxinitcodesize     << HOMESTEAD >> => false
-    rule Ghaspushzero            << HOMESTEAD >> => false
-    rule Ghaswarmcoinbase        << HOMESTEAD >> => false
-    rule Ghaswithdrawals         << HOMESTEAD >> => false
-    rule Ghastransient           << HOMESTEAD >> => false
-    rule Ghasmcopy               << HOMESTEAD >> => false
-    rule Ghasbeaconroot          << HOMESTEAD >> => false
-    rule Ghaseip6780             << HOMESTEAD >> => false
-    rule Ghasblobbasefee         << HOMESTEAD >> => false
-    rule Ghasblobhash            << HOMESTEAD >> => false
-    rule Ghasbls12msmdiscount    << HOMESTEAD >> => false
-    rule Ghasdelegation          << HOMESTEAD >> => false
-    rule Gecpairinputcheck       << HOMESTEAD >> => false
-    rule Ghasmip001              << HOMESTEAD >> => false
+    rule Gselfdestructnewaccount      << HOMESTEAD >> => false
+    rule Gstaticcalldepth             << HOMESTEAD >> => true
+    rule Gemptyisnonexistent          << HOMESTEAD >> => false
+    rule Gzerovaluenewaccountgas      << HOMESTEAD >> => true
+    rule Ghasrevert                   << HOMESTEAD >> => false
+    rule Ghasreturndata               << HOMESTEAD >> => false
+    rule Ghasstaticcall               << HOMESTEAD >> => false
+    rule Ghasshift                    << HOMESTEAD >> => false
+    rule Ghasdirtysstore              << HOMESTEAD >> => false
+    rule Ghassstorestipend            << HOMESTEAD >> => false
+    rule Ghascreate2                  << HOMESTEAD >> => false
+    rule Ghasextcodehash              << HOMESTEAD >> => false
+    rule Ghasselfbalance              << HOMESTEAD >> => false
+    rule Ghaschainid                  << HOMESTEAD >> => false
+    rule Ghasaccesslist               << HOMESTEAD >> => false
+    rule Ghasbasefee                  << HOMESTEAD >> => false
+    rule Ghasrejectedfirstbyte        << HOMESTEAD >> => false
+    rule Ghasprevrandao               << HOMESTEAD >> => false
+    rule Ghasmaxinitcodesize          << HOMESTEAD >> => false
+    rule Ghaspushzero                 << HOMESTEAD >> => false
+    rule Ghaswarmcoinbase             << HOMESTEAD >> => false
+    rule Ghaswithdrawals              << HOMESTEAD >> => false
+    rule Ghastransient                << HOMESTEAD >> => false
+    rule Ghasmcopy                    << HOMESTEAD >> => false
+    rule Ghasbeaconroot               << HOMESTEAD >> => false
+    rule Ghaseip6780                  << HOMESTEAD >> => false
+    rule Ghasblobbasefee              << HOMESTEAD >> => false
+    rule Ghasblobhash                 << HOMESTEAD >> => false
+    rule Ghasbls12msmdiscount         << HOMESTEAD >> => false
+    rule Ghasdelegation               << HOMESTEAD >> => false
+    rule Gecpairinputcheck            << HOMESTEAD >> => false
+    rule Gbls12g1msminputcheck        << HOMESTEAD >> => false
+    rule Gbls12g2msminputcheck        << HOMESTEAD >> => false
+    rule Gbls12pairingcheckinputcheck << HOMESTEAD >> => false
+     rule Ghasmip001                  << HOMESTEAD >> => false
 
     rule #isPrecompiledAccount(1p256, HOMESTEAD) => true
     rule #isPrecompiledAccount(2p256, HOMESTEAD) => true
@@ -439,6 +450,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < TANGERINE_WHISTLE > => 0
     rule Gbls12mapfp2tog2 < TANGERINE_WHISTLE > => 0
 
+    rule Gp256verify < TANGERINE_WHISTLE > => 0
+
     rule Gaccessliststoragekey < TANGERINE_WHISTLE > => 0
     rule Gaccesslistaddress    < TANGERINE_WHISTLE > => 0
 
@@ -447,38 +460,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < TANGERINE_WHISTLE > => 2
 
-    rule Gselfdestructnewaccount << TANGERINE_WHISTLE >> => true
-    rule Gstaticcalldepth        << TANGERINE_WHISTLE >> => false
-    rule Gemptyisnonexistent     << TANGERINE_WHISTLE >> => false
-    rule Gzerovaluenewaccountgas << TANGERINE_WHISTLE >> => true
-    rule Ghasrevert              << TANGERINE_WHISTLE >> => false
-    rule Ghasreturndata          << TANGERINE_WHISTLE >> => false
-    rule Ghasstaticcall          << TANGERINE_WHISTLE >> => false
-    rule Ghasshift               << TANGERINE_WHISTLE >> => false
-    rule Ghasdirtysstore         << TANGERINE_WHISTLE >> => false
-    rule Ghassstorestipend       << TANGERINE_WHISTLE >> => false
-    rule Ghascreate2             << TANGERINE_WHISTLE >> => false
-    rule Ghasextcodehash         << TANGERINE_WHISTLE >> => false
-    rule Ghasselfbalance         << TANGERINE_WHISTLE >> => false
-    rule Ghaschainid             << TANGERINE_WHISTLE >> => false
-    rule Ghasaccesslist          << TANGERINE_WHISTLE >> => false
-    rule Ghasbasefee             << TANGERINE_WHISTLE >> => false
-    rule Ghasrejectedfirstbyte   << TANGERINE_WHISTLE >> => false
-    rule Ghasprevrandao          << TANGERINE_WHISTLE >> => false
-    rule Ghasmaxinitcodesize     << TANGERINE_WHISTLE >> => false
-    rule Ghaspushzero            << TANGERINE_WHISTLE >> => false
-    rule Ghaswarmcoinbase        << TANGERINE_WHISTLE >> => false
-    rule Ghaswithdrawals         << TANGERINE_WHISTLE >> => false
-    rule Ghastransient           << TANGERINE_WHISTLE >> => false
-    rule Ghasmcopy               << TANGERINE_WHISTLE >> => false
-    rule Ghasbeaconroot          << TANGERINE_WHISTLE >> => false
-    rule Ghaseip6780             << TANGERINE_WHISTLE >> => false
-    rule Ghasblobbasefee         << TANGERINE_WHISTLE >> => false
-    rule Ghasblobhash            << TANGERINE_WHISTLE >> => false
-    rule Ghasbls12msmdiscount    << TANGERINE_WHISTLE >> => false
-    rule Ghasdelegation          << TANGERINE_WHISTLE >> => false
-    rule Gecpairinputcheck       << TANGERINE_WHISTLE >> => false
-    rule Ghasmip001              << TANGERINE_WHISTLE >> => false
+    rule Gselfdestructnewaccount      << TANGERINE_WHISTLE >> => true
+    rule Gstaticcalldepth             << TANGERINE_WHISTLE >> => false
+    rule Gemptyisnonexistent          << TANGERINE_WHISTLE >> => false
+    rule Gzerovaluenewaccountgas      << TANGERINE_WHISTLE >> => true
+    rule Ghasrevert                   << TANGERINE_WHISTLE >> => false
+    rule Ghasreturndata               << TANGERINE_WHISTLE >> => false
+    rule Ghasstaticcall               << TANGERINE_WHISTLE >> => false
+    rule Ghasshift                    << TANGERINE_WHISTLE >> => false
+    rule Ghasdirtysstore              << TANGERINE_WHISTLE >> => false
+    rule Ghassstorestipend            << TANGERINE_WHISTLE >> => false
+    rule Ghascreate2                  << TANGERINE_WHISTLE >> => false
+    rule Ghasextcodehash              << TANGERINE_WHISTLE >> => false
+    rule Ghasselfbalance              << TANGERINE_WHISTLE >> => false
+    rule Ghaschainid                  << TANGERINE_WHISTLE >> => false
+    rule Ghasaccesslist               << TANGERINE_WHISTLE >> => false
+    rule Ghasbasefee                  << TANGERINE_WHISTLE >> => false
+    rule Ghasrejectedfirstbyte        << TANGERINE_WHISTLE >> => false
+    rule Ghasprevrandao               << TANGERINE_WHISTLE >> => false
+    rule Ghasmaxinitcodesize          << TANGERINE_WHISTLE >> => false
+    rule Ghaspushzero                 << TANGERINE_WHISTLE >> => false
+    rule Ghaswarmcoinbase             << TANGERINE_WHISTLE >> => false
+    rule Ghaswithdrawals              << TANGERINE_WHISTLE >> => false
+    rule Ghastransient                << TANGERINE_WHISTLE >> => false
+    rule Ghasmcopy                    << TANGERINE_WHISTLE >> => false
+    rule Ghasbeaconroot               << TANGERINE_WHISTLE >> => false
+    rule Ghaseip6780                  << TANGERINE_WHISTLE >> => false
+    rule Ghasblobbasefee              << TANGERINE_WHISTLE >> => false
+    rule Ghasblobhash                 << TANGERINE_WHISTLE >> => false
+    rule Ghasbls12msmdiscount         << TANGERINE_WHISTLE >> => false
+    rule Ghasdelegation               << TANGERINE_WHISTLE >> => false
+    rule Gecpairinputcheck            << TANGERINE_WHISTLE >> => false
+    rule Gbls12g1msminputcheck        << TANGERINE_WHISTLE >> => false
+    rule Gbls12g2msminputcheck        << TANGERINE_WHISTLE >> => false
+    rule Gbls12pairingcheckinputcheck << TANGERINE_WHISTLE >> => false
+    rule Ghasmip001                   << TANGERINE_WHISTLE >> => false
 
     rule #isPrecompiledAccount(1p256, TANGERINE_WHISTLE) => true
     rule #isPrecompiledAccount(2p256, TANGERINE_WHISTLE) => true
@@ -564,6 +580,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < SPURIOUS_DRAGON > => 0
     rule Gbls12mapfp2tog2 < SPURIOUS_DRAGON > => 0
 
+    rule Gp256verify < SPURIOUS_DRAGON > => 0
+
     rule Gaccessliststoragekey < SPURIOUS_DRAGON > => 0
     rule Gaccesslistaddress    < SPURIOUS_DRAGON > => 0
 
@@ -572,38 +590,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < SPURIOUS_DRAGON > => 2
 
-    rule Gselfdestructnewaccount << SPURIOUS_DRAGON >> => true
-    rule Gstaticcalldepth        << SPURIOUS_DRAGON >> => false
-    rule Gemptyisnonexistent     << SPURIOUS_DRAGON >> => true
-    rule Gzerovaluenewaccountgas << SPURIOUS_DRAGON >> => false
-    rule Ghasrevert              << SPURIOUS_DRAGON >> => false
-    rule Ghasreturndata          << SPURIOUS_DRAGON >> => false
-    rule Ghasstaticcall          << SPURIOUS_DRAGON >> => false
-    rule Ghasshift               << SPURIOUS_DRAGON >> => false
-    rule Ghasdirtysstore         << SPURIOUS_DRAGON >> => false
-    rule Ghassstorestipend       << SPURIOUS_DRAGON >> => false
-    rule Ghascreate2             << SPURIOUS_DRAGON >> => false
-    rule Ghasextcodehash         << SPURIOUS_DRAGON >> => false
-    rule Ghasselfbalance         << SPURIOUS_DRAGON >> => false
-    rule Ghaschainid             << SPURIOUS_DRAGON >> => false
-    rule Ghasaccesslist          << SPURIOUS_DRAGON >> => false
-    rule Ghasbasefee             << SPURIOUS_DRAGON >> => false
-    rule Ghasrejectedfirstbyte   << SPURIOUS_DRAGON >> => false
-    rule Ghasprevrandao          << SPURIOUS_DRAGON >> => false
-    rule Ghasmaxinitcodesize     << SPURIOUS_DRAGON >> => false
-    rule Ghaspushzero            << SPURIOUS_DRAGON >> => false
-    rule Ghaswarmcoinbase        << SPURIOUS_DRAGON >> => false
-    rule Ghaswithdrawals         << SPURIOUS_DRAGON >> => false
-    rule Ghastransient           << SPURIOUS_DRAGON >> => false
-    rule Ghasmcopy               << SPURIOUS_DRAGON >> => false
-    rule Ghasbeaconroot          << SPURIOUS_DRAGON >> => false
-    rule Ghaseip6780             << SPURIOUS_DRAGON >> => false
-    rule Ghasblobbasefee         << SPURIOUS_DRAGON >> => false
-    rule Ghasblobhash            << SPURIOUS_DRAGON >> => false
-    rule Ghasbls12msmdiscount    << SPURIOUS_DRAGON >> => false
-    rule Ghasdelegation          << SPURIOUS_DRAGON >> => false
-    rule Gecpairinputcheck       << SPURIOUS_DRAGON >> => false
-    rule Ghasmip001              << SPURIOUS_DRAGON >> => false
+    rule Gselfdestructnewaccount      << SPURIOUS_DRAGON >> => true
+    rule Gstaticcalldepth             << SPURIOUS_DRAGON >> => false
+    rule Gemptyisnonexistent          << SPURIOUS_DRAGON >> => true
+    rule Gzerovaluenewaccountgas      << SPURIOUS_DRAGON >> => false
+    rule Ghasrevert                   << SPURIOUS_DRAGON >> => false
+    rule Ghasreturndata               << SPURIOUS_DRAGON >> => false
+    rule Ghasstaticcall               << SPURIOUS_DRAGON >> => false
+    rule Ghasshift                    << SPURIOUS_DRAGON >> => false
+    rule Ghasdirtysstore              << SPURIOUS_DRAGON >> => false
+    rule Ghassstorestipend            << SPURIOUS_DRAGON >> => false
+    rule Ghascreate2                  << SPURIOUS_DRAGON >> => false
+    rule Ghasextcodehash              << SPURIOUS_DRAGON >> => false
+    rule Ghasselfbalance              << SPURIOUS_DRAGON >> => false
+    rule Ghaschainid                  << SPURIOUS_DRAGON >> => false
+    rule Ghasaccesslist               << SPURIOUS_DRAGON >> => false
+    rule Ghasbasefee                  << SPURIOUS_DRAGON >> => false
+    rule Ghasrejectedfirstbyte        << SPURIOUS_DRAGON >> => false
+    rule Ghasprevrandao               << SPURIOUS_DRAGON >> => false
+    rule Ghasmaxinitcodesize          << SPURIOUS_DRAGON >> => false
+    rule Ghaspushzero                 << SPURIOUS_DRAGON >> => false
+    rule Ghaswarmcoinbase             << SPURIOUS_DRAGON >> => false
+    rule Ghaswithdrawals              << SPURIOUS_DRAGON >> => false
+    rule Ghastransient                << SPURIOUS_DRAGON >> => false
+    rule Ghasmcopy                    << SPURIOUS_DRAGON >> => false
+    rule Ghasbeaconroot               << SPURIOUS_DRAGON >> => false
+    rule Ghaseip6780                  << SPURIOUS_DRAGON >> => false
+    rule Ghasblobbasefee              << SPURIOUS_DRAGON >> => false
+    rule Ghasblobhash                 << SPURIOUS_DRAGON >> => false
+    rule Ghasbls12msmdiscount         << SPURIOUS_DRAGON >> => false
+    rule Ghasdelegation               << SPURIOUS_DRAGON >> => false
+    rule Gecpairinputcheck            << SPURIOUS_DRAGON >> => false
+    rule Gbls12g1msminputcheck        << SPURIOUS_DRAGON >> => false
+    rule Gbls12g2msminputcheck        << SPURIOUS_DRAGON >> => false
+    rule Gbls12pairingcheckinputcheck << SPURIOUS_DRAGON >> => false
+    rule Ghasmip001                   << SPURIOUS_DRAGON >> => false
 
     rule #isPrecompiledAccount(1p256, SPURIOUS_DRAGON) => true
     rule #isPrecompiledAccount(2p256, SPURIOUS_DRAGON) => true
@@ -689,6 +710,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < BYZANTIUM > => 0
     rule Gbls12mapfp2tog2 < BYZANTIUM > => 0
 
+    rule Gp256verify < BYZANTIUM > => 0
+
     rule Gaccessliststoragekey < BYZANTIUM > => 0
     rule Gaccesslistaddress    < BYZANTIUM > => 0
 
@@ -697,38 +720,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < BYZANTIUM > => 2
 
-    rule Gselfdestructnewaccount << BYZANTIUM >> => true
-    rule Gstaticcalldepth        << BYZANTIUM >> => false
-    rule Gemptyisnonexistent     << BYZANTIUM >> => true
-    rule Gzerovaluenewaccountgas << BYZANTIUM >> => false
-    rule Ghasrevert              << BYZANTIUM >> => true
-    rule Ghasreturndata          << BYZANTIUM >> => true
-    rule Ghasstaticcall          << BYZANTIUM >> => true
-    rule Ghasshift               << BYZANTIUM >> => false
-    rule Ghasdirtysstore         << BYZANTIUM >> => false
-    rule Ghassstorestipend       << BYZANTIUM >> => false
-    rule Ghascreate2             << BYZANTIUM >> => false
-    rule Ghasextcodehash         << BYZANTIUM >> => false
-    rule Ghasselfbalance         << BYZANTIUM >> => false
-    rule Ghaschainid             << BYZANTIUM >> => false
-    rule Ghasaccesslist          << BYZANTIUM >> => false
-    rule Ghasbasefee             << BYZANTIUM >> => false
-    rule Ghasrejectedfirstbyte   << BYZANTIUM >> => false
-    rule Ghasprevrandao          << BYZANTIUM >> => false
-    rule Ghasmaxinitcodesize     << BYZANTIUM >> => false
-    rule Ghaspushzero            << BYZANTIUM >> => false
-    rule Ghaswarmcoinbase        << BYZANTIUM >> => false
-    rule Ghaswithdrawals         << BYZANTIUM >> => false
-    rule Ghastransient           << BYZANTIUM >> => false
-    rule Ghasmcopy               << BYZANTIUM >> => false
-    rule Ghasbeaconroot          << BYZANTIUM >> => false
-    rule Ghaseip6780             << BYZANTIUM >> => false
-    rule Ghasblobbasefee         << BYZANTIUM >> => false
-    rule Ghasblobhash            << BYZANTIUM >> => false
-    rule Ghasbls12msmdiscount    << BYZANTIUM >> => false
-    rule Ghasdelegation          << BYZANTIUM >> => false
-    rule Gecpairinputcheck       << BYZANTIUM >> => false
-    rule Ghasmip001              << BYZANTIUM >> => false
+    rule Gselfdestructnewaccount      << BYZANTIUM >> => true
+    rule Gstaticcalldepth             << BYZANTIUM >> => false
+    rule Gemptyisnonexistent          << BYZANTIUM >> => true
+    rule Gzerovaluenewaccountgas      << BYZANTIUM >> => false
+    rule Ghasrevert                   << BYZANTIUM >> => true
+    rule Ghasreturndata               << BYZANTIUM >> => true
+    rule Ghasstaticcall               << BYZANTIUM >> => true
+    rule Ghasshift                    << BYZANTIUM >> => false
+    rule Ghasdirtysstore              << BYZANTIUM >> => false
+    rule Ghassstorestipend            << BYZANTIUM >> => false
+    rule Ghascreate2                  << BYZANTIUM >> => false
+    rule Ghasextcodehash              << BYZANTIUM >> => false
+    rule Ghasselfbalance              << BYZANTIUM >> => false
+    rule Ghaschainid                  << BYZANTIUM >> => false
+    rule Ghasaccesslist               << BYZANTIUM >> => false
+    rule Ghasbasefee                  << BYZANTIUM >> => false
+    rule Ghasrejectedfirstbyte        << BYZANTIUM >> => false
+    rule Ghasprevrandao               << BYZANTIUM >> => false
+    rule Ghasmaxinitcodesize          << BYZANTIUM >> => false
+    rule Ghaspushzero                 << BYZANTIUM >> => false
+    rule Ghaswarmcoinbase             << BYZANTIUM >> => false
+    rule Ghaswithdrawals              << BYZANTIUM >> => false
+    rule Ghastransient                << BYZANTIUM >> => false
+    rule Ghasmcopy                    << BYZANTIUM >> => false
+    rule Ghasbeaconroot               << BYZANTIUM >> => false
+    rule Ghaseip6780                  << BYZANTIUM >> => false
+    rule Ghasblobbasefee              << BYZANTIUM >> => false
+    rule Ghasblobhash                 << BYZANTIUM >> => false
+    rule Ghasbls12msmdiscount         << BYZANTIUM >> => false
+    rule Ghasdelegation               << BYZANTIUM >> => false
+    rule Gecpairinputcheck            << BYZANTIUM >> => false
+    rule Gbls12g1msminputcheck        << BYZANTIUM >> => false
+    rule Gbls12g2msminputcheck        << BYZANTIUM >> => false
+    rule Gbls12pairingcheckinputcheck << BYZANTIUM >> => false
+    rule Ghasmip001                   << BYZANTIUM >> => false
 
     rule #isPrecompiledAccount(1p256, BYZANTIUM) => true
     rule #isPrecompiledAccount(2p256, BYZANTIUM) => true
@@ -818,6 +844,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < CONSTANTINOPLE > => 0
     rule Gbls12mapfp2tog2 < CONSTANTINOPLE > => 0
 
+    rule Gp256verify < CONSTANTINOPLE > => 0
+
     rule Gaccessliststoragekey < CONSTANTINOPLE > => 0
     rule Gaccesslistaddress    < CONSTANTINOPLE > => 0
 
@@ -826,38 +854,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < CONSTANTINOPLE > => 2
 
-    rule Gselfdestructnewaccount << CONSTANTINOPLE >> => true
-    rule Gstaticcalldepth        << CONSTANTINOPLE >> => false
-    rule Gemptyisnonexistent     << CONSTANTINOPLE >> => true
-    rule Gzerovaluenewaccountgas << CONSTANTINOPLE >> => false
-    rule Ghasrevert              << CONSTANTINOPLE >> => true
-    rule Ghasreturndata          << CONSTANTINOPLE >> => true
-    rule Ghasstaticcall          << CONSTANTINOPLE >> => true
-    rule Ghasshift               << CONSTANTINOPLE >> => true
-    rule Ghasdirtysstore         << CONSTANTINOPLE >> => true
-    rule Ghassstorestipend       << CONSTANTINOPLE >> => false
-    rule Ghascreate2             << CONSTANTINOPLE >> => true
-    rule Ghasextcodehash         << CONSTANTINOPLE >> => true
-    rule Ghasselfbalance         << CONSTANTINOPLE >> => false
-    rule Ghaschainid             << CONSTANTINOPLE >> => false
-    rule Ghasaccesslist          << CONSTANTINOPLE >> => false
-    rule Ghasbasefee             << CONSTANTINOPLE >> => false
-    rule Ghasrejectedfirstbyte   << CONSTANTINOPLE >> => false
-    rule Ghasprevrandao          << CONSTANTINOPLE >> => false
-    rule Ghasmaxinitcodesize     << CONSTANTINOPLE >> => false
-    rule Ghaspushzero            << CONSTANTINOPLE >> => false
-    rule Ghaswarmcoinbase        << CONSTANTINOPLE >> => false
-    rule Ghaswithdrawals         << CONSTANTINOPLE >> => false
-    rule Ghastransient           << CONSTANTINOPLE >> => false
-    rule Ghasmcopy               << CONSTANTINOPLE >> => false
-    rule Ghasbeaconroot          << CONSTANTINOPLE >> => false
-    rule Ghaseip6780             << CONSTANTINOPLE >> => false
-    rule Ghasblobbasefee         << CONSTANTINOPLE >> => false
-    rule Ghasblobhash            << CONSTANTINOPLE >> => false
-    rule Ghasbls12msmdiscount    << CONSTANTINOPLE >> => false
-    rule Ghasdelegation          << CONSTANTINOPLE >> => false
-    rule Gecpairinputcheck       << CONSTANTINOPLE >> => false
-    rule Ghasmip001              << CONSTANTINOPLE >> => false
+    rule Gselfdestructnewaccount      << CONSTANTINOPLE >> => true
+    rule Gstaticcalldepth             << CONSTANTINOPLE >> => false
+    rule Gemptyisnonexistent          << CONSTANTINOPLE >> => true
+    rule Gzerovaluenewaccountgas      << CONSTANTINOPLE >> => false
+    rule Ghasrevert                   << CONSTANTINOPLE >> => true
+    rule Ghasreturndata               << CONSTANTINOPLE >> => true
+    rule Ghasstaticcall               << CONSTANTINOPLE >> => true
+    rule Ghasshift                    << CONSTANTINOPLE >> => true
+    rule Ghasdirtysstore              << CONSTANTINOPLE >> => true
+    rule Ghassstorestipend            << CONSTANTINOPLE >> => false
+    rule Ghascreate2                  << CONSTANTINOPLE >> => true
+    rule Ghasextcodehash              << CONSTANTINOPLE >> => true
+    rule Ghasselfbalance              << CONSTANTINOPLE >> => false
+    rule Ghaschainid                  << CONSTANTINOPLE >> => false
+    rule Ghasaccesslist               << CONSTANTINOPLE >> => false
+    rule Ghasbasefee                  << CONSTANTINOPLE >> => false
+    rule Ghasrejectedfirstbyte        << CONSTANTINOPLE >> => false
+    rule Ghasprevrandao               << CONSTANTINOPLE >> => false
+    rule Ghasmaxinitcodesize          << CONSTANTINOPLE >> => false
+    rule Ghaspushzero                 << CONSTANTINOPLE >> => false
+    rule Ghaswarmcoinbase             << CONSTANTINOPLE >> => false
+    rule Ghaswithdrawals              << CONSTANTINOPLE >> => false
+    rule Ghastransient                << CONSTANTINOPLE >> => false
+    rule Ghasmcopy                    << CONSTANTINOPLE >> => false
+    rule Ghasbeaconroot               << CONSTANTINOPLE >> => false
+    rule Ghaseip6780                  << CONSTANTINOPLE >> => false
+    rule Ghasblobbasefee              << CONSTANTINOPLE >> => false
+    rule Ghasblobhash                 << CONSTANTINOPLE >> => false
+    rule Ghasbls12msmdiscount         << CONSTANTINOPLE >> => false
+    rule Ghasdelegation               << CONSTANTINOPLE >> => false
+    rule Gecpairinputcheck            << CONSTANTINOPLE >> => false
+    rule Gbls12g1msminputcheck        << CONSTANTINOPLE >> => false
+    rule Gbls12g2msminputcheck        << CONSTANTINOPLE >> => false
+    rule Gbls12pairingcheckinputcheck << CONSTANTINOPLE >> => false
+    rule Ghasmip001                   << CONSTANTINOPLE >> => false
 
     rule #isPrecompiledAccount(1p256, CONSTANTINOPLE) => true
     rule #isPrecompiledAccount(2p256, CONSTANTINOPLE) => true
@@ -947,6 +978,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < PETERSBURG > => 0
     rule Gbls12mapfp2tog2 < PETERSBURG > => 0
 
+    rule Gp256verify < PETERSBURG > => 0
+
     rule Gaccessliststoragekey < PETERSBURG > => 0
     rule Gaccesslistaddress    < PETERSBURG > => 0
 
@@ -955,38 +988,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < PETERSBURG > => 2
 
-    rule Gselfdestructnewaccount << PETERSBURG >> => true
-    rule Gstaticcalldepth        << PETERSBURG >> => false
-    rule Gemptyisnonexistent     << PETERSBURG >> => true
-    rule Gzerovaluenewaccountgas << PETERSBURG >> => false
-    rule Ghasrevert              << PETERSBURG >> => true
-    rule Ghasreturndata          << PETERSBURG >> => true
-    rule Ghasstaticcall          << PETERSBURG >> => true
-    rule Ghasshift               << PETERSBURG >> => true
-    rule Ghasdirtysstore         << PETERSBURG >> => false
-    rule Ghassstorestipend       << PETERSBURG >> => false
-    rule Ghascreate2             << PETERSBURG >> => true
-    rule Ghasextcodehash         << PETERSBURG >> => true
-    rule Ghasselfbalance         << PETERSBURG >> => false
-    rule Ghaschainid             << PETERSBURG >> => false
-    rule Ghasaccesslist          << PETERSBURG >> => false
-    rule Ghasbasefee             << PETERSBURG >> => false
-    rule Ghasrejectedfirstbyte   << PETERSBURG >> => false
-    rule Ghasprevrandao          << PETERSBURG >> => false
-    rule Ghasmaxinitcodesize     << PETERSBURG >> => false
-    rule Ghaspushzero            << PETERSBURG >> => false
-    rule Ghaswarmcoinbase        << PETERSBURG >> => false
-    rule Ghaswithdrawals         << PETERSBURG >> => false
-    rule Ghastransient           << PETERSBURG >> => false
-    rule Ghasmcopy               << PETERSBURG >> => false
-    rule Ghasbeaconroot          << PETERSBURG >> => false
-    rule Ghaseip6780             << PETERSBURG >> => false
-    rule Ghasblobbasefee         << PETERSBURG >> => false
-    rule Ghasblobhash            << PETERSBURG >> => false
-    rule Ghasbls12msmdiscount    << PETERSBURG >> => false
-    rule Ghasdelegation          << PETERSBURG >> => false
-    rule Gecpairinputcheck       << PETERSBURG >> => false
-    rule Ghasmip001              << PETERSBURG >> => false
+    rule Gselfdestructnewaccount      << PETERSBURG >> => true
+    rule Gstaticcalldepth             << PETERSBURG >> => false
+    rule Gemptyisnonexistent          << PETERSBURG >> => true
+    rule Gzerovaluenewaccountgas      << PETERSBURG >> => false
+    rule Ghasrevert                   << PETERSBURG >> => true
+    rule Ghasreturndata               << PETERSBURG >> => true
+    rule Ghasstaticcall               << PETERSBURG >> => true
+    rule Ghasshift                    << PETERSBURG >> => true
+    rule Ghasdirtysstore              << PETERSBURG >> => false
+    rule Ghassstorestipend            << PETERSBURG >> => false
+    rule Ghascreate2                  << PETERSBURG >> => true
+    rule Ghasextcodehash              << PETERSBURG >> => true
+    rule Ghasselfbalance              << PETERSBURG >> => false
+    rule Ghaschainid                  << PETERSBURG >> => false
+    rule Ghasaccesslist               << PETERSBURG >> => false
+    rule Ghasbasefee                  << PETERSBURG >> => false
+    rule Ghasrejectedfirstbyte        << PETERSBURG >> => false
+    rule Ghasprevrandao               << PETERSBURG >> => false
+    rule Ghasmaxinitcodesize          << PETERSBURG >> => false
+    rule Ghaspushzero                 << PETERSBURG >> => false
+    rule Ghaswarmcoinbase             << PETERSBURG >> => false
+    rule Ghaswithdrawals              << PETERSBURG >> => false
+    rule Ghastransient                << PETERSBURG >> => false
+    rule Ghasmcopy                    << PETERSBURG >> => false
+    rule Ghasbeaconroot               << PETERSBURG >> => false
+    rule Ghaseip6780                  << PETERSBURG >> => false
+    rule Ghasblobbasefee              << PETERSBURG >> => false
+    rule Ghasblobhash                 << PETERSBURG >> => false
+    rule Ghasbls12msmdiscount         << PETERSBURG >> => false
+    rule Ghasdelegation               << PETERSBURG >> => false
+    rule Gecpairinputcheck            << PETERSBURG >> => false
+    rule Gbls12g1msminputcheck        << PETERSBURG >> => false
+    rule Gbls12g2msminputcheck        << PETERSBURG >> => false
+    rule Gbls12pairingcheckinputcheck << PETERSBURG >> => false
+    rule Ghasmip001                   << PETERSBURG >> => false
 
     rule #isPrecompiledAccount(1p256, PETERSBURG) => true
     rule #isPrecompiledAccount(2p256, PETERSBURG) => true
@@ -1076,6 +1112,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < ISTANBUL > => 0
     rule Gbls12mapfp2tog2 < ISTANBUL > => 0
 
+    rule Gp256verify < ISTANBUL > => 0
+
     rule Gaccessliststoragekey < ISTANBUL > => 0
     rule Gaccesslistaddress    < ISTANBUL > => 0
 
@@ -1084,38 +1122,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < ISTANBUL > => 2
 
-    rule Gselfdestructnewaccount << ISTANBUL >> => true
-    rule Gstaticcalldepth        << ISTANBUL >> => false
-    rule Gemptyisnonexistent     << ISTANBUL >> => true
-    rule Gzerovaluenewaccountgas << ISTANBUL >> => false
-    rule Ghasrevert              << ISTANBUL >> => true
-    rule Ghasreturndata          << ISTANBUL >> => true
-    rule Ghasstaticcall          << ISTANBUL >> => true
-    rule Ghasshift               << ISTANBUL >> => true
-    rule Ghasdirtysstore         << ISTANBUL >> => true
-    rule Ghassstorestipend       << ISTANBUL >> => true
-    rule Ghascreate2             << ISTANBUL >> => true
-    rule Ghasextcodehash         << ISTANBUL >> => true
-    rule Ghasselfbalance         << ISTANBUL >> => true
-    rule Ghaschainid             << ISTANBUL >> => true
-    rule Ghasaccesslist          << ISTANBUL >> => false
-    rule Ghasbasefee             << ISTANBUL >> => false
-    rule Ghasrejectedfirstbyte   << ISTANBUL >> => false
-    rule Ghasprevrandao          << ISTANBUL >> => false
-    rule Ghasmaxinitcodesize     << ISTANBUL >> => false
-    rule Ghaspushzero            << ISTANBUL >> => false
-    rule Ghaswarmcoinbase        << ISTANBUL >> => false
-    rule Ghaswithdrawals         << ISTANBUL >> => false
-    rule Ghastransient           << ISTANBUL >> => false
-    rule Ghasmcopy               << ISTANBUL >> => false
-    rule Ghasbeaconroot          << ISTANBUL >> => false
-    rule Ghaseip6780             << ISTANBUL >> => false
-    rule Ghasblobbasefee         << ISTANBUL >> => false
-    rule Ghasblobhash            << ISTANBUL >> => false
-    rule Ghasbls12msmdiscount    << ISTANBUL >> => false
-    rule Ghasdelegation          << ISTANBUL >> => false
-    rule Gecpairinputcheck       << ISTANBUL >> => false
-    rule Ghasmip001              << ISTANBUL >> => false
+    rule Gselfdestructnewaccount      << ISTANBUL >> => true
+    rule Gstaticcalldepth             << ISTANBUL >> => false
+    rule Gemptyisnonexistent          << ISTANBUL >> => true
+    rule Gzerovaluenewaccountgas      << ISTANBUL >> => false
+    rule Ghasrevert                   << ISTANBUL >> => true
+    rule Ghasreturndata               << ISTANBUL >> => true
+    rule Ghasstaticcall               << ISTANBUL >> => true
+    rule Ghasshift                    << ISTANBUL >> => true
+    rule Ghasdirtysstore              << ISTANBUL >> => true
+    rule Ghassstorestipend            << ISTANBUL >> => true
+    rule Ghascreate2                  << ISTANBUL >> => true
+    rule Ghasextcodehash              << ISTANBUL >> => true
+    rule Ghasselfbalance              << ISTANBUL >> => true
+    rule Ghaschainid                  << ISTANBUL >> => true
+    rule Ghasaccesslist               << ISTANBUL >> => false
+    rule Ghasbasefee                  << ISTANBUL >> => false
+    rule Ghasrejectedfirstbyte        << ISTANBUL >> => false
+    rule Ghasprevrandao               << ISTANBUL >> => false
+    rule Ghasmaxinitcodesize          << ISTANBUL >> => false
+    rule Ghaspushzero                 << ISTANBUL >> => false
+    rule Ghaswarmcoinbase             << ISTANBUL >> => false
+    rule Ghaswithdrawals              << ISTANBUL >> => false
+    rule Ghastransient                << ISTANBUL >> => false
+    rule Ghasmcopy                    << ISTANBUL >> => false
+    rule Ghasbeaconroot               << ISTANBUL >> => false
+    rule Ghaseip6780                  << ISTANBUL >> => false
+    rule Ghasblobbasefee              << ISTANBUL >> => false
+    rule Ghasblobhash                 << ISTANBUL >> => false
+    rule Ghasbls12msmdiscount         << ISTANBUL >> => false
+    rule Ghasdelegation               << ISTANBUL >> => false
+    rule Gecpairinputcheck            << ISTANBUL >> => false
+    rule Gbls12g1msminputcheck        << ISTANBUL >> => false
+    rule Gbls12g2msminputcheck        << ISTANBUL >> => false
+    rule Gbls12pairingcheckinputcheck << ISTANBUL >> => false
+    rule Ghasmip001                   << ISTANBUL >> => false
 
     rule #isPrecompiledAccount(1p256, ISTANBUL) => true
     rule #isPrecompiledAccount(2p256, ISTANBUL) => true
@@ -1206,6 +1247,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < BERLIN > => 0
     rule Gbls12mapfp2tog2 < BERLIN > => 0
 
+    rule Gp256verify < BERLIN > => 0
+
     rule Gaccessliststoragekey < BERLIN > => 1900
     rule Gaccesslistaddress    < BERLIN > => 2400
 
@@ -1214,38 +1257,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < BERLIN > => 2
 
-    rule Gselfdestructnewaccount << BERLIN >> => true
-    rule Gstaticcalldepth        << BERLIN >> => false
-    rule Gemptyisnonexistent     << BERLIN >> => true
-    rule Gzerovaluenewaccountgas << BERLIN >> => false
-    rule Ghasrevert              << BERLIN >> => true
-    rule Ghasreturndata          << BERLIN >> => true
-    rule Ghasstaticcall          << BERLIN >> => true
-    rule Ghasshift               << BERLIN >> => true
-    rule Ghasdirtysstore         << BERLIN >> => true
-    rule Ghassstorestipend       << BERLIN >> => true
-    rule Ghascreate2             << BERLIN >> => true
-    rule Ghasextcodehash         << BERLIN >> => true
-    rule Ghasselfbalance         << BERLIN >> => true
-    rule Ghaschainid             << BERLIN >> => true
-    rule Ghasaccesslist          << BERLIN >> => true
-    rule Ghasbasefee             << BERLIN >> => false
-    rule Ghasrejectedfirstbyte   << BERLIN >> => false
-    rule Ghasprevrandao          << BERLIN >> => false
-    rule Ghasmaxinitcodesize     << BERLIN >> => false
-    rule Ghaspushzero            << BERLIN >> => false
-    rule Ghaswarmcoinbase        << BERLIN >> => false
-    rule Ghaswithdrawals         << BERLIN >> => false
-    rule Ghastransient           << BERLIN >> => false
-    rule Ghasmcopy               << BERLIN >> => false
-    rule Ghasbeaconroot          << BERLIN >> => false
-    rule Ghaseip6780             << BERLIN >> => false
-    rule Ghasblobbasefee         << BERLIN >> => false
-    rule Ghasblobhash            << BERLIN >> => false
-    rule Ghasbls12msmdiscount    << BERLIN >> => false
-    rule Ghasdelegation          << BERLIN >> => false
-    rule Gecpairinputcheck       << BERLIN >> => false
-    rule Ghasmip001              << BERLIN >> => false
+    rule Gselfdestructnewaccount      << BERLIN >> => true
+    rule Gstaticcalldepth             << BERLIN >> => false
+    rule Gemptyisnonexistent          << BERLIN >> => true
+    rule Gzerovaluenewaccountgas      << BERLIN >> => false
+    rule Ghasrevert                   << BERLIN >> => true
+    rule Ghasreturndata               << BERLIN >> => true
+    rule Ghasstaticcall               << BERLIN >> => true
+    rule Ghasshift                    << BERLIN >> => true
+    rule Ghasdirtysstore              << BERLIN >> => true
+    rule Ghassstorestipend            << BERLIN >> => true
+    rule Ghascreate2                  << BERLIN >> => true
+    rule Ghasextcodehash              << BERLIN >> => true
+    rule Ghasselfbalance              << BERLIN >> => true
+    rule Ghaschainid                  << BERLIN >> => true
+    rule Ghasaccesslist               << BERLIN >> => true
+    rule Ghasbasefee                  << BERLIN >> => false
+    rule Ghasrejectedfirstbyte        << BERLIN >> => false
+    rule Ghasprevrandao               << BERLIN >> => false
+    rule Ghasmaxinitcodesize          << BERLIN >> => false
+    rule Ghaspushzero                 << BERLIN >> => false
+    rule Ghaswarmcoinbase             << BERLIN >> => false
+    rule Ghaswithdrawals              << BERLIN >> => false
+    rule Ghastransient                << BERLIN >> => false
+    rule Ghasmcopy                    << BERLIN >> => false
+    rule Ghasbeaconroot               << BERLIN >> => false
+    rule Ghaseip6780                  << BERLIN >> => false
+    rule Ghasblobbasefee              << BERLIN >> => false
+    rule Ghasblobhash                 << BERLIN >> => false
+    rule Ghasbls12msmdiscount         << BERLIN >> => false
+    rule Ghasdelegation               << BERLIN >> => false
+    rule Gecpairinputcheck            << BERLIN >> => false
+    rule Gbls12g1msminputcheck        << BERLIN >> => false
+    rule Gbls12g2msminputcheck        << BERLIN >> => false
+    rule Gbls12pairingcheckinputcheck << BERLIN >> => false
+    rule Ghasmip001                   << BERLIN >> => false
 
     rule #isPrecompiledAccount(1p256, BERLIN) => true
     rule #isPrecompiledAccount(2p256, BERLIN) => true
@@ -1336,6 +1382,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < LONDON > => 0
     rule Gbls12mapfp2tog2 < LONDON > => 0
 
+    rule Gp256verify < LONDON > => 0
+
     rule Gaccessliststoragekey < LONDON > => 1900
     rule Gaccesslistaddress    < LONDON > => 2400
 
@@ -1344,38 +1392,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < LONDON > => 5
 
-    rule Gselfdestructnewaccount << LONDON >> => true
-    rule Gstaticcalldepth        << LONDON >> => false
-    rule Gemptyisnonexistent     << LONDON >> => true
-    rule Gzerovaluenewaccountgas << LONDON >> => false
-    rule Ghasrevert              << LONDON >> => true
-    rule Ghasreturndata          << LONDON >> => true
-    rule Ghasstaticcall          << LONDON >> => true
-    rule Ghasshift               << LONDON >> => true
-    rule Ghasdirtysstore         << LONDON >> => true
-    rule Ghassstorestipend       << LONDON >> => true
-    rule Ghascreate2             << LONDON >> => true
-    rule Ghasextcodehash         << LONDON >> => true
-    rule Ghasselfbalance         << LONDON >> => true
-    rule Ghaschainid             << LONDON >> => true
-    rule Ghasaccesslist          << LONDON >> => true
-    rule Ghasbasefee             << LONDON >> => true
-    rule Ghasrejectedfirstbyte   << LONDON >> => true
-    rule Ghasprevrandao          << LONDON >> => false
-    rule Ghasmaxinitcodesize     << LONDON >> => false
-    rule Ghaspushzero            << LONDON >> => false
-    rule Ghaswarmcoinbase        << LONDON >> => false
-    rule Ghaswithdrawals         << LONDON >> => false
-    rule Ghastransient           << LONDON >> => false
-    rule Ghasmcopy               << LONDON >> => false
-    rule Ghasbeaconroot          << LONDON >> => false
-    rule Ghaseip6780             << LONDON >> => false
-    rule Ghasblobbasefee         << LONDON >> => false
-    rule Ghasblobhash            << LONDON >> => false
-    rule Ghasbls12msmdiscount    << LONDON >> => false
-    rule Ghasdelegation          << LONDON >> => false
-    rule Gecpairinputcheck       << LONDON >> => false
-    rule Ghasmip001              << LONDON >> => false
+    rule Gselfdestructnewaccount      << LONDON >> => true
+    rule Gstaticcalldepth             << LONDON >> => false
+    rule Gemptyisnonexistent          << LONDON >> => true
+    rule Gzerovaluenewaccountgas      << LONDON >> => false
+    rule Ghasrevert                   << LONDON >> => true
+    rule Ghasreturndata               << LONDON >> => true
+    rule Ghasstaticcall               << LONDON >> => true
+    rule Ghasshift                    << LONDON >> => true
+    rule Ghasdirtysstore              << LONDON >> => true
+    rule Ghassstorestipend            << LONDON >> => true
+    rule Ghascreate2                  << LONDON >> => true
+    rule Ghasextcodehash              << LONDON >> => true
+    rule Ghasselfbalance              << LONDON >> => true
+    rule Ghaschainid                  << LONDON >> => true
+    rule Ghasaccesslist               << LONDON >> => true
+    rule Ghasbasefee                  << LONDON >> => true
+    rule Ghasrejectedfirstbyte        << LONDON >> => true
+    rule Ghasprevrandao               << LONDON >> => false
+    rule Ghasmaxinitcodesize          << LONDON >> => false
+    rule Ghaspushzero                 << LONDON >> => false
+    rule Ghaswarmcoinbase             << LONDON >> => false
+    rule Ghaswithdrawals              << LONDON >> => false
+    rule Ghastransient                << LONDON >> => false
+    rule Ghasmcopy                    << LONDON >> => false
+    rule Ghasbeaconroot               << LONDON >> => false
+    rule Ghaseip6780                  << LONDON >> => false
+    rule Ghasblobbasefee              << LONDON >> => false
+    rule Ghasblobhash                 << LONDON >> => false
+    rule Ghasbls12msmdiscount         << LONDON >> => false
+    rule Ghasdelegation               << LONDON >> => false
+    rule Gecpairinputcheck            << LONDON >> => false
+    rule Gbls12g1msminputcheck        << LONDON >> => false
+    rule Gbls12g2msminputcheck        << LONDON >> => false
+    rule Gbls12pairingcheckinputcheck << LONDON >> => false
+    rule Ghasmip001                   << LONDON >> => false
 
     rule #isPrecompiledAccount(1p256, LONDON) => true
     rule #isPrecompiledAccount(2p256, LONDON) => true
@@ -1466,6 +1517,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < MERGE > => 0
     rule Gbls12mapfp2tog2 < MERGE > => 0
 
+    rule Gp256verify < MERGE > => 0
+
     rule Gaccessliststoragekey < MERGE > => 1900
     rule Gaccesslistaddress    < MERGE > => 2400
 
@@ -1474,38 +1527,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < MERGE > => 5
 
-    rule Gselfdestructnewaccount << MERGE >> => true
-    rule Gstaticcalldepth        << MERGE >> => false
-    rule Gemptyisnonexistent     << MERGE >> => true
-    rule Gzerovaluenewaccountgas << MERGE >> => false
-    rule Ghasrevert              << MERGE >> => true
-    rule Ghasreturndata          << MERGE >> => true
-    rule Ghasstaticcall          << MERGE >> => true
-    rule Ghasshift               << MERGE >> => true
-    rule Ghasdirtysstore         << MERGE >> => true
-    rule Ghassstorestipend       << MERGE >> => true
-    rule Ghascreate2             << MERGE >> => true
-    rule Ghasextcodehash         << MERGE >> => true
-    rule Ghasselfbalance         << MERGE >> => true
-    rule Ghaschainid             << MERGE >> => true
-    rule Ghasaccesslist          << MERGE >> => true
-    rule Ghasbasefee             << MERGE >> => true
-    rule Ghasrejectedfirstbyte   << MERGE >> => true
-    rule Ghasprevrandao          << MERGE >> => true
-    rule Ghasmaxinitcodesize     << MERGE >> => false
-    rule Ghaspushzero            << MERGE >> => false
-    rule Ghaswarmcoinbase        << MERGE >> => false
-    rule Ghaswithdrawals         << MERGE >> => false
-    rule Ghastransient           << MERGE >> => false
-    rule Ghasmcopy               << MERGE >> => false
-    rule Ghasbeaconroot          << MERGE >> => false
-    rule Ghaseip6780             << MERGE >> => false
-    rule Ghasblobbasefee         << MERGE >> => false
-    rule Ghasblobhash            << MERGE >> => false
-    rule Ghasbls12msmdiscount    << MERGE >> => false
-    rule Ghasdelegation          << MERGE >> => false
-    rule Gecpairinputcheck       << MERGE >> => false
-    rule Ghasmip001              << MERGE >> => false
+    rule Gselfdestructnewaccount      << MERGE >> => true
+    rule Gstaticcalldepth             << MERGE >> => false
+    rule Gemptyisnonexistent          << MERGE >> => true
+    rule Gzerovaluenewaccountgas      << MERGE >> => false
+    rule Ghasrevert                   << MERGE >> => true
+    rule Ghasreturndata               << MERGE >> => true
+    rule Ghasstaticcall               << MERGE >> => true
+    rule Ghasshift                    << MERGE >> => true
+    rule Ghasdirtysstore              << MERGE >> => true
+    rule Ghassstorestipend            << MERGE >> => true
+    rule Ghascreate2                  << MERGE >> => true
+    rule Ghasextcodehash              << MERGE >> => true
+    rule Ghasselfbalance              << MERGE >> => true
+    rule Ghaschainid                  << MERGE >> => true
+    rule Ghasaccesslist               << MERGE >> => true
+    rule Ghasbasefee                  << MERGE >> => true
+    rule Ghasrejectedfirstbyte        << MERGE >> => true
+    rule Ghasprevrandao               << MERGE >> => true
+    rule Ghasmaxinitcodesize          << MERGE >> => false
+    rule Ghaspushzero                 << MERGE >> => false
+    rule Ghaswarmcoinbase             << MERGE >> => false
+    rule Ghaswithdrawals              << MERGE >> => false
+    rule Ghastransient                << MERGE >> => false
+    rule Ghasmcopy                    << MERGE >> => false
+    rule Ghasbeaconroot               << MERGE >> => false
+    rule Ghaseip6780                  << MERGE >> => false
+    rule Ghasblobbasefee              << MERGE >> => false
+    rule Ghasblobhash                 << MERGE >> => false
+    rule Ghasbls12msmdiscount         << MERGE >> => false
+    rule Ghasdelegation               << MERGE >> => false
+    rule Gecpairinputcheck            << MERGE >> => false
+    rule Gbls12g1msminputcheck        << MERGE >> => false
+    rule Gbls12g2msminputcheck        << MERGE >> => false
+    rule Gbls12pairingcheckinputcheck << MERGE >> => false
+    rule Ghasmip001                   << MERGE >> => false
 
     rule #isPrecompiledAccount(1p256, MERGE) => true
     rule #isPrecompiledAccount(2p256, MERGE) => true
@@ -1597,6 +1653,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < SHANGHAI > => 0
     rule Gbls12mapfp2tog2 < SHANGHAI > => 0
 
+    rule Gp256verify < SHANGHAI > => 0
+
     rule Gaccessliststoragekey < SHANGHAI > => 1900
     rule Gaccesslistaddress    < SHANGHAI > => 2400
 
@@ -1605,38 +1663,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < SHANGHAI > => 5
 
-    rule Gselfdestructnewaccount << SHANGHAI >> => true
-    rule Gstaticcalldepth        << SHANGHAI >> => false
-    rule Gemptyisnonexistent     << SHANGHAI >> => true
-    rule Gzerovaluenewaccountgas << SHANGHAI >> => false
-    rule Ghasrevert              << SHANGHAI >> => true
-    rule Ghasreturndata          << SHANGHAI >> => true
-    rule Ghasstaticcall          << SHANGHAI >> => true
-    rule Ghasshift               << SHANGHAI >> => true
-    rule Ghasdirtysstore         << SHANGHAI >> => true
-    rule Ghassstorestipend       << SHANGHAI >> => true
-    rule Ghascreate2             << SHANGHAI >> => true
-    rule Ghasextcodehash         << SHANGHAI >> => true
-    rule Ghasselfbalance         << SHANGHAI >> => true
-    rule Ghaschainid             << SHANGHAI >> => true
-    rule Ghasaccesslist          << SHANGHAI >> => true
-    rule Ghasbasefee             << SHANGHAI >> => true
-    rule Ghasrejectedfirstbyte   << SHANGHAI >> => true
-    rule Ghasprevrandao          << SHANGHAI >> => true
-    rule Ghasmaxinitcodesize     << SHANGHAI >> => true
-    rule Ghaspushzero            << SHANGHAI >> => true
-    rule Ghaswarmcoinbase        << SHANGHAI >> => true
-    rule Ghaswithdrawals         << SHANGHAI >> => true
-    rule Ghastransient           << SHANGHAI >> => false
-    rule Ghasmcopy               << SHANGHAI >> => false
-    rule Ghasbeaconroot          << SHANGHAI >> => false
-    rule Ghaseip6780             << SHANGHAI >> => false
-    rule Ghasblobbasefee         << SHANGHAI >> => false
-    rule Ghasblobhash            << SHANGHAI >> => false
-    rule Ghasbls12msmdiscount    << SHANGHAI >> => false
-    rule Ghasdelegation          << SHANGHAI >> => false
-    rule Gecpairinputcheck       << SHANGHAI >> => false
-    rule Ghasmip001              << SHANGHAI >> => false
+    rule Gselfdestructnewaccount      << SHANGHAI >> => true
+    rule Gstaticcalldepth             << SHANGHAI >> => false
+    rule Gemptyisnonexistent          << SHANGHAI >> => true
+    rule Gzerovaluenewaccountgas      << SHANGHAI >> => false
+    rule Ghasrevert                   << SHANGHAI >> => true
+    rule Ghasreturndata               << SHANGHAI >> => true
+    rule Ghasstaticcall               << SHANGHAI >> => true
+    rule Ghasshift                    << SHANGHAI >> => true
+    rule Ghasdirtysstore              << SHANGHAI >> => true
+    rule Ghassstorestipend            << SHANGHAI >> => true
+    rule Ghascreate2                  << SHANGHAI >> => true
+    rule Ghasextcodehash              << SHANGHAI >> => true
+    rule Ghasselfbalance              << SHANGHAI >> => true
+    rule Ghaschainid                  << SHANGHAI >> => true
+    rule Ghasaccesslist               << SHANGHAI >> => true
+    rule Ghasbasefee                  << SHANGHAI >> => true
+    rule Ghasrejectedfirstbyte        << SHANGHAI >> => true
+    rule Ghasprevrandao               << SHANGHAI >> => true
+    rule Ghasmaxinitcodesize          << SHANGHAI >> => true
+    rule Ghaspushzero                 << SHANGHAI >> => true
+    rule Ghaswarmcoinbase             << SHANGHAI >> => true
+    rule Ghaswithdrawals              << SHANGHAI >> => true
+    rule Ghastransient                << SHANGHAI >> => false
+    rule Ghasmcopy                    << SHANGHAI >> => false
+    rule Ghasbeaconroot               << SHANGHAI >> => false
+    rule Ghaseip6780                  << SHANGHAI >> => false
+    rule Ghasblobbasefee              << SHANGHAI >> => false
+    rule Ghasblobhash                 << SHANGHAI >> => false
+    rule Ghasbls12msmdiscount         << SHANGHAI >> => false
+    rule Ghasdelegation               << SHANGHAI >> => false
+    rule Gecpairinputcheck            << SHANGHAI >> => false
+    rule Gbls12g1msminputcheck        << SHANGHAI >> => false
+    rule Gbls12g2msminputcheck        << SHANGHAI >> => false
+    rule Gbls12pairingcheckinputcheck << SHANGHAI >> => false
+    rule Ghasmip001                   << SHANGHAI >> => false
 
     rule #isPrecompiledAccount(1p256, SHANGHAI) => true
     rule #isPrecompiledAccount(2p256, SHANGHAI) => true
@@ -1728,6 +1789,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < CANCUN > => 0
     rule Gbls12mapfp2tog2 < CANCUN > => 0
 
+    rule Gp256verify < CANCUN > => 0
+
     rule Gaccessliststoragekey < CANCUN > => 1900
     rule Gaccesslistaddress    < CANCUN > => 2400
 
@@ -1736,38 +1799,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < CANCUN > => 5
 
-    rule Gselfdestructnewaccount << CANCUN >> => true
-    rule Gstaticcalldepth        << CANCUN >> => false
-    rule Gemptyisnonexistent     << CANCUN >> => true
-    rule Gzerovaluenewaccountgas << CANCUN >> => false
-    rule Ghasrevert              << CANCUN >> => true
-    rule Ghasreturndata          << CANCUN >> => true
-    rule Ghasstaticcall          << CANCUN >> => true
-    rule Ghasshift               << CANCUN >> => true
-    rule Ghasdirtysstore         << CANCUN >> => true
-    rule Ghassstorestipend       << CANCUN >> => true
-    rule Ghascreate2             << CANCUN >> => true
-    rule Ghasextcodehash         << CANCUN >> => true
-    rule Ghasselfbalance         << CANCUN >> => true
-    rule Ghaschainid             << CANCUN >> => true
-    rule Ghasaccesslist          << CANCUN >> => true
-    rule Ghasbasefee             << CANCUN >> => true
-    rule Ghasrejectedfirstbyte   << CANCUN >> => true
-    rule Ghasprevrandao          << CANCUN >> => true
-    rule Ghasmaxinitcodesize     << CANCUN >> => true
-    rule Ghaspushzero            << CANCUN >> => true
-    rule Ghaswarmcoinbase        << CANCUN >> => true
-    rule Ghaswithdrawals         << CANCUN >> => true
-    rule Ghastransient           << CANCUN >> => true
-    rule Ghasmcopy               << CANCUN >> => true
-    rule Ghasbeaconroot          << CANCUN >> => true
-    rule Ghaseip6780             << CANCUN >> => true
-    rule Ghasblobbasefee         << CANCUN >> => true
-    rule Ghasblobhash            << CANCUN >> => true
-    rule Ghasbls12msmdiscount    << CANCUN >> => false
-    rule Ghasdelegation          << CANCUN >> => false
-    rule Gecpairinputcheck       << CANCUN >> => false
-    rule Ghasmip001              << CANCUN >> => false
+    rule Gselfdestructnewaccount      << CANCUN >> => true
+    rule Gstaticcalldepth             << CANCUN >> => false
+    rule Gemptyisnonexistent          << CANCUN >> => true
+    rule Gzerovaluenewaccountgas      << CANCUN >> => false
+    rule Ghasrevert                   << CANCUN >> => true
+    rule Ghasreturndata               << CANCUN >> => true
+    rule Ghasstaticcall               << CANCUN >> => true
+    rule Ghasshift                    << CANCUN >> => true
+    rule Ghasdirtysstore              << CANCUN >> => true
+    rule Ghassstorestipend            << CANCUN >> => true
+    rule Ghascreate2                  << CANCUN >> => true
+    rule Ghasextcodehash              << CANCUN >> => true
+    rule Ghasselfbalance              << CANCUN >> => true
+    rule Ghaschainid                  << CANCUN >> => true
+    rule Ghasaccesslist               << CANCUN >> => true
+    rule Ghasbasefee                  << CANCUN >> => true
+    rule Ghasrejectedfirstbyte        << CANCUN >> => true
+    rule Ghasprevrandao               << CANCUN >> => true
+    rule Ghasmaxinitcodesize          << CANCUN >> => true
+    rule Ghaspushzero                 << CANCUN >> => true
+    rule Ghaswarmcoinbase             << CANCUN >> => true
+    rule Ghaswithdrawals              << CANCUN >> => true
+    rule Ghastransient                << CANCUN >> => true
+    rule Ghasmcopy                    << CANCUN >> => true
+    rule Ghasbeaconroot               << CANCUN >> => true
+    rule Ghaseip6780                  << CANCUN >> => true
+    rule Ghasblobbasefee              << CANCUN >> => true
+    rule Ghasblobhash                 << CANCUN >> => true
+    rule Ghasbls12msmdiscount         << CANCUN >> => false
+    rule Ghasdelegation               << CANCUN >> => false
+    rule Gecpairinputcheck            << CANCUN >> => false
+    rule Gbls12g1msminputcheck        << CANCUN >> => false
+    rule Gbls12g2msminputcheck        << CANCUN >> => false
+    rule Gbls12pairingcheckinputcheck << CANCUN >> => false
+    rule Ghasmip001                   << CANCUN >> => false
 
     rule #isPrecompiledAccount(1p256, CANCUN) => true
     rule #isPrecompiledAccount(2p256, CANCUN) => true
@@ -1861,6 +1927,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < PRAGUE > => 5500
     rule Gbls12mapfp2tog2 < PRAGUE > => 23800
 
+    rule Gp256verify < PRAGUE > => 0
+
     rule Gaccessliststoragekey < PRAGUE > => 1900
     rule Gaccesslistaddress    < PRAGUE > => 2400
 
@@ -1869,38 +1937,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < PRAGUE > => 5
 
-    rule Gselfdestructnewaccount << PRAGUE >> => true
-    rule Gstaticcalldepth        << PRAGUE >> => false
-    rule Gemptyisnonexistent     << PRAGUE >> => true
-    rule Gzerovaluenewaccountgas << PRAGUE >> => false
-    rule Ghasrevert              << PRAGUE >> => true
-    rule Ghasreturndata          << PRAGUE >> => true
-    rule Ghasstaticcall          << PRAGUE >> => true
-    rule Ghasshift               << PRAGUE >> => true
-    rule Ghasdirtysstore         << PRAGUE >> => true
-    rule Ghassstorestipend       << PRAGUE >> => true
-    rule Ghascreate2             << PRAGUE >> => true
-    rule Ghasextcodehash         << PRAGUE >> => true
-    rule Ghasselfbalance         << PRAGUE >> => true
-    rule Ghaschainid             << PRAGUE >> => true
-    rule Ghasaccesslist          << PRAGUE >> => true
-    rule Ghasbasefee             << PRAGUE >> => true
-    rule Ghasrejectedfirstbyte   << PRAGUE >> => true
-    rule Ghasprevrandao          << PRAGUE >> => true
-    rule Ghasmaxinitcodesize     << PRAGUE >> => true
-    rule Ghaspushzero            << PRAGUE >> => true
-    rule Ghaswarmcoinbase        << PRAGUE >> => true
-    rule Ghaswithdrawals         << PRAGUE >> => true
-    rule Ghastransient           << PRAGUE >> => true
-    rule Ghasmcopy               << PRAGUE >> => true
-    rule Ghasbeaconroot          << PRAGUE >> => true
-    rule Ghaseip6780             << PRAGUE >> => true
-    rule Ghasblobbasefee         << PRAGUE >> => true
-    rule Ghasblobhash            << PRAGUE >> => true
-    rule Ghasbls12msmdiscount    << PRAGUE >> => true
-    rule Ghasdelegation          << PRAGUE >> => true
-    rule Gecpairinputcheck       << PRAGUE >> => false
-    rule Ghasmip001              << PRAGUE >> => false
+    rule Gselfdestructnewaccount      << PRAGUE >> => true
+    rule Gstaticcalldepth             << PRAGUE >> => false
+    rule Gemptyisnonexistent          << PRAGUE >> => true
+    rule Gzerovaluenewaccountgas      << PRAGUE >> => false
+    rule Ghasrevert                   << PRAGUE >> => true
+    rule Ghasreturndata               << PRAGUE >> => true
+    rule Ghasstaticcall               << PRAGUE >> => true
+    rule Ghasshift                    << PRAGUE >> => true
+    rule Ghasdirtysstore              << PRAGUE >> => true
+    rule Ghassstorestipend            << PRAGUE >> => true
+    rule Ghascreate2                  << PRAGUE >> => true
+    rule Ghasextcodehash              << PRAGUE >> => true
+    rule Ghasselfbalance              << PRAGUE >> => true
+    rule Ghaschainid                  << PRAGUE >> => true
+    rule Ghasaccesslist               << PRAGUE >> => true
+    rule Ghasbasefee                  << PRAGUE >> => true
+    rule Ghasrejectedfirstbyte        << PRAGUE >> => true
+    rule Ghasprevrandao               << PRAGUE >> => true
+    rule Ghasmaxinitcodesize          << PRAGUE >> => true
+    rule Ghaspushzero                 << PRAGUE >> => true
+    rule Ghaswarmcoinbase             << PRAGUE >> => true
+    rule Ghaswithdrawals              << PRAGUE >> => true
+    rule Ghastransient                << PRAGUE >> => true
+    rule Ghasmcopy                    << PRAGUE >> => true
+    rule Ghasbeaconroot               << PRAGUE >> => true
+    rule Ghaseip6780                  << PRAGUE >> => true
+    rule Ghasblobbasefee              << PRAGUE >> => true
+    rule Ghasblobhash                 << PRAGUE >> => true
+    rule Ghasbls12msmdiscount         << PRAGUE >> => true
+    rule Ghasdelegation               << PRAGUE >> => true
+    rule Gecpairinputcheck            << PRAGUE >> => false
+    rule Gbls12g1msminputcheck        << PRAGUE >> => false
+    rule Gbls12g2msminputcheck        << PRAGUE >> => false
+    rule Gbls12pairingcheckinputcheck << PRAGUE >> => false
+    rule Ghasmip001                   << PRAGUE >> => false
 
     rule #isPrecompiledAccount(1p256, PRAGUE) => true
     rule #isPrecompiledAccount(2p256, PRAGUE) => true
@@ -2000,6 +2071,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < BEDROCK > => 0
     rule Gbls12mapfp2tog2 < BEDROCK > => 0
 
+    rule Gp256verify < BEDROCK > => 0
+
     rule Gaccessliststoragekey < BEDROCK > => 1900
     rule Gaccesslistaddress    < BEDROCK > => 2400
 
@@ -2008,38 +2081,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < BEDROCK > => 5
 
-    rule Gselfdestructnewaccount << BEDROCK >> => true
-    rule Gstaticcalldepth        << BEDROCK >> => false
-    rule Gemptyisnonexistent     << BEDROCK >> => true
-    rule Gzerovaluenewaccountgas << BEDROCK >> => false
-    rule Ghasrevert              << BEDROCK >> => true
-    rule Ghasreturndata          << BEDROCK >> => true
-    rule Ghasstaticcall          << BEDROCK >> => true
-    rule Ghasshift               << BEDROCK >> => true
-    rule Ghasdirtysstore         << BEDROCK >> => true
-    rule Ghassstorestipend       << BEDROCK >> => true
-    rule Ghascreate2             << BEDROCK >> => true
-    rule Ghasextcodehash         << BEDROCK >> => true
-    rule Ghasselfbalance         << BEDROCK >> => true
-    rule Ghaschainid             << BEDROCK >> => true
-    rule Ghasaccesslist          << BEDROCK >> => true
-    rule Ghasbasefee             << BEDROCK >> => true
-    rule Ghasrejectedfirstbyte   << BEDROCK >> => true
-    rule Ghasprevrandao          << BEDROCK >> => true
-    rule Ghasmaxinitcodesize     << BEDROCK >> => false
-    rule Ghaspushzero            << BEDROCK >> => false
-    rule Ghaswarmcoinbase        << BEDROCK >> => false
-    rule Ghaswithdrawals         << BEDROCK >> => false
-    rule Ghastransient           << BEDROCK >> => false
-    rule Ghasmcopy               << BEDROCK >> => false
-    rule Ghasbeaconroot          << BEDROCK >> => false
-    rule Ghaseip6780             << BEDROCK >> => false
-    rule Ghasblobbasefee         << BEDROCK >> => false
-    rule Ghasblobhash            << BEDROCK >> => false
-    rule Ghasbls12msmdiscount    << BEDROCK >> => false
-    rule Ghasdelegation          << BEDROCK >> => false
-    rule Gecpairinputcheck       << BEDROCK >> => false
-    rule Ghasmip001              << BEDROCK >> => false
+    rule Gselfdestructnewaccount      << BEDROCK >> => true
+    rule Gstaticcalldepth             << BEDROCK >> => false
+    rule Gemptyisnonexistent          << BEDROCK >> => true
+    rule Gzerovaluenewaccountgas      << BEDROCK >> => false
+    rule Ghasrevert                   << BEDROCK >> => true
+    rule Ghasreturndata               << BEDROCK >> => true
+    rule Ghasstaticcall               << BEDROCK >> => true
+    rule Ghasshift                    << BEDROCK >> => true
+    rule Ghasdirtysstore              << BEDROCK >> => true
+    rule Ghassstorestipend            << BEDROCK >> => true
+    rule Ghascreate2                  << BEDROCK >> => true
+    rule Ghasextcodehash              << BEDROCK >> => true
+    rule Ghasselfbalance              << BEDROCK >> => true
+    rule Ghaschainid                  << BEDROCK >> => true
+    rule Ghasaccesslist               << BEDROCK >> => true
+    rule Ghasbasefee                  << BEDROCK >> => true
+    rule Ghasrejectedfirstbyte        << BEDROCK >> => true
+    rule Ghasprevrandao               << BEDROCK >> => true
+    rule Ghasmaxinitcodesize          << BEDROCK >> => false
+    rule Ghaspushzero                 << BEDROCK >> => false
+    rule Ghaswarmcoinbase             << BEDROCK >> => false
+    rule Ghaswithdrawals              << BEDROCK >> => false
+    rule Ghastransient                << BEDROCK >> => false
+    rule Ghasmcopy                    << BEDROCK >> => false
+    rule Ghasbeaconroot               << BEDROCK >> => false
+    rule Ghaseip6780                  << BEDROCK >> => false
+    rule Ghasblobbasefee              << BEDROCK >> => false
+    rule Ghasblobhash                 << BEDROCK >> => false
+    rule Ghasbls12msmdiscount         << BEDROCK >> => false
+    rule Ghasdelegation               << BEDROCK >> => false
+    rule Gecpairinputcheck            << BEDROCK >> => false
+    rule Gbls12g1msminputcheck        << BEDROCK >> => false
+    rule Gbls12g2msminputcheck        << BEDROCK >> => false
+    rule Gbls12pairingcheckinputcheck << BEDROCK >> => false
+    rule Ghasmip001                   << BEDROCK >> => false
 
     rule #isPrecompiledAccount(1p256, BEDROCK) => true
     rule #isPrecompiledAccount(2p256, BEDROCK) => true
@@ -2130,6 +2206,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < REGOLITH > => 0
     rule Gbls12mapfp2tog2 < REGOLITH > => 0
 
+    rule Gp256verify < REGOLITH > => 0
+
     rule Gaccessliststoragekey < REGOLITH > => 1900
     rule Gaccesslistaddress    < REGOLITH > => 2400
 
@@ -2138,38 +2216,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < REGOLITH > => 5
 
-    rule Gselfdestructnewaccount << REGOLITH >> => true
-    rule Gstaticcalldepth        << REGOLITH >> => false
-    rule Gemptyisnonexistent     << REGOLITH >> => true
-    rule Gzerovaluenewaccountgas << REGOLITH >> => false
-    rule Ghasrevert              << REGOLITH >> => true
-    rule Ghasreturndata          << REGOLITH >> => true
-    rule Ghasstaticcall          << REGOLITH >> => true
-    rule Ghasshift               << REGOLITH >> => true
-    rule Ghasdirtysstore         << REGOLITH >> => true
-    rule Ghassstorestipend       << REGOLITH >> => true
-    rule Ghascreate2             << REGOLITH >> => true
-    rule Ghasextcodehash         << REGOLITH >> => true
-    rule Ghasselfbalance         << REGOLITH >> => true
-    rule Ghaschainid             << REGOLITH >> => true
-    rule Ghasaccesslist          << REGOLITH >> => true
-    rule Ghasbasefee             << REGOLITH >> => true
-    rule Ghasrejectedfirstbyte   << REGOLITH >> => true
-    rule Ghasprevrandao          << REGOLITH >> => true
-    rule Ghasmaxinitcodesize     << REGOLITH >> => false
-    rule Ghaspushzero            << REGOLITH >> => false
-    rule Ghaswarmcoinbase        << REGOLITH >> => false
-    rule Ghaswithdrawals         << REGOLITH >> => false
-    rule Ghastransient           << REGOLITH >> => false
-    rule Ghasmcopy               << REGOLITH >> => false
-    rule Ghasbeaconroot          << REGOLITH >> => false
-    rule Ghaseip6780             << REGOLITH >> => false
-    rule Ghasblobbasefee         << REGOLITH >> => false
-    rule Ghasblobhash            << REGOLITH >> => false
-    rule Ghasbls12msmdiscount    << REGOLITH >> => false
-    rule Ghasdelegation          << REGOLITH >> => false
-    rule Gecpairinputcheck       << REGOLITH >> => false
-    rule Ghasmip001              << REGOLITH >> => false
+    rule Gselfdestructnewaccount      << REGOLITH >> => true
+    rule Gstaticcalldepth             << REGOLITH >> => false
+    rule Gemptyisnonexistent          << REGOLITH >> => true
+    rule Gzerovaluenewaccountgas      << REGOLITH >> => false
+    rule Ghasrevert                   << REGOLITH >> => true
+    rule Ghasreturndata               << REGOLITH >> => true
+    rule Ghasstaticcall               << REGOLITH >> => true
+    rule Ghasshift                    << REGOLITH >> => true
+    rule Ghasdirtysstore              << REGOLITH >> => true
+    rule Ghassstorestipend            << REGOLITH >> => true
+    rule Ghascreate2                  << REGOLITH >> => true
+    rule Ghasextcodehash              << REGOLITH >> => true
+    rule Ghasselfbalance              << REGOLITH >> => true
+    rule Ghaschainid                  << REGOLITH >> => true
+    rule Ghasaccesslist               << REGOLITH >> => true
+    rule Ghasbasefee                  << REGOLITH >> => true
+    rule Ghasrejectedfirstbyte        << REGOLITH >> => true
+    rule Ghasprevrandao               << REGOLITH >> => true
+    rule Ghasmaxinitcodesize          << REGOLITH >> => false
+    rule Ghaspushzero                 << REGOLITH >> => false
+    rule Ghaswarmcoinbase             << REGOLITH >> => false
+    rule Ghaswithdrawals              << REGOLITH >> => false
+    rule Ghastransient                << REGOLITH >> => false
+    rule Ghasmcopy                    << REGOLITH >> => false
+    rule Ghasbeaconroot               << REGOLITH >> => false
+    rule Ghaseip6780                  << REGOLITH >> => false
+    rule Ghasblobbasefee              << REGOLITH >> => false
+    rule Ghasblobhash                 << REGOLITH >> => false
+    rule Ghasbls12msmdiscount         << REGOLITH >> => false
+    rule Ghasdelegation               << REGOLITH >> => false
+    rule Gecpairinputcheck            << REGOLITH >> => false
+    rule Gbls12g1msminputcheck        << REGOLITH >> => false
+    rule Gbls12g2msminputcheck        << REGOLITH >> => false
+    rule Gbls12pairingcheckinputcheck << REGOLITH >> => false
+    rule Ghasmip001                   << REGOLITH >> => false
 
     rule #isPrecompiledAccount(1p256, REGOLITH) => true
     rule #isPrecompiledAccount(2p256, REGOLITH) => true
@@ -2261,6 +2342,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < CANYON > => 0
     rule Gbls12mapfp2tog2 < CANYON > => 0
 
+    rule Gp256verify < CANYON > => 0
+
     rule Gaccessliststoragekey < CANYON > => 1900
     rule Gaccesslistaddress    < CANYON > => 2400
 
@@ -2269,38 +2352,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < CANYON > => 5
 
-    rule Gselfdestructnewaccount << CANYON >> => true
-    rule Gstaticcalldepth        << CANYON >> => false
-    rule Gemptyisnonexistent     << CANYON >> => true
-    rule Gzerovaluenewaccountgas << CANYON >> => false
-    rule Ghasrevert              << CANYON >> => true
-    rule Ghasreturndata          << CANYON >> => true
-    rule Ghasstaticcall          << CANYON >> => true
-    rule Ghasshift               << CANYON >> => true
-    rule Ghasdirtysstore         << CANYON >> => true
-    rule Ghassstorestipend       << CANYON >> => true
-    rule Ghascreate2             << CANYON >> => true
-    rule Ghasextcodehash         << CANYON >> => true
-    rule Ghasselfbalance         << CANYON >> => true
-    rule Ghaschainid             << CANYON >> => true
-    rule Ghasaccesslist          << CANYON >> => true
-    rule Ghasbasefee             << CANYON >> => true
-    rule Ghasrejectedfirstbyte   << CANYON >> => true
-    rule Ghasprevrandao          << CANYON >> => true
-    rule Ghasmaxinitcodesize     << CANYON >> => true
-    rule Ghaspushzero            << CANYON >> => true
-    rule Ghaswarmcoinbase        << CANYON >> => true
-    rule Ghaswithdrawals         << CANYON >> => true
-    rule Ghastransient           << CANYON >> => false
-    rule Ghasmcopy               << CANYON >> => false
-    rule Ghasbeaconroot          << CANYON >> => false
-    rule Ghaseip6780             << CANYON >> => false
-    rule Ghasblobbasefee         << CANYON >> => false
-    rule Ghasblobhash            << CANYON >> => false
-    rule Ghasbls12msmdiscount    << CANYON >> => false
-    rule Ghasdelegation          << CANYON >> => false
-    rule Gecpairinputcheck       << CANYON >> => false
-    rule Ghasmip001              << CANYON >> => false
+    rule Gselfdestructnewaccount      << CANYON >> => true
+    rule Gstaticcalldepth             << CANYON >> => false
+    rule Gemptyisnonexistent          << CANYON >> => true
+    rule Gzerovaluenewaccountgas      << CANYON >> => false
+    rule Ghasrevert                   << CANYON >> => true
+    rule Ghasreturndata               << CANYON >> => true
+    rule Ghasstaticcall               << CANYON >> => true
+    rule Ghasshift                    << CANYON >> => true
+    rule Ghasdirtysstore              << CANYON >> => true
+    rule Ghassstorestipend            << CANYON >> => true
+    rule Ghascreate2                  << CANYON >> => true
+    rule Ghasextcodehash              << CANYON >> => true
+    rule Ghasselfbalance              << CANYON >> => true
+    rule Ghaschainid                  << CANYON >> => true
+    rule Ghasaccesslist               << CANYON >> => true
+    rule Ghasbasefee                  << CANYON >> => true
+    rule Ghasrejectedfirstbyte        << CANYON >> => true
+    rule Ghasprevrandao               << CANYON >> => true
+    rule Ghasmaxinitcodesize          << CANYON >> => true
+    rule Ghaspushzero                 << CANYON >> => true
+    rule Ghaswarmcoinbase             << CANYON >> => true
+    rule Ghaswithdrawals              << CANYON >> => true
+    rule Ghastransient                << CANYON >> => false
+    rule Ghasmcopy                    << CANYON >> => false
+    rule Ghasbeaconroot               << CANYON >> => false
+    rule Ghaseip6780                  << CANYON >> => false
+    rule Ghasblobbasefee              << CANYON >> => false
+    rule Ghasblobhash                 << CANYON >> => false
+    rule Ghasbls12msmdiscount         << CANYON >> => false
+    rule Ghasdelegation               << CANYON >> => false
+    rule Gecpairinputcheck            << CANYON >> => false
+    rule Gbls12g1msminputcheck        << CANYON >> => false
+    rule Gbls12g2msminputcheck        << CANYON >> => false
+    rule Gbls12pairingcheckinputcheck << CANYON >> => false
+    rule Ghasmip001                   << CANYON >> => false
 
     rule #isPrecompiledAccount(1p256, CANYON) => true
     rule #isPrecompiledAccount(2p256, CANYON) => true
@@ -2392,6 +2478,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < ECOTONE > => 0
     rule Gbls12mapfp2tog2 < ECOTONE > => 0
 
+    rule Gp256verify < ECOTONE > => 0
+
     rule Gaccessliststoragekey < ECOTONE > => 1900
     rule Gaccesslistaddress    < ECOTONE > => 2400
 
@@ -2400,38 +2488,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < ECOTONE > => 5
 
-    rule Gselfdestructnewaccount << ECOTONE >> => true
-    rule Gstaticcalldepth        << ECOTONE >> => false
-    rule Gemptyisnonexistent     << ECOTONE >> => true
-    rule Gzerovaluenewaccountgas << ECOTONE >> => false
-    rule Ghasrevert              << ECOTONE >> => true
-    rule Ghasreturndata          << ECOTONE >> => true
-    rule Ghasstaticcall          << ECOTONE >> => true
-    rule Ghasshift               << ECOTONE >> => true
-    rule Ghasdirtysstore         << ECOTONE >> => true
-    rule Ghassstorestipend       << ECOTONE >> => true
-    rule Ghascreate2             << ECOTONE >> => true
-    rule Ghasextcodehash         << ECOTONE >> => true
-    rule Ghasselfbalance         << ECOTONE >> => true
-    rule Ghaschainid             << ECOTONE >> => true
-    rule Ghasaccesslist          << ECOTONE >> => true
-    rule Ghasbasefee             << ECOTONE >> => true
-    rule Ghasrejectedfirstbyte   << ECOTONE >> => true
-    rule Ghasprevrandao          << ECOTONE >> => true
-    rule Ghasmaxinitcodesize     << ECOTONE >> => true
-    rule Ghaspushzero            << ECOTONE >> => true
-    rule Ghaswarmcoinbase        << ECOTONE >> => true
-    rule Ghaswithdrawals         << ECOTONE >> => true
-    rule Ghastransient           << ECOTONE >> => true
-    rule Ghasmcopy               << ECOTONE >> => true
-    rule Ghasbeaconroot          << ECOTONE >> => true
-    rule Ghaseip6780             << ECOTONE >> => true
-    rule Ghasblobbasefee         << ECOTONE >> => true
-    rule Ghasblobhash            << ECOTONE >> => true
-    rule Ghasbls12msmdiscount    << ECOTONE >> => false
-    rule Ghasdelegation          << ECOTONE >> => false
-    rule Gecpairinputcheck       << ECOTONE >> => false
-    rule Ghasmip001              << ECOTONE >> => false
+    rule Gselfdestructnewaccount      << ECOTONE >> => true
+    rule Gstaticcalldepth             << ECOTONE >> => false
+    rule Gemptyisnonexistent          << ECOTONE >> => true
+    rule Gzerovaluenewaccountgas      << ECOTONE >> => false
+    rule Ghasrevert                   << ECOTONE >> => true
+    rule Ghasreturndata               << ECOTONE >> => true
+    rule Ghasstaticcall               << ECOTONE >> => true
+    rule Ghasshift                    << ECOTONE >> => true
+    rule Ghasdirtysstore              << ECOTONE >> => true
+    rule Ghassstorestipend            << ECOTONE >> => true
+    rule Ghascreate2                  << ECOTONE >> => true
+    rule Ghasextcodehash              << ECOTONE >> => true
+    rule Ghasselfbalance              << ECOTONE >> => true
+    rule Ghaschainid                  << ECOTONE >> => true
+    rule Ghasaccesslist               << ECOTONE >> => true
+    rule Ghasbasefee                  << ECOTONE >> => true
+    rule Ghasrejectedfirstbyte        << ECOTONE >> => true
+    rule Ghasprevrandao               << ECOTONE >> => true
+    rule Ghasmaxinitcodesize          << ECOTONE >> => true
+    rule Ghaspushzero                 << ECOTONE >> => true
+    rule Ghaswarmcoinbase             << ECOTONE >> => true
+    rule Ghaswithdrawals              << ECOTONE >> => true
+    rule Ghastransient                << ECOTONE >> => true
+    rule Ghasmcopy                    << ECOTONE >> => true
+    rule Ghasbeaconroot               << ECOTONE >> => true
+    rule Ghaseip6780                  << ECOTONE >> => true
+    rule Ghasblobbasefee              << ECOTONE >> => true
+    rule Ghasblobhash                 << ECOTONE >> => true
+    rule Ghasbls12msmdiscount         << ECOTONE >> => false
+    rule Ghasdelegation               << ECOTONE >> => false
+    rule Gecpairinputcheck            << ECOTONE >> => false
+    rule Gbls12g1msminputcheck        << ECOTONE >> => false
+    rule Gbls12g2msminputcheck        << ECOTONE >> => false
+    rule Gbls12pairingcheckinputcheck << ECOTONE >> => false
+    rule Ghasmip001                   << ECOTONE >> => false
 
     rule #isPrecompiledAccount(1p256, ECOTONE) => true
     rule #isPrecompiledAccount(2p256, ECOTONE) => true
@@ -2524,6 +2615,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < FJORD > => 0
     rule Gbls12mapfp2tog2 < FJORD > => 0
 
+    rule Gp256verify < FJORD > => 3450
+
     rule Gaccessliststoragekey < FJORD > => 1900
     rule Gaccesslistaddress    < FJORD > => 2400
 
@@ -2532,38 +2625,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < FJORD > => 5
 
-    rule Gselfdestructnewaccount << FJORD >> => true
-    rule Gstaticcalldepth        << FJORD >> => false
-    rule Gemptyisnonexistent     << FJORD >> => true
-    rule Gzerovaluenewaccountgas << FJORD >> => false
-    rule Ghasrevert              << FJORD >> => true
-    rule Ghasreturndata          << FJORD >> => true
-    rule Ghasstaticcall          << FJORD >> => true
-    rule Ghasshift               << FJORD >> => true
-    rule Ghasdirtysstore         << FJORD >> => true
-    rule Ghassstorestipend       << FJORD >> => true
-    rule Ghascreate2             << FJORD >> => true
-    rule Ghasextcodehash         << FJORD >> => true
-    rule Ghasselfbalance         << FJORD >> => true
-    rule Ghaschainid             << FJORD >> => true
-    rule Ghasaccesslist          << FJORD >> => true
-    rule Ghasbasefee             << FJORD >> => true
-    rule Ghasrejectedfirstbyte   << FJORD >> => true
-    rule Ghasprevrandao          << FJORD >> => true
-    rule Ghasmaxinitcodesize     << FJORD >> => true
-    rule Ghaspushzero            << FJORD >> => true
-    rule Ghaswarmcoinbase        << FJORD >> => true
-    rule Ghaswithdrawals         << FJORD >> => true
-    rule Ghastransient           << FJORD >> => true
-    rule Ghasmcopy               << FJORD >> => true
-    rule Ghasbeaconroot          << FJORD >> => true
-    rule Ghaseip6780             << FJORD >> => true
-    rule Ghasblobbasefee         << FJORD >> => true
-    rule Ghasblobhash            << FJORD >> => true
-    rule Ghasbls12msmdiscount    << FJORD >> => false
-    rule Ghasdelegation          << FJORD >> => false
-    rule Gecpairinputcheck       << FJORD >> => false
-    rule Ghasmip001              << FJORD >> => false
+    rule Gselfdestructnewaccount      << FJORD >> => true
+    rule Gstaticcalldepth             << FJORD >> => false
+    rule Gemptyisnonexistent          << FJORD >> => true
+    rule Gzerovaluenewaccountgas      << FJORD >> => false
+    rule Ghasrevert                   << FJORD >> => true
+    rule Ghasreturndata               << FJORD >> => true
+    rule Ghasstaticcall               << FJORD >> => true
+    rule Ghasshift                    << FJORD >> => true
+    rule Ghasdirtysstore              << FJORD >> => true
+    rule Ghassstorestipend            << FJORD >> => true
+    rule Ghascreate2                  << FJORD >> => true
+    rule Ghasextcodehash              << FJORD >> => true
+    rule Ghasselfbalance              << FJORD >> => true
+    rule Ghaschainid                  << FJORD >> => true
+    rule Ghasaccesslist               << FJORD >> => true
+    rule Ghasbasefee                  << FJORD >> => true
+    rule Ghasrejectedfirstbyte        << FJORD >> => true
+    rule Ghasprevrandao               << FJORD >> => true
+    rule Ghasmaxinitcodesize          << FJORD >> => true
+    rule Ghaspushzero                 << FJORD >> => true
+    rule Ghaswarmcoinbase             << FJORD >> => true
+    rule Ghaswithdrawals              << FJORD >> => true
+    rule Ghastransient                << FJORD >> => true
+    rule Ghasmcopy                    << FJORD >> => true
+    rule Ghasbeaconroot               << FJORD >> => true
+    rule Ghaseip6780                  << FJORD >> => true
+    rule Ghasblobbasefee              << FJORD >> => true
+    rule Ghasblobhash                 << FJORD >> => true
+    rule Ghasbls12msmdiscount         << FJORD >> => false
+    rule Ghasdelegation               << FJORD >> => false
+    rule Gecpairinputcheck            << FJORD >> => false
+    rule Gbls12g1msminputcheck        << FJORD >> => false
+    rule Gbls12g2msminputcheck        << FJORD >> => false
+    rule Gbls12pairingcheckinputcheck << FJORD >> => false
+    rule Ghasmip001                   << FJORD >> => false
 
     rule #isPrecompiledAccount(1p256, FJORD) => true
     rule #isPrecompiledAccount(2p256, FJORD) => true
@@ -2575,6 +2671,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule #isPrecompiledAccount(8p256, FJORD) => true
     rule #isPrecompiledAccount(9p256, FJORD) => true
     rule #isPrecompiledAccount(10p256, FJORD) => true
+    rule
+   FJORD) => true
 ```
 
 ### Granite Schedule
@@ -2656,6 +2754,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < GRANITE > => 0
     rule Gbls12mapfp2tog2 < GRANITE > => 0
 
+    rule Gp256verify < GRANITE > => 3450
+
     rule Gaccessliststoragekey < GRANITE > => 1900
     rule Gaccesslistaddress    < GRANITE > => 2400
 
@@ -2664,38 +2764,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < GRANITE > => 5
 
-    rule Gselfdestructnewaccount << GRANITE >> => true
-    rule Gstaticcalldepth        << GRANITE >> => false
-    rule Gemptyisnonexistent     << GRANITE >> => true
-    rule Gzerovaluenewaccountgas << GRANITE >> => false
-    rule Ghasrevert              << GRANITE >> => true
-    rule Ghasreturndata          << GRANITE >> => true
-    rule Ghasstaticcall          << GRANITE >> => true
-    rule Ghasshift               << GRANITE >> => true
-    rule Ghasdirtysstore         << GRANITE >> => true
-    rule Ghassstorestipend       << GRANITE >> => true
-    rule Ghascreate2             << GRANITE >> => true
-    rule Ghasextcodehash         << GRANITE >> => true
-    rule Ghasselfbalance         << GRANITE >> => true
-    rule Ghaschainid             << GRANITE >> => true
-    rule Ghasaccesslist          << GRANITE >> => true
-    rule Ghasbasefee             << GRANITE >> => true
-    rule Ghasrejectedfirstbyte   << GRANITE >> => true
-    rule Ghasprevrandao          << GRANITE >> => true
-    rule Ghasmaxinitcodesize     << GRANITE >> => true
-    rule Ghaspushzero            << GRANITE >> => true
-    rule Ghaswarmcoinbase        << GRANITE >> => true
-    rule Ghaswithdrawals         << GRANITE >> => true
-    rule Ghastransient           << GRANITE >> => true
-    rule Ghasmcopy               << GRANITE >> => true
-    rule Ghasbeaconroot          << GRANITE >> => true
-    rule Ghaseip6780             << GRANITE >> => true
-    rule Ghasblobbasefee         << GRANITE >> => true
-    rule Ghasblobhash            << GRANITE >> => true
-    rule Ghasbls12msmdiscount    << GRANITE >> => false
-    rule Ghasdelegation          << GRANITE >> => false
-    rule Gecpairinputcheck       << GRANITE >> => true
-    rule Ghasmip001              << GRANITE >> => false
+    rule Gselfdestructnewaccount      << GRANITE >> => true
+    rule Gstaticcalldepth             << GRANITE >> => false
+    rule Gemptyisnonexistent          << GRANITE >> => true
+    rule Gzerovaluenewaccountgas      << GRANITE >> => false
+    rule Ghasrevert                   << GRANITE >> => true
+    rule Ghasreturndata               << GRANITE >> => true
+    rule Ghasstaticcall               << GRANITE >> => true
+    rule Ghasshift                    << GRANITE >> => true
+    rule Ghasdirtysstore              << GRANITE >> => true
+    rule Ghassstorestipend            << GRANITE >> => true
+    rule Ghascreate2                  << GRANITE >> => true
+    rule Ghasextcodehash              << GRANITE >> => true
+    rule Ghasselfbalance              << GRANITE >> => true
+    rule Ghaschainid                  << GRANITE >> => true
+    rule Ghasaccesslist               << GRANITE >> => true
+    rule Ghasbasefee                  << GRANITE >> => true
+    rule Ghasrejectedfirstbyte        << GRANITE >> => true
+    rule Ghasprevrandao               << GRANITE >> => true
+    rule Ghasmaxinitcodesize          << GRANITE >> => true
+    rule Ghaspushzero                 << GRANITE >> => true
+    rule Ghaswarmcoinbase             << GRANITE >> => true
+    rule Ghaswithdrawals              << GRANITE >> => true
+    rule Ghastransient                << GRANITE >> => true
+    rule Ghasmcopy                    << GRANITE >> => true
+    rule Ghasbeaconroot               << GRANITE >> => true
+    rule Ghaseip6780                  << GRANITE >> => true
+    rule Ghasblobbasefee              << GRANITE >> => true
+    rule Ghasblobhash                 << GRANITE >> => true
+    rule Ghasbls12msmdiscount         << GRANITE >> => false
+    rule Ghasdelegation               << GRANITE >> => false
+    rule Gecpairinputcheck            << GRANITE >> => true
+    rule Gbls12g1msminputcheck        << GRANITE >> => false
+    rule Gbls12g2msminputcheck        << GRANITE >> => false
+    rule Gbls12pairingcheckinputcheck << GRANITE >> => false
+    rule Ghasmip001                   << GRANITE >> => false
 
     rule #isPrecompiledAccount(1p256, GRANITE) => true
     rule #isPrecompiledAccount(2p256, GRANITE) => true
@@ -2707,6 +2810,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule #isPrecompiledAccount(8p256, GRANITE) => true
     rule #isPrecompiledAccount(9p256, GRANITE) => true
     rule #isPrecompiledAccount(10p256, GRANITE) => true
+    rule #isPrecompiledAccount(256p256, GRANITE) => true
 ```
 
 ### Holocene Schedule
@@ -2788,6 +2892,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < HOLOCENE > => 0
     rule Gbls12mapfp2tog2 < HOLOCENE > => 0
 
+    rule Gp256verify < HOLOCENE > => 3450
+
     rule Gaccessliststoragekey < HOLOCENE > => 1900
     rule Gaccesslistaddress    < HOLOCENE > => 2400
 
@@ -2796,38 +2902,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < HOLOCENE > => 5
 
-    rule Gselfdestructnewaccount << HOLOCENE >> => true
-    rule Gstaticcalldepth        << HOLOCENE >> => false
-    rule Gemptyisnonexistent     << HOLOCENE >> => true
-    rule Gzerovaluenewaccountgas << HOLOCENE >> => false
-    rule Ghasrevert              << HOLOCENE >> => true
-    rule Ghasreturndata          << HOLOCENE >> => true
-    rule Ghasstaticcall          << HOLOCENE >> => true
-    rule Ghasshift               << HOLOCENE >> => true
-    rule Ghasdirtysstore         << HOLOCENE >> => true
-    rule Ghassstorestipend       << HOLOCENE >> => true
-    rule Ghascreate2             << HOLOCENE >> => true
-    rule Ghasextcodehash         << HOLOCENE >> => true
-    rule Ghasselfbalance         << HOLOCENE >> => true
-    rule Ghaschainid             << HOLOCENE >> => true
-    rule Ghasaccesslist          << HOLOCENE >> => true
-    rule Ghasbasefee             << HOLOCENE >> => true
-    rule Ghasrejectedfirstbyte   << HOLOCENE >> => true
-    rule Ghasprevrandao          << HOLOCENE >> => true
-    rule Ghasmaxinitcodesize     << HOLOCENE >> => true
-    rule Ghaspushzero            << HOLOCENE >> => true
-    rule Ghaswarmcoinbase        << HOLOCENE >> => true
-    rule Ghaswithdrawals         << HOLOCENE >> => true
-    rule Ghastransient           << HOLOCENE >> => true
-    rule Ghasmcopy               << HOLOCENE >> => true
-    rule Ghasbeaconroot          << HOLOCENE >> => true
-    rule Ghaseip6780             << HOLOCENE >> => true
-    rule Ghasblobbasefee         << HOLOCENE >> => true
-    rule Ghasblobhash            << HOLOCENE >> => true
-    rule Ghasbls12msmdiscount    << HOLOCENE >> => false
-    rule Ghasdelegation          << HOLOCENE >> => false
-    rule Gecpairinputcheck       << HOLOCENE >> => true
-    rule Ghasmip001              << HOLOCENE >> => false
+    rule Gselfdestructnewaccount      << HOLOCENE >> => true
+    rule Gstaticcalldepth             << HOLOCENE >> => false
+    rule Gemptyisnonexistent          << HOLOCENE >> => true
+    rule Gzerovaluenewaccountgas      << HOLOCENE >> => false
+    rule Ghasrevert                   << HOLOCENE >> => true
+    rule Ghasreturndata               << HOLOCENE >> => true
+    rule Ghasstaticcall               << HOLOCENE >> => true
+    rule Ghasshift                    << HOLOCENE >> => true
+    rule Ghasdirtysstore              << HOLOCENE >> => true
+    rule Ghassstorestipend            << HOLOCENE >> => true
+    rule Ghascreate2                  << HOLOCENE >> => true
+    rule Ghasextcodehash              << HOLOCENE >> => true
+    rule Ghasselfbalance              << HOLOCENE >> => true
+    rule Ghaschainid                  << HOLOCENE >> => true
+    rule Ghasaccesslist               << HOLOCENE >> => true
+    rule Ghasbasefee                  << HOLOCENE >> => true
+    rule Ghasrejectedfirstbyte        << HOLOCENE >> => true
+    rule Ghasprevrandao               << HOLOCENE >> => true
+    rule Ghasmaxinitcodesize          << HOLOCENE >> => true
+    rule Ghaspushzero                 << HOLOCENE >> => true
+    rule Ghaswarmcoinbase             << HOLOCENE >> => true
+    rule Ghaswithdrawals              << HOLOCENE >> => true
+    rule Ghastransient                << HOLOCENE >> => true
+    rule Ghasmcopy                    << HOLOCENE >> => true
+    rule Ghasbeaconroot               << HOLOCENE >> => true
+    rule Ghaseip6780                  << HOLOCENE >> => true
+    rule Ghasblobbasefee              << HOLOCENE >> => true
+    rule Ghasblobhash                 << HOLOCENE >> => true
+    rule Ghasbls12msmdiscount         << HOLOCENE >> => false
+    rule Ghasdelegation               << HOLOCENE >> => false
+    rule Gecpairinputcheck            << HOLOCENE >> => true
+    rule Gbls12g1msminputcheck        << HOLOCENE >> => false
+    rule Gbls12g2msminputcheck        << HOLOCENE >> => false
+    rule Gbls12pairingcheckinputcheck << HOLOCENE >> => false
+    rule Ghasmip001                   << HOLOCENE >> => false
 
     rule #isPrecompiledAccount(1p256, HOLOCENE) => true
     rule #isPrecompiledAccount(2p256, HOLOCENE) => true
@@ -2839,6 +2948,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule #isPrecompiledAccount(8p256, HOLOCENE) => true
     rule #isPrecompiledAccount(9p256, HOLOCENE) => true
     rule #isPrecompiledAccount(10p256, HOLOCENE) => true
+    rule #isPrecompiledAccount(256p256, HOLOCENE) => true
 ```
 
 ### Isthmus Schedule
@@ -2921,6 +3031,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < ISTHMUS > => 5500
     rule Gbls12mapfp2tog2 < ISTHMUS > => 23800
 
+    rule Gp256verify < ISTHMUS > => 3450
+
     rule Gaccessliststoragekey < ISTHMUS > => 1900
     rule Gaccesslistaddress    < ISTHMUS > => 2400
 
@@ -2929,38 +3041,41 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < ISTHMUS > => 5
 
-    rule Gselfdestructnewaccount << ISTHMUS >> => true
-    rule Gstaticcalldepth        << ISTHMUS >> => false
-    rule Gemptyisnonexistent     << ISTHMUS >> => true
-    rule Gzerovaluenewaccountgas << ISTHMUS >> => false
-    rule Ghasrevert              << ISTHMUS >> => true
-    rule Ghasreturndata          << ISTHMUS >> => true
-    rule Ghasstaticcall          << ISTHMUS >> => true
-    rule Ghasshift               << ISTHMUS >> => true
-    rule Ghasdirtysstore         << ISTHMUS >> => true
-    rule Ghassstorestipend       << ISTHMUS >> => true
-    rule Ghascreate2             << ISTHMUS >> => true
-    rule Ghasextcodehash         << ISTHMUS >> => true
-    rule Ghasselfbalance         << ISTHMUS >> => true
-    rule Ghaschainid             << ISTHMUS >> => true
-    rule Ghasaccesslist          << ISTHMUS >> => true
-    rule Ghasbasefee             << ISTHMUS >> => true
-    rule Ghasrejectedfirstbyte   << ISTHMUS >> => true
-    rule Ghasprevrandao          << ISTHMUS >> => true
-    rule Ghasmaxinitcodesize     << ISTHMUS >> => true
-    rule Ghaspushzero            << ISTHMUS >> => true
-    rule Ghaswarmcoinbase        << ISTHMUS >> => true
-    rule Ghaswithdrawals         << ISTHMUS >> => true
-    rule Ghastransient           << ISTHMUS >> => true
-    rule Ghasmcopy               << ISTHMUS >> => true
-    rule Ghasbeaconroot          << ISTHMUS >> => true
-    rule Ghaseip6780             << ISTHMUS >> => true
-    rule Ghasblobbasefee         << ISTHMUS >> => true
-    rule Ghasblobhash            << ISTHMUS >> => true
-    rule Ghasbls12msmdiscount    << ISTHMUS >> => true
-    rule Ghasdelegation          << ISTHMUS >> => true
-    rule Gecpairinputcheck       << ISTHMUS >> => true
-    rule Ghasmip001              << ISTHMUS >> => false
+    rule Gselfdestructnewaccount      << ISTHMUS >> => true
+    rule Gstaticcalldepth             << ISTHMUS >> => false
+    rule Gemptyisnonexistent          << ISTHMUS >> => true
+    rule Gzerovaluenewaccountgas      << ISTHMUS >> => false
+    rule Ghasrevert                   << ISTHMUS >> => true
+    rule Ghasreturndata               << ISTHMUS >> => true
+    rule Ghasstaticcall               << ISTHMUS >> => true
+    rule Ghasshift                    << ISTHMUS >> => true
+    rule Ghasdirtysstore              << ISTHMUS >> => true
+    rule Ghassstorestipend            << ISTHMUS >> => true
+    rule Ghascreate2                  << ISTHMUS >> => true
+    rule Ghasextcodehash              << ISTHMUS >> => true
+    rule Ghasselfbalance              << ISTHMUS >> => true
+    rule Ghaschainid                  << ISTHMUS >> => true
+    rule Ghasaccesslist               << ISTHMUS >> => true
+    rule Ghasbasefee                  << ISTHMUS >> => true
+    rule Ghasrejectedfirstbyte        << ISTHMUS >> => true
+    rule Ghasprevrandao               << ISTHMUS >> => true
+    rule Ghasmaxinitcodesize          << ISTHMUS >> => true
+    rule Ghaspushzero                 << ISTHMUS >> => true
+    rule Ghaswarmcoinbase             << ISTHMUS >> => true
+    rule Ghaswithdrawals              << ISTHMUS >> => true
+    rule Ghastransient                << ISTHMUS >> => true
+    rule Ghasmcopy                    << ISTHMUS >> => true
+    rule Ghasbeaconroot               << ISTHMUS >> => true
+    rule Ghaseip6780                  << ISTHMUS >> => true
+    rule Ghasblobbasefee              << ISTHMUS >> => true
+    rule Ghasblobhash                 << ISTHMUS >> => true
+    rule Ghasbls12msmdiscount         << ISTHMUS >> => true
+    rule Ghasdelegation               << ISTHMUS >> => true
+    rule Gecpairinputcheck            << ISTHMUS >> => true
+    rule Gbls12g1msminputcheck        << ISTHMUS >> => true
+    rule Gbls12g2msminputcheck        << ISTHMUS >> => true
+    rule Gbls12pairingcheckinputcheck << ISTHMUS >> => true
+    rule Ghasmip001                   << ISTHMUS >> => false
 
     rule #isPrecompiledAccount(1p256, ISTHMUS) => true
     rule #isPrecompiledAccount(2p256, ISTHMUS) => true
@@ -2979,6 +3094,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule #isPrecompiledAccount(15p256, ISTHMUS) => true
     rule #isPrecompiledAccount(16p256, ISTHMUS) => true
     rule #isPrecompiledAccount(17p256, ISTHMUS) => true
+    rule #isPrecompiledAccount(256p256, ISTHMUS) => true
 ```
 ## MegaETH Schedules
 ### EQUIVALENCE Schedule

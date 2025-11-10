@@ -35,6 +35,7 @@ module SCHEDULE
     rule getSchedule(11) => SHANGHAI
     rule getSchedule(12) => CANCUN
     rule getSchedule(13) => PRAGUE
+    rule getSchedule(14) => OSAKA
     rule getSchedule(100) => BEDROCK
     rule getSchedule(101) => REGOLITH
     rule getSchedule(102) => CANYON
@@ -68,6 +69,7 @@ module SCHEDULE
     rule isOptimismSchedule(SHANGHAI) => false
     rule isOptimismSchedule(CANCUN) => false
     rule isOptimismSchedule(PRAGUE) => false
+    rule isOptimismSchedule(OSAKA) => false
 
     syntax Bool ::= ScheduleFlag "<<" Schedule ">>" [function, total]
  // -----------------------------------------------------------------
@@ -1958,6 +1960,149 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule #isPrecompiledAccount(15p256, PRAGUE) => true
     rule #isPrecompiledAccount(16p256, PRAGUE) => true
     rule #isPrecompiledAccount(17p256, PRAGUE) => true
+```
+
+### Osaka Schedule
+
+```k
+    syntax Schedule ::= "OSAKA" [symbol(OSAKA_EVM), smtlib(schedule_OSAKA)]
+ // --------------------------------------------------------------------------
+
+    rule Gzero    < OSAKA > => 0
+
+    rule Gbase    < OSAKA > => 2
+    rule Gverylow < OSAKA > => 3
+    rule Glow     < OSAKA > => 5
+    rule Gmid     < OSAKA > => 8
+    rule Ghigh    < OSAKA > => 10
+
+    rule Gexp      < OSAKA > => 10
+    rule Gexpbyte  < OSAKA > => 50
+    rule Gsha3     < OSAKA > => 30
+    rule Gsha3word < OSAKA > => 6
+
+    rule Gsload       < OSAKA > => 100
+    rule Gsstoreset   < OSAKA > => 20000
+    rule Gsstorereset < OSAKA > => 2900
+    rule Rsstoreclear < OSAKA > => 4800
+
+    rule Glog      < OSAKA > => 375
+    rule Glogdata  < OSAKA > => 8
+    rule Glogtopic < OSAKA > => 375
+
+    rule Gcall        < OSAKA > => 700
+    rule Gcallstipend < OSAKA > => 2300
+    rule Gcallvalue   < OSAKA > => 9000
+    rule Gnewaccount  < OSAKA > => 25000
+
+    rule Gcreate       < OSAKA > => 32000
+    rule Gcodedeposit  < OSAKA > => 200
+    rule Gselfdestruct < OSAKA > => 5000
+    rule Rselfdestruct < OSAKA > => 0
+
+    rule Gmemory      < OSAKA > => 3
+    rule Gquadcoeff   < OSAKA > => 512
+    rule Gcopy        < OSAKA > => 3
+    rule Gquaddivisor < OSAKA > => 3
+
+    rule Gtransaction   < OSAKA > => 21000
+    rule Gtxcreate      < OSAKA > => 53000
+    rule Gtxdatazero    < OSAKA > => 4
+    rule Gtxdatanonzero < OSAKA > => 16
+
+    rule Gjumpdest    < OSAKA > => 1
+    rule Gbalance     < OSAKA > => 700
+    rule Gblockhash   < OSAKA > => 20
+    rule Gextcodesize < OSAKA > => 700
+    rule Gextcodecopy < OSAKA > => 700
+
+    rule Gecadd       < OSAKA > => 150
+    rule Gecmul       < OSAKA > => 6000
+    rule Gecpairconst < OSAKA > => 45000
+    rule Gecpaircoeff < OSAKA > => 34000
+    rule Gfround      < OSAKA > => 1
+
+    rule maxCodeSize < OSAKA > => 24576
+    rule Rb          < OSAKA > => 0
+
+    rule Gcoldsload             < OSAKA > => 2100
+    rule Gcoldaccountaccess     < OSAKA > => 2600
+    rule Gwarmstorageread       < OSAKA > => 100
+    rule Gwarmstoragedirtystore < OSAKA > => 100
+
+    rule Gpointeval < OSAKA > => 50000
+
+    rule Gbls12g1add < OSAKA > => 375
+    rule Gbls12g1mul < OSAKA > => 12000
+    rule Gbls12g2add < OSAKA > => 600
+    rule Gbls12g2mul < OSAKA > => 22500
+    rule Gbls12PairingCheckMul < OSAKA > => 32600
+    rule Gbls12PairingCheckAdd < OSAKA > => 37700
+    rule Gbls12mapfptog1 < OSAKA > => 5500
+    rule Gbls12mapfp2tog2 < OSAKA > => 23800
+
+    rule Gp256verify < OSAKA > => 0
+
+    rule Gaccessliststoragekey < OSAKA > => 1900
+    rule Gaccesslistaddress    < OSAKA > => 2400
+
+    rule maxInitCodeSize   < OSAKA > => 49152
+    rule Ginitcodewordcost < OSAKA > => 2
+
+    rule Rmaxquotient < OSAKA > => 5
+
+    rule Gselfdestructnewaccount      << OSAKA >> => true
+    rule Gstaticcalldepth             << OSAKA >> => false
+    rule Gemptyisnonexistent          << OSAKA >> => true
+    rule Gzerovaluenewaccountgas      << OSAKA >> => false
+    rule Ghasrevert                   << OSAKA >> => true
+    rule Ghasreturndata               << OSAKA >> => true
+    rule Ghasstaticcall               << OSAKA >> => true
+    rule Ghasshift                    << OSAKA >> => true
+    rule Ghasdirtysstore              << OSAKA >> => true
+    rule Ghassstorestipend            << OSAKA >> => true
+    rule Ghascreate2                  << OSAKA >> => true
+    rule Ghasextcodehash              << OSAKA >> => true
+    rule Ghasselfbalance              << OSAKA >> => true
+    rule Ghaschainid                  << OSAKA >> => true
+    rule Ghasaccesslist               << OSAKA >> => true
+    rule Ghasbasefee                  << OSAKA >> => true
+    rule Ghasrejectedfirstbyte        << OSAKA >> => true
+    rule Ghasprevrandao               << OSAKA >> => true
+    rule Ghasmaxinitcodesize          << OSAKA >> => true
+    rule Ghaspushzero                 << OSAKA >> => true
+    rule Ghaswarmcoinbase             << OSAKA >> => true
+    rule Ghaswithdrawals              << OSAKA >> => true
+    rule Ghastransient                << OSAKA >> => true
+    rule Ghasmcopy                    << OSAKA >> => true
+    rule Ghasbeaconroot               << OSAKA >> => true
+    rule Ghaseip6780                  << OSAKA >> => true
+    rule Ghasblobbasefee              << OSAKA >> => true
+    rule Ghasblobhash                 << OSAKA >> => true
+    rule Ghasbls12msmdiscount         << OSAKA >> => true
+    rule Ghasdelegation               << OSAKA >> => true
+    rule Gecpairinputcheck            << OSAKA >> => false
+    rule Gbls12g1msminputcheck        << OSAKA >> => false
+    rule Gbls12g2msminputcheck        << OSAKA >> => false
+    rule Gbls12pairingcheckinputcheck << OSAKA >> => false
+
+    rule #isPrecompiledAccount(1p256, OSAKA) => true
+    rule #isPrecompiledAccount(2p256, OSAKA) => true
+    rule #isPrecompiledAccount(3p256, OSAKA) => true
+    rule #isPrecompiledAccount(4p256, OSAKA) => true
+    rule #isPrecompiledAccount(5p256, OSAKA) => true
+    rule #isPrecompiledAccount(6p256, OSAKA) => true
+    rule #isPrecompiledAccount(7p256, OSAKA) => true
+    rule #isPrecompiledAccount(8p256, OSAKA) => true
+    rule #isPrecompiledAccount(9p256, OSAKA) => true
+    rule #isPrecompiledAccount(10p256, OSAKA) => true
+    rule #isPrecompiledAccount(11p256, OSAKA) => true
+    rule #isPrecompiledAccount(12p256, OSAKA) => true
+    rule #isPrecompiledAccount(13p256, OSAKA) => true
+    rule #isPrecompiledAccount(14p256, OSAKA) => true
+    rule #isPrecompiledAccount(15p256, OSAKA) => true
+    rule #isPrecompiledAccount(16p256, OSAKA) => true
+    rule #isPrecompiledAccount(17p256, OSAKA) => true
 ```
 
 ### Bedrock Schedule

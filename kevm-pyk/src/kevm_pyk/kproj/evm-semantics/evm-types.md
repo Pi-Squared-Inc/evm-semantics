@@ -77,8 +77,9 @@ We use 256-bit machine integers as our word data type.
 
     syntax MInt{256} ::= clzMInt(MInt{256}) [function]
  // -----------------------------------------------------
-    rule clzMInt(N) => 0p256                               requires N  >uMInt maxUInt255p256
-    rule clzMInt(N) => 1p256 +MInt clzMInt(N <<MInt 1p256) requires N <=uMInt maxUInt255p256
+    rule clzMInt(0p256) => 256p256
+    rule clzMInt(N)     => 0p256                               requires N  >uMInt maxUInt255p256 andBool N =/=MInt 0p256
+    rule clzMInt(N)     => 1p256 +MInt clzMInt(N <<MInt 1p256) requires N <=uMInt maxUInt255p256 andBool N =/=MInt 0p256
 
     syntax MInt{256} ::= #nBitsMInt256  ( MInt{256} )  [function]
                        | #nBytesMInt256 ( MInt{256} )  [function]

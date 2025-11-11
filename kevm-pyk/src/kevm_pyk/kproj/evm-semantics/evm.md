@@ -553,10 +553,11 @@ Expression calculations are simple and don't require anything but the arguments 
 NOTE: We have to call the opcode `OR` by `EVMOR` instead, because K has trouble parsing it/compiling the definition otherwise.
 
 ```k
-    syntax UnStackOp ::= "ISZERO" | "NOT"
+    syntax UnStackOp ::= "ISZERO" | "NOT" | "CLZ"
  // -------------------------------------
     rule <k> ISZERO W => bool2MInt256(W ==MInt 0p256) ~> #push ... </k>
     rule <k> NOT    W => ~MInt W                      ~> #push ... </k>
+    rule <k> CLZ    W => clzMInt(W)                   ~> #push ... </k>
 
     syntax BinStackOp ::= "ADD" | "MUL" | "SUB" | "DIV" | "EXP" | "MOD"
  // -------------------------------------------------------------------

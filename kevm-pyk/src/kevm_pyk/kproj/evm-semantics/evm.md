@@ -104,6 +104,7 @@ Output Extraction
     rule getStatus(EVMC_REJECTED) => EVMC_REJECTED
     rule getStatus(EVMC_INTERNAL_ERROR) => EVMC_INTERNAL_ERROR
     rule getStatus(EVMC_SUCCESS) => EVMC_SUCCESS
+    rule getStatus(EVMC_STOP) => EVMC_STOP
     rule getStatus(EVMC_REVERT) => EVMC_REVERT
     rule getStatus(EVMC_FAILURE) => EVMC_FAILURE
     rule getStatus(EVMC_INVALID_INSTRUCTION) => EVMC_INVALID_INSTRUCTION
@@ -128,10 +129,16 @@ Output Extraction
     rule getStatus(EVMC_PRECOMPILE_BLS12MAPFP2TOG2_LENGTH) => EVMC_PRECOMPILE_BLS12MAPFP2TOG2_LENGTH
     rule getStatus(EVMC_PRECOMPILE_BLS12_FP_PADDING) => EVMC_PRECOMPILE_BLS12_FP_PADDING
 
-    rule getGasLeft(G) => 0 requires getStatus(G) =/=Int EVMC_SUCCESS andBool getStatus(G) =/=Int EVMC_REVERT
+    rule getGasLeft(G) => 0
+      requires getStatus(G) =/=Int EVMC_SUCCESS
+       andBool getStatus(G) =/=Int EVMC_STOP
+       andBool getStatus(G) =/=Int EVMC_REVERT
     rule getGasLeft(<generatedTop>... <gas> G </gas> ...</generatedTop>) => G [priority(51)]
 
-    rule getOutput(G) => .Bytes requires getStatus(G) =/=Int EVMC_SUCCESS andBool getStatus(G) =/=Int EVMC_REVERT
+    rule getOutput(G) => .Bytes
+      requires getStatus(G) =/=Int EVMC_SUCCESS
+       andBool getStatus(G) =/=Int EVMC_STOP
+       andBool getStatus(G) =/=Int EVMC_REVERT
     rule getOutput(<generatedTop>... <output> O </output> ...</generatedTop>) => O [priority(51)]
 ```
 
@@ -239,7 +246,7 @@ OpCode Execution
 ### Single Step
 
 If the program-counter points to an actual opcode, it's loaded into the `#next [_]` operator.
-If `.NoOpCode` is loaded into `#next [_]`, then it means that there is no next opcode and the execution will halt with an `EVMC_SUCCESS` status code.
+If `.NoOpCode` is loaded into `#next [_]`, then it means that there is no next opcode and the execution will halt with an `EVMC_STOP` status code.
 The `#next [_]` operator initiates execution by:
 
 1.  checking if there will be a stack over/underflow, or a static mode violation,
@@ -250,7 +257,7 @@ The `#next [_]` operator initiates execution by:
 ```k
     syntax InternalOp ::= "#next" "[" MaybeOpCode "]"
  // -------------------------------------------------
-    rule <k> #next [ .NoOpCode ] => #end EVMC_SUCCESS ... </k>
+    rule <k> #next [ .NoOpCode ] => #end EVMC_STOP ... </k>
          <output> _ => .Bytes </output>
 
     rule <k> #next [ OP:OpCode ]
@@ -715,7 +722,7 @@ The `JUMP*` family of operations affect the current program counter.
 ```k
     syntax NullStackOp ::= "STOP"
  // -----------------------------
-    rule <k> STOP => #end EVMC_SUCCESS ... </k>
+    rule <k> STOP => #end EVMC_STOP ... </k>
          <output> _ => .Bytes </output>
 
     syntax BinStackOp ::= "RETURN"
@@ -1009,6 +1016,16 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
          <output> OUT </output>
          <gas> GAVAIL </gas>
 
+    rule [return.stop]:
+         <statusCode> EVMC_STOP </statusCode>
+         <k> #halt ~> #return RETSTART RETWIDTH
+          => #popCallStack ~> #dropWorldState
+          ~> 1p256 ~> #push ~> #refund GAVAIL ~> #setLocalMem RETSTART RETWIDTH OUT
+         ...
+         </k>
+         <output> OUT </output>
+         <gas> GAVAIL </gas>
+
 
     syntax InternalOp ::= "#refund" Gas
                         | "#setLocalMem" MInt{256} MInt{256} Bytes
@@ -1147,6 +1164,9 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
          <gas> GAVAIL </gas>
 
     rule <statusCode> EVMC_SUCCESS </statusCode>
+         <k> #halt ~> #codeDeposit ACCT => #mkCodeDeposit ACCT ... </k>
+
+    rule <statusCode> EVMC_STOP </statusCode>
          <k> #halt ~> #codeDeposit ACCT => #mkCodeDeposit ACCT ... </k>
 
     rule <k> #mkCodeDeposit ACCT

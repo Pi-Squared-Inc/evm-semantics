@@ -87,14 +87,17 @@ The following codes all indicate that the VM ended execution with an exception, 
 These additional status codes indicate that execution has ended in some non-exceptional way.
 
 -   `EVMC_SUCCESS` indicates successful end of execution.
+-   `EVMC_STOP` indicates successful end of execution with the `STOP` opcode.
 -   `EVMC_REVERT` indicates that the contract called `REVERT`.
 
 ```k
     syntax EndStatusCode ::= ExceptionalStatusCode
                            | "EVMC_SUCCESS"
+                           | "EVMC_STOP"
                            | "EVMC_REVERT"
  // --------------------------------------
     rule StatusCode2String(EVMC_SUCCESS) => "EVMC_SUCCESS"
+    rule StatusCode2String(EVMC_STOP) => "EVMC_STOP"
     rule StatusCode2String(EVMC_REVERT)  => "EVMC_REVERT"
 ```
 

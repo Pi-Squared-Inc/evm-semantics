@@ -2177,6 +2177,7 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
     rule <k> #gasExec(SCHED, BLOBHASH _)     => Gverylow < SCHED > ... </k>
 
     // Wlow
+    rule <k> #gasExec(SCHED, CLZ _)          => Glow < SCHED > ... </k>
     rule <k> #gasExec(SCHED, MUL _ _)        => Glow < SCHED > ... </k>
     rule <k> #gasExec(SCHED, DIV _ _)        => Glow < SCHED > ... </k>
     rule <k> #gasExec(SCHED, SDIV _ _)       => Glow < SCHED > ... </k>
@@ -2326,6 +2327,7 @@ After interpreting the strings representing programs as a `WordStack`, it should
     rule #dasmOpCode(  27p256, SCHED ) => SHL requires Ghasshift << SCHED >>
     rule #dasmOpCode(  28p256, SCHED ) => SHR requires Ghasshift << SCHED >>
     rule #dasmOpCode(  29p256, SCHED ) => SAR requires Ghasshift << SCHED >>
+    rule #dasmOpCode(  30p256,     _ ) => CLZ
     rule #dasmOpCode(  32p256,     _ ) => SHA3
     rule #dasmOpCode(  48p256,     _ ) => ADDRESS
     rule #dasmOpCode(  49p256,     _ ) => BALANCE

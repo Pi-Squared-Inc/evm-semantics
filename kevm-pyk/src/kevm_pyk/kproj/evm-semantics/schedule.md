@@ -75,14 +75,14 @@ module SCHEDULE
  // -----------------------------------------------------------------
 
     syntax ScheduleFlag ::= "Gselfdestructnewaccount" | "Gstaticcalldepth" | "Gemptyisnonexistent" | "Gzerovaluenewaccountgas"
-                          | "Ghasrevert"              | "Ghasreturndata"   | "Ghasstaticcall"      | "Ghasshift"
-                          | "Ghasdirtysstore"         | "Ghascreate2"      | "Ghasextcodehash"     | "Ghasselfbalance"
-                          | "Ghassstorestipend"       | "Ghaschainid"      | "Ghasaccesslist"      | "Ghasbasefee"
-                          | "Ghasrejectedfirstbyte"   | "Ghasprevrandao"   | "Ghasmaxinitcodesize" | "Ghaspushzero"
-                          | "Ghaswarmcoinbase"        | "Ghaswithdrawals"  | "Ghastransient"       | "Ghasmcopy"
-                          | "Ghasbeaconroot"          | "Ghaseip6780"      | "Ghasblobbasefee"     | "Ghasblobhash"
-                          | "Ghasbls12msmdiscount"    | "Ghasdelegation"   | "Gecpairinputcheck"   | "Gbls12g1msminputcheck"
-                          | "Gbls12g2msminputcheck"   | "Gbls12pairingcheckinputcheck"
+                          | "Ghasrevert"              | "Ghasreturndata"        | "Ghasstaticcall"      | "Ghasshift"
+                          | "Ghasdirtysstore"         | "Ghascreate2"           | "Ghasextcodehash"     | "Ghasselfbalance"
+                          | "Ghassstorestipend"       | "Ghaschainid"           | "Ghasaccesslist"      | "Ghasbasefee"
+                          | "Ghasrejectedfirstbyte"   | "Ghasprevrandao"        | "Ghasmaxinitcodesize" | "Ghaspushzero"
+                          | "Ghaswarmcoinbase"        | "Ghaswithdrawals"       | "Ghastransient"       | "Ghasmcopy"
+                          | "Ghasbeaconroot"          | "Ghaseip6780"           | "Ghasblobbasefee"     | "Ghasblobhash"
+                          | "Ghasbls12msmdiscount"    | "Ghasdelegation"        | "Gecpairinputcheck"   | "Ghasclz"
+                          | "Gbls12g1msminputcheck"   | "Gbls12g2msminputcheck" | "Gbls12pairingcheckinputcheck"
 
     syntax Bool ::= #isPrecompiledAccount ( MInt{256} , Schedule ) [symbol(isPrecompiledAccount), function, total, smtlib(isPrecompiledAccount)]
  // --------------------------------------------------------------------------------------------------------------------------------------------
@@ -228,6 +228,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << FRONTIER >> => false
     rule Ghasdelegation               << FRONTIER >> => false
     rule Gecpairinputcheck            << FRONTIER >> => false
+    rule Ghasclz                      << FRONTIER >> => false
     rule Gbls12g1msminputcheck        << FRONTIER >> => false
     rule Gbls12g2msminputcheck        << FRONTIER >> => false
     rule Gbls12pairingcheckinputcheck << FRONTIER >> => false
@@ -356,6 +357,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << HOMESTEAD >> => false
     rule Ghasdelegation               << HOMESTEAD >> => false
     rule Gecpairinputcheck            << HOMESTEAD >> => false
+    rule Ghasclz                      << HOMESTEAD >> => false
     rule Gbls12g1msminputcheck        << HOMESTEAD >> => false
     rule Gbls12g2msminputcheck        << HOMESTEAD >> => false
     rule Gbls12pairingcheckinputcheck << HOMESTEAD >> => false
@@ -484,6 +486,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << TANGERINE_WHISTLE >> => false
     rule Ghasdelegation               << TANGERINE_WHISTLE >> => false
     rule Gecpairinputcheck            << TANGERINE_WHISTLE >> => false
+    rule Ghasclz                      << TANGERINE_WHISTLE >> => false
     rule Gbls12g1msminputcheck        << TANGERINE_WHISTLE >> => false
     rule Gbls12g2msminputcheck        << TANGERINE_WHISTLE >> => false
     rule Gbls12pairingcheckinputcheck << TANGERINE_WHISTLE >> => false
@@ -612,6 +615,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << SPURIOUS_DRAGON >> => false
     rule Ghasdelegation               << SPURIOUS_DRAGON >> => false
     rule Gecpairinputcheck            << SPURIOUS_DRAGON >> => false
+    rule Ghasclz                      << SPURIOUS_DRAGON >> => false
     rule Gbls12g1msminputcheck        << SPURIOUS_DRAGON >> => false
     rule Gbls12g2msminputcheck        << SPURIOUS_DRAGON >> => false
     rule Gbls12pairingcheckinputcheck << SPURIOUS_DRAGON >> => false
@@ -740,6 +744,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << BYZANTIUM >> => false
     rule Ghasdelegation               << BYZANTIUM >> => false
     rule Gecpairinputcheck            << BYZANTIUM >> => false
+    rule Ghasclz                      << BYZANTIUM >> => false
     rule Gbls12g1msminputcheck        << BYZANTIUM >> => false
     rule Gbls12g2msminputcheck        << BYZANTIUM >> => false
     rule Gbls12pairingcheckinputcheck << BYZANTIUM >> => false
@@ -872,6 +877,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << CONSTANTINOPLE >> => false
     rule Ghasdelegation               << CONSTANTINOPLE >> => false
     rule Gecpairinputcheck            << CONSTANTINOPLE >> => false
+    rule Ghasclz                      << CONSTANTINOPLE >> => false
     rule Gbls12g1msminputcheck        << CONSTANTINOPLE >> => false
     rule Gbls12g2msminputcheck        << CONSTANTINOPLE >> => false
     rule Gbls12pairingcheckinputcheck << CONSTANTINOPLE >> => false
@@ -1004,6 +1010,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << PETERSBURG >> => false
     rule Ghasdelegation               << PETERSBURG >> => false
     rule Gecpairinputcheck            << PETERSBURG >> => false
+    rule Ghasclz                      << PETERSBURG >> => false
     rule Gbls12g1msminputcheck        << PETERSBURG >> => false
     rule Gbls12g2msminputcheck        << PETERSBURG >> => false
     rule Gbls12pairingcheckinputcheck << PETERSBURG >> => false
@@ -1136,6 +1143,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << ISTANBUL >> => false
     rule Ghasdelegation               << ISTANBUL >> => false
     rule Gecpairinputcheck            << ISTANBUL >> => false
+    rule Ghasclz                      << ISTANBUL >> => false
     rule Gbls12g1msminputcheck        << ISTANBUL >> => false
     rule Gbls12g2msminputcheck        << ISTANBUL >> => false
     rule Gbls12pairingcheckinputcheck << ISTANBUL >> => false
@@ -1269,6 +1277,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << BERLIN >> => false
     rule Ghasdelegation               << BERLIN >> => false
     rule Gecpairinputcheck            << BERLIN >> => false
+    rule Ghasclz                      << BERLIN >> => false
     rule Gbls12g1msminputcheck        << BERLIN >> => false
     rule Gbls12g2msminputcheck        << BERLIN >> => false
     rule Gbls12pairingcheckinputcheck << BERLIN >> => false
@@ -1402,6 +1411,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << LONDON >> => false
     rule Ghasdelegation               << LONDON >> => false
     rule Gecpairinputcheck            << LONDON >> => false
+    rule Ghasclz                      << LONDON >> => false
     rule Gbls12g1msminputcheck        << LONDON >> => false
     rule Gbls12g2msminputcheck        << LONDON >> => false
     rule Gbls12pairingcheckinputcheck << LONDON >> => false
@@ -1535,6 +1545,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << MERGE >> => false
     rule Ghasdelegation               << MERGE >> => false
     rule Gecpairinputcheck            << MERGE >> => false
+    rule Ghasclz                      << MERGE >> => false
     rule Gbls12g1msminputcheck        << MERGE >> => false
     rule Gbls12g2msminputcheck        << MERGE >> => false
     rule Gbls12pairingcheckinputcheck << MERGE >> => false
@@ -1669,6 +1680,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << SHANGHAI >> => false
     rule Ghasdelegation               << SHANGHAI >> => false
     rule Gecpairinputcheck            << SHANGHAI >> => false
+    rule Ghasclz                      << SHANGHAI >> => false
     rule Gbls12g1msminputcheck        << SHANGHAI >> => false
     rule Gbls12g2msminputcheck        << SHANGHAI >> => false
     rule Gbls12pairingcheckinputcheck << SHANGHAI >> => false
@@ -1803,6 +1815,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << CANCUN >> => false
     rule Ghasdelegation               << CANCUN >> => false
     rule Gecpairinputcheck            << CANCUN >> => false
+    rule Ghasclz                      << CANCUN >> => false
     rule Gbls12g1msminputcheck        << CANCUN >> => false
     rule Gbls12g2msminputcheck        << CANCUN >> => false
     rule Gbls12pairingcheckinputcheck << CANCUN >> => false
@@ -1939,6 +1952,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << PRAGUE >> => true
     rule Ghasdelegation               << PRAGUE >> => true
     rule Gecpairinputcheck            << PRAGUE >> => false
+    rule Ghasclz                      << PRAGUE >> => false
     rule Gbls12g1msminputcheck        << PRAGUE >> => false
     rule Gbls12g2msminputcheck        << PRAGUE >> => false
     rule Gbls12pairingcheckinputcheck << PRAGUE >> => false
@@ -2082,6 +2096,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << OSAKA >> => true
     rule Ghasdelegation               << OSAKA >> => true
     rule Gecpairinputcheck            << OSAKA >> => false
+    rule Ghasclz                      << OSAKA >> => true
     rule Gbls12g1msminputcheck        << OSAKA >> => false
     rule Gbls12g2msminputcheck        << OSAKA >> => false
     rule Gbls12pairingcheckinputcheck << OSAKA >> => false
@@ -2223,6 +2238,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << BEDROCK >> => false
     rule Ghasdelegation               << BEDROCK >> => false
     rule Gecpairinputcheck            << BEDROCK >> => false
+    rule Ghasclz                      << BEDROCK >> => false
     rule Gbls12g1msminputcheck        << BEDROCK >> => false
     rule Gbls12g2msminputcheck        << BEDROCK >> => false
     rule Gbls12pairingcheckinputcheck << BEDROCK >> => false
@@ -2356,6 +2372,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << REGOLITH >> => false
     rule Ghasdelegation               << REGOLITH >> => false
     rule Gecpairinputcheck            << REGOLITH >> => false
+    rule Ghasclz                      << REGOLITH >> => false
     rule Gbls12g1msminputcheck        << REGOLITH >> => false
     rule Gbls12g2msminputcheck        << REGOLITH >> => false
     rule Gbls12pairingcheckinputcheck << REGOLITH >> => false
@@ -2490,6 +2507,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << CANYON >> => false
     rule Ghasdelegation               << CANYON >> => false
     rule Gecpairinputcheck            << CANYON >> => false
+    rule Ghasclz                      << CANYON >> => false
     rule Gbls12g1msminputcheck        << CANYON >> => false
     rule Gbls12g2msminputcheck        << CANYON >> => false
     rule Gbls12pairingcheckinputcheck << CANYON >> => false
@@ -2624,6 +2642,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << ECOTONE >> => false
     rule Ghasdelegation               << ECOTONE >> => false
     rule Gecpairinputcheck            << ECOTONE >> => false
+    rule Ghasclz                      << ECOTONE >> => false
     rule Gbls12g1msminputcheck        << ECOTONE >> => false
     rule Gbls12g2msminputcheck        << ECOTONE >> => false
     rule Gbls12pairingcheckinputcheck << ECOTONE >> => false
@@ -2759,6 +2778,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << FJORD >> => false
     rule Ghasdelegation               << FJORD >> => false
     rule Gecpairinputcheck            << FJORD >> => false
+    rule Ghasclz                      << FJORD >> => false
     rule Gbls12g1msminputcheck        << FJORD >> => false
     rule Gbls12g2msminputcheck        << FJORD >> => false
     rule Gbls12pairingcheckinputcheck << FJORD >> => false
@@ -2895,6 +2915,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << GRANITE >> => false
     rule Ghasdelegation               << GRANITE >> => false
     rule Gecpairinputcheck            << GRANITE >> => true
+    rule Ghasclz                      << GRANITE >> => false
     rule Gbls12g1msminputcheck        << GRANITE >> => false
     rule Gbls12g2msminputcheck        << GRANITE >> => false
     rule Gbls12pairingcheckinputcheck << GRANITE >> => false
@@ -3031,6 +3052,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << HOLOCENE >> => false
     rule Ghasdelegation               << HOLOCENE >> => false
     rule Gecpairinputcheck            << HOLOCENE >> => true
+    rule Ghasclz                      << HOLOCENE >> => false
     rule Gbls12g1msminputcheck        << HOLOCENE >> => false
     rule Gbls12g2msminputcheck        << HOLOCENE >> => false
     rule Gbls12pairingcheckinputcheck << HOLOCENE >> => false
@@ -3168,6 +3190,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasbls12msmdiscount         << ISTHMUS >> => true
     rule Ghasdelegation               << ISTHMUS >> => true
     rule Gecpairinputcheck            << ISTHMUS >> => true
+    rule Ghasclz                      << ISTHMUS >> => false
     rule Gbls12g1msminputcheck        << ISTHMUS >> => true
     rule Gbls12g2msminputcheck        << ISTHMUS >> => true
     rule Gbls12pairingcheckinputcheck << ISTHMUS >> => true

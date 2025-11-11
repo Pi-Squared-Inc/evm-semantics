@@ -40,6 +40,10 @@ We use 256-bit machine integers as our word data type.
  // -------------------------------------------------------------
     rule maxUInt256p256 => 115792089237316195423570985008687907853269984665640564039457584007913129639935p256
 
+    syntax MInt{256} ::= "maxUInt255p256" [macro] /* 2^255 - 1 */
+ // -------------------------------------------------------------
+    rule maxUInt255p256 => 57896044618658097711785492504343953926634992332820282019728792003956564819967p256
+
     syntax Bool ::= #rangeNonceMInt256( MInt{256} ) [alias]
  // -------------------------------------------------------
     rule #rangeNonceMInt256(X) => 0p256 <=uMInt X andBool X <uMInt maxUInt64p256
@@ -70,6 +74,11 @@ We use 256-bit machine integers as our word data type.
  // -----------------------------------------------------
     rule mint2562Bool( W ) => false requires W  ==MInt 0p256
     rule mint2562Bool( W ) => true  requires W =/=MInt 0p256
+
+    syntax MInt{256} ::= clzMInt(MInt{256}) [function]
+ // -----------------------------------------------------
+    rule clzMInt(N) => 0p256                               requires N  >uMInt maxUInt255p256
+    rule clzMInt(N) => 1p256 +MInt clzMInt(N <<MInt 1p256) requires N <=uMInt maxUInt255p256
 
     syntax MInt{256} ::= #nBitsMInt256  ( MInt{256} )  [function]
                        | #nBytesMInt256 ( MInt{256} )  [function]

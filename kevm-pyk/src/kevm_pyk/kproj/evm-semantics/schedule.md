@@ -83,6 +83,7 @@ module SCHEDULE
                           | "Ghasbeaconroot"          | "Ghaseip6780"           | "Ghasblobbasefee"     | "Ghasblobhash"
                           | "Ghasbls12msmdiscount"    | "Ghasdelegation"        | "Gecpairinputcheck"   | "Ghasclz"
                           | "Gbls12g1msminputcheck"   | "Gbls12g2msminputcheck" | "Gbls12pairingcheckinputcheck"
+                          | "Ghasmodexplimits"
 
     syntax Bool ::= #isPrecompiledAccount ( MInt{256} , Schedule ) [symbol(isPrecompiledAccount), function, total, smtlib(isPrecompiledAccount)]
  // --------------------------------------------------------------------------------------------------------------------------------------------
@@ -106,7 +107,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
                            | "Gecpairconst"  | "Gecpaircoeff"  | "Gfround"       | "Gcoldsload"        | "Gcoldaccountaccess" | "Gwarmstorageread" | "Gaccesslistaddress"
                            | "Gaccessliststoragekey"           | "Rmaxquotient"  | "Ginitcodewordcost" | "maxInitCodeSize"    | "Gwarmstoragedirtystore"
                            | "Gpointeval"    | "Gbls12g1add"   | "Gbls12g1mul"   | "Gbls12g2add"       | "Gbls12g2mul"        | "Gbls12PairingCheckMul"
-                           | "Gbls12PairingCheckAdd"           | "Gbls12mapfptog1"                     | "Gbls12mapfp2tog2"   | "Gp256verify"
+                           | "Gbls12PairingCheckAdd"           | "Gbls12mapfptog1"                     | "Gbls12mapfp2tog2"   | "Gp256verify"      | "Gmexpfactor" 
+                           | "Gmexpmin"      | "Gminmultcomp"  | "Gmulcompfctr"                        | "Gmclencutoff"
  // ----------------------------------------------------------------------------------------------------------------------------------------------------
 ```
 
@@ -150,6 +152,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < FRONTIER > => 512
     rule Gcopy        < FRONTIER > => 3
     rule Gquaddivisor < FRONTIER > => 20
+    rule Gmexpfactor  < FRONTIER > => 8
+    rule Gmexpmin     < FRONTIER > => 200
+    rule Gminmultcomp < FRONTIER > => 0
+    rule Gmclencutoff < FRONTIER > => 0
+    rule Gmulcompfctr < FRONTIER > => 1
 
     rule Gtransaction   < FRONTIER > => 21000
     rule Gtxcreate      < FRONTIER > => 21000
@@ -279,6 +286,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < HOMESTEAD > => 512
     rule Gcopy        < HOMESTEAD > => 3
     rule Gquaddivisor < HOMESTEAD > => 20
+    rule Gmexpfactor  < HOMESTEAD > => 8
+    rule Gmexpmin     < HOMESTEAD > => 200
+    rule Gminmultcomp < HOMESTEAD > => 0
+    rule Gmclencutoff < HOMESTEAD > => 0
+    rule Gmulcompfctr < HOMESTEAD > => 1
 
     rule Gtransaction   < HOMESTEAD > => 21000
     rule Gtxcreate      < HOMESTEAD > => 53000
@@ -361,6 +373,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << HOMESTEAD >> => false
     rule Gbls12g2msminputcheck        << HOMESTEAD >> => false
     rule Gbls12pairingcheckinputcheck << HOMESTEAD >> => false
+    rule Ghasmodexplimits             << HOMESTEAD >> => false
 
     rule #isPrecompiledAccount(1p256, HOMESTEAD) => true
     rule #isPrecompiledAccount(2p256, HOMESTEAD) => true
@@ -408,6 +421,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < TANGERINE_WHISTLE > => 512
     rule Gcopy        < TANGERINE_WHISTLE > => 3
     rule Gquaddivisor < TANGERINE_WHISTLE > => 20
+    rule Gmexpfactor  < TANGERINE_WHISTLE > => 8
+    rule Gmexpmin     < TANGERINE_WHISTLE > => 200
+    rule Gminmultcomp < TANGERINE_WHISTLE > => 0
+    rule Gmclencutoff < TANGERINE_WHISTLE > => 0
+    rule Gmulcompfctr < TANGERINE_WHISTLE > => 1
 
     rule Gtransaction   < TANGERINE_WHISTLE > => 21000
     rule Gtxcreate      < TANGERINE_WHISTLE > => 53000
@@ -490,6 +508,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << TANGERINE_WHISTLE >> => false
     rule Gbls12g2msminputcheck        << TANGERINE_WHISTLE >> => false
     rule Gbls12pairingcheckinputcheck << TANGERINE_WHISTLE >> => false
+    rule Ghasmodexplimits             << TANGERINE_WHISTLE >> => false
 
     rule #isPrecompiledAccount(1p256, TANGERINE_WHISTLE) => true
     rule #isPrecompiledAccount(2p256, TANGERINE_WHISTLE) => true
@@ -537,6 +556,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < SPURIOUS_DRAGON > => 512
     rule Gcopy        < SPURIOUS_DRAGON > => 3
     rule Gquaddivisor < SPURIOUS_DRAGON > => 20
+    rule Gmexpfactor  < SPURIOUS_DRAGON > => 8
+    rule Gmexpmin     < SPURIOUS_DRAGON > => 200
+    rule Gminmultcomp < SPURIOUS_DRAGON > => 0
+    rule Gmclencutoff < SPURIOUS_DRAGON > => 0
+    rule Gmulcompfctr < SPURIOUS_DRAGON > => 1
 
     rule Gtransaction   < SPURIOUS_DRAGON > => 21000
     rule Gtxcreate      < SPURIOUS_DRAGON > => 53000
@@ -619,6 +643,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << SPURIOUS_DRAGON >> => false
     rule Gbls12g2msminputcheck        << SPURIOUS_DRAGON >> => false
     rule Gbls12pairingcheckinputcheck << SPURIOUS_DRAGON >> => false
+    rule Ghasmodexplimits             << SPURIOUS_DRAGON >> => false
 
     rule #isPrecompiledAccount(1p256, SPURIOUS_DRAGON) => true
     rule #isPrecompiledAccount(2p256, SPURIOUS_DRAGON) => true
@@ -666,6 +691,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < BYZANTIUM > => 512
     rule Gcopy        < BYZANTIUM > => 3
     rule Gquaddivisor < BYZANTIUM > => 20
+    rule Gmexpfactor  < BYZANTIUM > => 8
+    rule Gmexpmin     < BYZANTIUM > => 200
+    rule Gminmultcomp < BYZANTIUM > => 0
+    rule Gmclencutoff < BYZANTIUM > => 0
+    rule Gmulcompfctr < BYZANTIUM > => 1
 
     rule Gtransaction   < BYZANTIUM > => 21000
     rule Gtxcreate      < BYZANTIUM > => 53000
@@ -748,6 +778,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << BYZANTIUM >> => false
     rule Gbls12g2msminputcheck        << BYZANTIUM >> => false
     rule Gbls12pairingcheckinputcheck << BYZANTIUM >> => false
+    rule Ghasmodexplimits             << BYZANTIUM >> => false
 
     rule #isPrecompiledAccount(1p256, BYZANTIUM) => true
     rule #isPrecompiledAccount(2p256, BYZANTIUM) => true
@@ -799,6 +830,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < CONSTANTINOPLE > => 512
     rule Gcopy        < CONSTANTINOPLE > => 3
     rule Gquaddivisor < CONSTANTINOPLE > => 20
+    rule Gmexpfactor  < CONSTANTINOPLE > => 8
+    rule Gmexpmin     < CONSTANTINOPLE > => 200
+    rule Gminmultcomp < CONSTANTINOPLE > => 0
+    rule Gmclencutoff < CONSTANTINOPLE > => 0
+    rule Gmulcompfctr < CONSTANTINOPLE > => 1
 
     rule Gtransaction   < CONSTANTINOPLE > => 21000
     rule Gtxcreate      < CONSTANTINOPLE > => 53000
@@ -881,6 +917,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << CONSTANTINOPLE >> => false
     rule Gbls12g2msminputcheck        << CONSTANTINOPLE >> => false
     rule Gbls12pairingcheckinputcheck << CONSTANTINOPLE >> => false
+    rule Ghasmodexplimits             << CONSTANTINOPLE >> => false
 
     rule #isPrecompiledAccount(1p256, CONSTANTINOPLE) => true
     rule #isPrecompiledAccount(2p256, CONSTANTINOPLE) => true
@@ -932,6 +969,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < PETERSBURG > => 512
     rule Gcopy        < PETERSBURG > => 3
     rule Gquaddivisor < PETERSBURG > => 20
+    rule Gmexpfactor  < PETERSBURG > => 8
+    rule Gmexpmin     < PETERSBURG > => 200
+    rule Gminmultcomp < PETERSBURG > => 0
+    rule Gmclencutoff < PETERSBURG > => 0
+    rule Gmulcompfctr < PETERSBURG > => 1
 
     rule Gtransaction   < PETERSBURG > => 21000
     rule Gtxcreate      < PETERSBURG > => 53000
@@ -1014,6 +1056,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << PETERSBURG >> => false
     rule Gbls12g2msminputcheck        << PETERSBURG >> => false
     rule Gbls12pairingcheckinputcheck << PETERSBURG >> => false
+    rule Ghasmodexplimits             << PETERSBURG >> => false
 
     rule #isPrecompiledAccount(1p256, PETERSBURG) => true
     rule #isPrecompiledAccount(2p256, PETERSBURG) => true
@@ -1065,6 +1108,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < ISTANBUL > => 512
     rule Gcopy        < ISTANBUL > => 3
     rule Gquaddivisor < ISTANBUL > => 20
+    rule Gmexpfactor  < ISTANBUL > => 8
+    rule Gmexpmin     < ISTANBUL > => 200
+    rule Gminmultcomp < ISTANBUL > => 0
+    rule Gmclencutoff < ISTANBUL > => 0
+    rule Gmulcompfctr < ISTANBUL > => 1
 
     rule Gtransaction   < ISTANBUL > => 21000
     rule Gtxcreate      < ISTANBUL > => 53000
@@ -1147,6 +1195,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << ISTANBUL >> => false
     rule Gbls12g2msminputcheck        << ISTANBUL >> => false
     rule Gbls12pairingcheckinputcheck << ISTANBUL >> => false
+    rule Ghasmodexplimits             << ISTANBUL >> => false
 
     rule #isPrecompiledAccount(1p256, ISTANBUL) => true
     rule #isPrecompiledAccount(2p256, ISTANBUL) => true
@@ -1199,6 +1248,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < BERLIN > => 512
     rule Gcopy        < BERLIN > => 3
     rule Gquaddivisor < BERLIN > => 3
+    rule Gmexpfactor  < BERLIN > => 8
+    rule Gmexpmin     < BERLIN > => 200
+    rule Gminmultcomp < BERLIN > => 0
+    rule Gmclencutoff < BERLIN > => 0
+    rule Gmulcompfctr < BERLIN > => 1
 
     rule Gtransaction   < BERLIN > => 21000
     rule Gtxcreate      < BERLIN > => 53000
@@ -1281,6 +1335,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << BERLIN >> => false
     rule Gbls12g2msminputcheck        << BERLIN >> => false
     rule Gbls12pairingcheckinputcheck << BERLIN >> => false
+    rule Ghasmodexplimits             << BERLIN >> => false
 
     rule #isPrecompiledAccount(1p256, BERLIN) => true
     rule #isPrecompiledAccount(2p256, BERLIN) => true
@@ -1333,6 +1388,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < LONDON > => 512
     rule Gcopy        < LONDON > => 3
     rule Gquaddivisor < LONDON > => 3
+    rule Gmexpfactor  < LONDON > => 8
+    rule Gmexpmin     < LONDON > => 200
+    rule Gminmultcomp < LONDON > => 0
+    rule Gmclencutoff < LONDON > => 0
+    rule Gmulcompfctr < LONDON > => 1
 
     rule Gtransaction   < LONDON > => 21000
     rule Gtxcreate      < LONDON > => 53000
@@ -1415,6 +1475,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << LONDON >> => false
     rule Gbls12g2msminputcheck        << LONDON >> => false
     rule Gbls12pairingcheckinputcheck << LONDON >> => false
+    rule Ghasmodexplimits             << LONDON >> => false
 
     rule #isPrecompiledAccount(1p256, LONDON) => true
     rule #isPrecompiledAccount(2p256, LONDON) => true
@@ -1467,6 +1528,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < MERGE > => 512
     rule Gcopy        < MERGE > => 3
     rule Gquaddivisor < MERGE > => 3
+    rule Gmexpfactor  < MERGE > => 8
+    rule Gmexpmin     < MERGE > => 200
+    rule Gminmultcomp < MERGE > => 0
+    rule Gmclencutoff < MERGE > => 0
+    rule Gmulcompfctr < MERGE > => 1
 
     rule Gtransaction   < MERGE > => 21000
     rule Gtxcreate      < MERGE > => 53000
@@ -1549,6 +1615,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << MERGE >> => false
     rule Gbls12g2msminputcheck        << MERGE >> => false
     rule Gbls12pairingcheckinputcheck << MERGE >> => false
+    rule Ghasmodexplimits             << MERGE >> => false
 
     rule #isPrecompiledAccount(1p256, MERGE) => true
     rule #isPrecompiledAccount(2p256, MERGE) => true
@@ -1602,6 +1669,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < SHANGHAI > => 512
     rule Gcopy        < SHANGHAI > => 3
     rule Gquaddivisor < SHANGHAI > => 3
+    rule Gmexpfactor  < SHANGHAI > => 8
+    rule Gmexpmin     < SHANGHAI > => 200
+    rule Gminmultcomp < SHANGHAI > => 0
+    rule Gmclencutoff < SHANGHAI > => 0
+    rule Gmulcompfctr < SHANGHAI > => 1
 
     rule Gtransaction   < SHANGHAI > => 21000
     rule Gtxcreate      < SHANGHAI > => 53000
@@ -1684,6 +1756,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << SHANGHAI >> => false
     rule Gbls12g2msminputcheck        << SHANGHAI >> => false
     rule Gbls12pairingcheckinputcheck << SHANGHAI >> => false
+    rule Ghasmodexplimits             << SHANGHAI >> => false
 
     rule #isPrecompiledAccount(1p256, SHANGHAI) => true
     rule #isPrecompiledAccount(2p256, SHANGHAI) => true
@@ -1737,6 +1810,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < CANCUN > => 512
     rule Gcopy        < CANCUN > => 3
     rule Gquaddivisor < CANCUN > => 3
+    rule Gmexpfactor  < CANCUN > => 8
+    rule Gmexpmin     < CANCUN > => 200
+    rule Gminmultcomp < CANCUN > => 0
+    rule Gmclencutoff < CANCUN > => 0
+    rule Gmulcompfctr < CANCUN > => 1
 
     rule Gtransaction   < CANCUN > => 21000
     rule Gtxcreate      < CANCUN > => 53000
@@ -1819,6 +1897,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << CANCUN >> => false
     rule Gbls12g2msminputcheck        << CANCUN >> => false
     rule Gbls12pairingcheckinputcheck << CANCUN >> => false
+    rule Ghasmodexplimits             << CANCUN >> => false
 
     rule #isPrecompiledAccount(1p256, CANCUN) => true
     rule #isPrecompiledAccount(2p256, CANCUN) => true
@@ -1874,6 +1953,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < PRAGUE > => 512
     rule Gcopy        < PRAGUE > => 3
     rule Gquaddivisor < PRAGUE > => 3
+    rule Gmexpfactor  < PRAGUE > => 8
+    rule Gmexpmin     < PRAGUE > => 200
+    rule Gminmultcomp < PRAGUE > => 0
+    rule Gmclencutoff < PRAGUE > => 0
+    rule Gmulcompfctr < PRAGUE > => 1
 
     rule Gtransaction   < PRAGUE > => 21000
     rule Gtxcreate      < PRAGUE > => 53000
@@ -1956,6 +2040,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << PRAGUE >> => false
     rule Gbls12g2msminputcheck        << PRAGUE >> => false
     rule Gbls12pairingcheckinputcheck << PRAGUE >> => false
+    rule Ghasmodexplimits             << PRAGUE >> => false
 
     rule #isPrecompiledAccount(1p256, PRAGUE) => true
     rule #isPrecompiledAccount(2p256, PRAGUE) => true
@@ -2017,7 +2102,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gmemory      < OSAKA > => 3
     rule Gquadcoeff   < OSAKA > => 512
     rule Gcopy        < OSAKA > => 3
-    rule Gquaddivisor < OSAKA > => 3
+    rule Gquaddivisor < OSAKA > => 1
+    rule Gmexpfactor  < OSAKA > => 16
+    rule Gmexpmin     < OSAKA > => 500
+    rule Gminmultcomp < OSAKA > => 16
+    rule Gmclencutoff < OSAKA > => 32
+    rule Gmulcompfctr < OSAKA > => 2
 
     rule Gtransaction   < OSAKA > => 21000
     rule Gtxcreate      < OSAKA > => 53000
@@ -2100,6 +2190,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << OSAKA >> => false
     rule Gbls12g2msminputcheck        << OSAKA >> => false
     rule Gbls12pairingcheckinputcheck << OSAKA >> => false
+    rule Ghasmodexplimits             << OSAKA >> => true
 
     rule #isPrecompiledAccount(1p256, OSAKA) => true
     rule #isPrecompiledAccount(2p256, OSAKA) => true
@@ -2160,6 +2251,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < BEDROCK > => 512
     rule Gcopy        < BEDROCK > => 3
     rule Gquaddivisor < BEDROCK > => 3
+    rule Gmexpfactor  < BEDROCK > => 8
+    rule Gmexpmin     < BEDROCK > => 200
+    rule Gminmultcomp < BEDROCK > => 0
+    rule Gmclencutoff < BEDROCK > => 0
+    rule Gmulcompfctr < BEDROCK > => 1
 
     rule Gtransaction   < BEDROCK > => 21000
     rule Gtxcreate      < BEDROCK > => 53000
@@ -2242,6 +2338,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << BEDROCK >> => false
     rule Gbls12g2msminputcheck        << BEDROCK >> => false
     rule Gbls12pairingcheckinputcheck << BEDROCK >> => false
+    rule Ghasmodexplimits             << BEDROCK >> => false
 
     rule #isPrecompiledAccount(1p256, BEDROCK) => true
     rule #isPrecompiledAccount(2p256, BEDROCK) => true
@@ -2294,6 +2391,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < REGOLITH > => 512
     rule Gcopy        < REGOLITH > => 3
     rule Gquaddivisor < REGOLITH > => 3
+    rule Gmexpfactor  < REGOLITH > => 8
+    rule Gmexpmin     < REGOLITH > => 200
+    rule Gminmultcomp < REGOLITH > => 0
+    rule Gmclencutoff < REGOLITH > => 0
+    rule Gmulcompfctr < REGOLITH > => 1
 
     rule Gtransaction   < REGOLITH > => 21000
     rule Gtxcreate      < REGOLITH > => 53000
@@ -2376,6 +2478,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << REGOLITH >> => false
     rule Gbls12g2msminputcheck        << REGOLITH >> => false
     rule Gbls12pairingcheckinputcheck << REGOLITH >> => false
+    rule Ghasmodexplimits             << REGOLITH >> => false
 
     rule #isPrecompiledAccount(1p256, REGOLITH) => true
     rule #isPrecompiledAccount(2p256, REGOLITH) => true
@@ -2429,6 +2532,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < CANYON > => 512
     rule Gcopy        < CANYON > => 3
     rule Gquaddivisor < CANYON > => 3
+    rule Gmexpfactor  < CANYON > => 8
+    rule Gmexpmin     < CANYON > => 200
+    rule Gminmultcomp < CANYON > => 0
+    rule Gmclencutoff < CANYON > => 0
+    rule Gmulcompfctr < CANYON > => 1
 
     rule Gtransaction   < CANYON > => 21000
     rule Gtxcreate      < CANYON > => 53000
@@ -2511,6 +2619,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << CANYON >> => false
     rule Gbls12g2msminputcheck        << CANYON >> => false
     rule Gbls12pairingcheckinputcheck << CANYON >> => false
+    rule Ghasmodexplimits             << CANYON >> => false
 
     rule #isPrecompiledAccount(1p256, CANYON) => true
     rule #isPrecompiledAccount(2p256, CANYON) => true
@@ -2564,6 +2673,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < ECOTONE > => 512
     rule Gcopy        < ECOTONE > => 3
     rule Gquaddivisor < ECOTONE > => 3
+    rule Gmexpfactor  < ECOTONE > => 8
+    rule Gmexpmin     < ECOTONE > => 200
+    rule Gminmultcomp < ECOTONE > => 0
+    rule Gmclencutoff < ECOTONE > => 0
+    rule Gmulcompfctr < ECOTONE > => 1
 
     rule Gtransaction   < ECOTONE > => 21000
     rule Gtxcreate      < ECOTONE > => 53000
@@ -2646,6 +2760,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << ECOTONE >> => false
     rule Gbls12g2msminputcheck        << ECOTONE >> => false
     rule Gbls12pairingcheckinputcheck << ECOTONE >> => false
+    rule Ghasmodexplimits             << ECOTONE >> => false
 
     rule #isPrecompiledAccount(1p256, ECOTONE) => true
     rule #isPrecompiledAccount(2p256, ECOTONE) => true
@@ -2700,6 +2815,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < FJORD > => 512
     rule Gcopy        < FJORD > => 3
     rule Gquaddivisor < FJORD > => 3
+    rule Gmexpfactor  < FJORD > => 8
+    rule Gmexpmin     < FJORD > => 200
+    rule Gminmultcomp < FJORD > => 0
+    rule Gmclencutoff < FJORD > => 0
+    rule Gmulcompfctr < FJORD > => 1
 
     rule Gtransaction   < FJORD > => 21000
     rule Gtxcreate      < FJORD > => 53000
@@ -2782,6 +2902,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << FJORD >> => false
     rule Gbls12g2msminputcheck        << FJORD >> => false
     rule Gbls12pairingcheckinputcheck << FJORD >> => false
+    rule Ghasmodexplimits             << FJORD >> => false
 
     rule #isPrecompiledAccount(1p256, FJORD) => true
     rule #isPrecompiledAccount(2p256, FJORD) => true
@@ -2837,6 +2958,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < GRANITE > => 512
     rule Gcopy        < GRANITE > => 3
     rule Gquaddivisor < GRANITE > => 3
+    rule Gmexpfactor  < GRANITE > => 8
+    rule Gmexpmin     < GRANITE > => 200
+    rule Gminmultcomp < GRANITE > => 0
+    rule Gmclencutoff < GRANITE > => 0
+    rule Gmulcompfctr < GRANITE > => 1
 
     rule Gtransaction   < GRANITE > => 21000
     rule Gtxcreate      < GRANITE > => 53000
@@ -2919,6 +3045,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << GRANITE >> => false
     rule Gbls12g2msminputcheck        << GRANITE >> => false
     rule Gbls12pairingcheckinputcheck << GRANITE >> => false
+    rule Ghasmodexplimits             << GRANITE >> => false
 
     rule #isPrecompiledAccount(1p256, GRANITE) => true
     rule #isPrecompiledAccount(2p256, GRANITE) => true
@@ -2974,6 +3101,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < HOLOCENE > => 512
     rule Gcopy        < HOLOCENE > => 3
     rule Gquaddivisor < HOLOCENE > => 3
+    rule Gmexpfactor  < HOLOCENE > => 8
+    rule Gmexpmin     < HOLOCENE > => 200
+    rule Gminmultcomp < HOLOCENE > => 0
+    rule Gmclencutoff < HOLOCENE > => 0
+    rule Gmulcompfctr < HOLOCENE > => 1
 
     rule Gtransaction   < HOLOCENE > => 21000
     rule Gtxcreate      < HOLOCENE > => 53000
@@ -3056,6 +3188,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << HOLOCENE >> => false
     rule Gbls12g2msminputcheck        << HOLOCENE >> => false
     rule Gbls12pairingcheckinputcheck << HOLOCENE >> => false
+    rule Ghasmodexplimits             << HOLOCENE >> => false
 
     rule #isPrecompiledAccount(1p256, HOLOCENE) => true
     rule #isPrecompiledAccount(2p256, HOLOCENE) => true
@@ -3112,6 +3245,11 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquadcoeff   < ISTHMUS > => 512
     rule Gcopy        < ISTHMUS > => 3
     rule Gquaddivisor < ISTHMUS > => 3
+    rule Gmexpfactor  < ISTHMUS > => 8
+    rule Gmexpmin     < ISTHMUS > => 200
+    rule Gminmultcomp < ISTHMUS > => 0
+    rule Gmclencutoff < ISTHMUS > => 0
+    rule Gmulcompfctr < ISTHMUS > => 1
 
     rule Gtransaction   < ISTHMUS > => 21000
     rule Gtxcreate      < ISTHMUS > => 53000
@@ -3194,6 +3332,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12g1msminputcheck        << ISTHMUS >> => true
     rule Gbls12g2msminputcheck        << ISTHMUS >> => true
     rule Gbls12pairingcheckinputcheck << ISTHMUS >> => true
+    rule Ghasmodexplimits             << ISTHMUS >> => false
 
     rule #isPrecompiledAccount(1p256, ISTHMUS) => true
     rule #isPrecompiledAccount(2p256, ISTHMUS) => true

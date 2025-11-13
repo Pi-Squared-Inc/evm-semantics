@@ -1342,6 +1342,21 @@ Precompiled Contracts
     rule <k> MODEXP => #end EVMC_SUCCESS ... </k>
          <output> _ => #let DATA = CD #in #modexp1(#asWord(#range(DATA, 0, 32)), #asWord(#range(DATA, 32, 32)), #asWord(#range(DATA, 64, 32)), #range(DATA, 96, maxInt(0, lengthBytes(DATA) -Int 96))) </output>
          <callData> CD </callData>
+      requires modexpInputRangeCheck(CD)
+
+   rule <k> MODEXP => #end EVMC_PRECOMPILE_FAILURE ... </k>
+        <callData> CD </callData>
+      requires notBool modexpInputRangeCheck(CD)
+
+    syntax Int ::= "modexpInputLimit" [macro]
+ // -----------------------------------------------------
+    rule modexpInputLimit => 1024
+
+    syntax Bool ::= modexpInputRangeCheck(Bytes) [function]
+    rule modexpInputRangeCheck(DATA) => false requires #asWord(#range(DATA, 0, 32)) >Int modexpInputLimit
+    rule modexpInputRangeCheck(DATA) => false requires #asWord(#range(DATA, 32, 32)) >Int modexpInputLimit
+    rule modexpInputRangeCheck(DATA) => false requires #asWord(#range(DATA, 64, 32)) >Int modexpInputLimit
+    rule modexpInputRangeCheck(DATA) => true [owise]
 
     syntax Bytes ::= #modexp1 ( Int , Int , Int , Bytes ) [symbol(#modexp1), function]
                    | #modexp2 ( Int , Int , Int , Bytes ) [symbol(#modexp2), function]

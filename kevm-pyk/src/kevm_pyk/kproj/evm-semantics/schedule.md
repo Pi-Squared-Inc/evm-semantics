@@ -153,7 +153,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < FRONTIER > => 20
     rule Gmexpfactor  < FRONTIER > => 8
     rule Gmexpmin     < FRONTIER > => 200
-    rule Gminmultcomp  < FRONTIER > => 0
+    rule Gminmultcomp < FRONTIER > => 0
     rule Gmclencutoff < FRONTIER > => 0
     rule Gmulcompfctr < FRONTIER > => 1
 

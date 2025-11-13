@@ -208,17 +208,12 @@ module GAS-FEES
       requires notBool Ghasaccesslist << SCHED >>
       [concrete]
 
-    rule [Cmodexp.new]: Cmodexp(SCHED, DATA, BASELEN, EXPLEN, MODLEN) => maxInt(Gmexpmin < SCHED >,
-    (
-    ( #if maxInt(BASELEN, MODLEN) >Int Gmclencutoff < SCHED > #then
-      (Gmultcompfactor < SCHED > *Int #newMultComplexity(maxInt(BASELEN, MODLEN)))
-      #else
-      Gminmultcomp < SCHED >
-      #fi
+    rule [Cmodexp.new]: Cmodexp(SCHED, DATA, BASELEN, EXPLEN, MODLEN) => maxInt(
+      Gmexpmin < SCHED >,
+      (#if maxInt(BASELEN, MODLEN) >Int Gmclencutoff < SCHED > #then (Gmulcompfctr < SCHED > *Int #newMultComplexity(maxInt(BASELEN, MODLEN))) #else Gminmultcomp < SCHED > #fi 
+        *Int maxInt(#adjustedExpLength(BASELEN, EXPLEN, DATA, Gmexpfactor < SCHED >), 1)) 
+    /Int Gquaddivisor < SCHED > 
     )
-
-    *Int maxInt(#adjustedExpLength(BASELEN, EXPLEN, DATA,
-    Gmexpfactor < SCHED >), 1)) /Int Gquaddivisor < SCHED > )
       requires Ghasaccesslist << SCHED >>
       [concrete]
 

@@ -106,9 +106,8 @@ A `ScheduleConst` is a constant determined by the fee schedule.
                            | "Gecpairconst"  | "Gecpaircoeff"  | "Gfround"       | "Gcoldsload"        | "Gcoldaccountaccess" | "Gwarmstorageread" | "Gaccesslistaddress"
                            | "Gaccessliststoragekey"           | "Rmaxquotient"  | "Ginitcodewordcost" | "maxInitCodeSize"    | "Gwarmstoragedirtystore"
                            | "Gpointeval"    | "Gbls12g1add"   | "Gbls12g1mul"   | "Gbls12g2add"       | "Gbls12g2mul"        | "Gbls12PairingCheckMul"
-                           | "Gbls12PairingCheckAdd"           | "Gbls12mapfptog1"                     |
-                           "Gbls12mapfp2tog2"   | "Gp256verify"      | "Gmexpfactor" | "Gmexpmin" | 
-                           "Gminmultcomp" | "Gmultcompfactor" | "Gmclencutoff"
+                           | "Gbls12PairingCheckAdd"           | "Gbls12mapfptog1"                     | "Gbls12mapfp2tog2"   | "Gp256verify"      | "Gmexpfactor" 
+                           | "Gmexpmin"      | "Gminmultcomp"  | "Gmulcompfctr"                        | "Gmclencutoff"
  // ----------------------------------------------------------------------------------------------------------------------------------------------------
 ```
 
@@ -154,9 +153,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < FRONTIER > => 20
     rule Gmexpfactor  < FRONTIER > => 8
     rule Gmexpmin     < FRONTIER > => 200
-    rule Gminmultcomp    < FRONTIER > => 0
-    rule Gmclencutoff    < FRONTIER > => 0
-    rule Gmultcompfactor < FRONTIER > => 1
+    rule Gminmultcomp  < FRONTIER > => 0
+    rule Gmclencutoff < FRONTIER > => 0
+    rule Gmulcompfctr < FRONTIER > => 1
 
     rule Gtransaction   < FRONTIER > => 21000
     rule Gtxcreate      < FRONTIER > => 21000
@@ -288,9 +287,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < HOMESTEAD > => 20
     rule Gmexpfactor  < HOMESTEAD > => 8
     rule Gmexpmin     < HOMESTEAD > => 200
-    rule Gminmultcomp    < HOMESTEAD > => 0
-    rule Gmclencutoff    < HOMESTEAD > => 0
-    rule Gmultcompfactor < HOMESTEAD > => 1
+    rule Gminmultcomp < HOMESTEAD > => 0
+    rule Gmclencutoff < HOMESTEAD > => 0
+    rule Gmulcompfctr < HOMESTEAD > => 1
 
     rule Gtransaction   < HOMESTEAD > => 21000
     rule Gtxcreate      < HOMESTEAD > => 53000
@@ -422,9 +421,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < TANGERINE_WHISTLE > => 20
     rule Gmexpfactor  < TANGERINE_WHISTLE > => 8
     rule Gmexpmin     < TANGERINE_WHISTLE > => 200
-    rule Gminmultcomp    < TANGERINE_WHISTLE > => 0
-    rule Gmclencutoff    < TANGERINE_WHISTLE > => 0
-    rule Gmultcompfactor < TANGERINE_WHISTLE > => 1
+    rule Gminmultcomp < TANGERINE_WHISTLE > => 0
+    rule Gmclencutoff < TANGERINE_WHISTLE > => 0
+    rule Gmulcompfctr < TANGERINE_WHISTLE > => 1
 
     rule Gtransaction   < TANGERINE_WHISTLE > => 21000
     rule Gtxcreate      < TANGERINE_WHISTLE > => 53000
@@ -556,9 +555,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < SPURIOUS_DRAGON > => 20
     rule Gmexpfactor  < SPURIOUS_DRAGON > => 8
     rule Gmexpmin     < SPURIOUS_DRAGON > => 200
-    rule Gminmultcomp    < SPURIOUS_DRAGON > => 0
-    rule Gmclencutoff    < SPURIOUS_DRAGON > => 0
-    rule Gmultcompfactor < SPURIOUS_DRAGON > => 1
+    rule Gminmultcomp < SPURIOUS_DRAGON > => 0
+    rule Gmclencutoff < SPURIOUS_DRAGON > => 0
+    rule Gmulcompfctr < SPURIOUS_DRAGON > => 1
 
     rule Gtransaction   < SPURIOUS_DRAGON > => 21000
     rule Gtxcreate      < SPURIOUS_DRAGON > => 53000
@@ -690,9 +689,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < BYZANTIUM > => 20
     rule Gmexpfactor  < BYZANTIUM > => 8
     rule Gmexpmin     < BYZANTIUM > => 200
-    rule Gminmultcomp    < BYZANTIUM > => 0
-    rule Gmclencutoff    < BYZANTIUM > => 0
-    rule Gmultcompfactor < BYZANTIUM > => 1
+    rule Gminmultcomp < BYZANTIUM > => 0
+    rule Gmclencutoff < BYZANTIUM > => 0
+    rule Gmulcompfctr < BYZANTIUM > => 1
 
     rule Gtransaction   < BYZANTIUM > => 21000
     rule Gtxcreate      < BYZANTIUM > => 53000
@@ -828,9 +827,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < CONSTANTINOPLE > => 20
     rule Gmexpfactor  < CONSTANTINOPLE > => 8
     rule Gmexpmin     < CONSTANTINOPLE > => 200
-    rule Gminmultcomp    < CONSTANTINOPLE > => 0
-    rule Gmclencutoff    < CONSTANTINOPLE > => 0
-    rule Gmultcompfactor < CONSTANTINOPLE > => 1
+    rule Gminmultcomp < CONSTANTINOPLE > => 0
+    rule Gmclencutoff < CONSTANTINOPLE > => 0
+    rule Gmulcompfctr < CONSTANTINOPLE > => 1
 
     rule Gtransaction   < CONSTANTINOPLE > => 21000
     rule Gtxcreate      < CONSTANTINOPLE > => 53000
@@ -966,9 +965,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < PETERSBURG > => 20
     rule Gmexpfactor  < PETERSBURG > => 8
     rule Gmexpmin     < PETERSBURG > => 200
-    rule Gminmultcomp    < PETERSBURG > => 0
-    rule Gmclencutoff    < PETERSBURG > => 0
-    rule Gmultcompfactor < PETERSBURG > => 1
+    rule Gminmultcomp < PETERSBURG > => 0
+    rule Gmclencutoff < PETERSBURG > => 0
+    rule Gmulcompfctr < PETERSBURG > => 1
 
     rule Gtransaction   < PETERSBURG > => 21000
     rule Gtxcreate      < PETERSBURG > => 53000
@@ -1104,9 +1103,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < ISTANBUL > => 20
     rule Gmexpfactor  < ISTANBUL > => 8
     rule Gmexpmin     < ISTANBUL > => 200
-    rule Gminmultcomp    < ISTANBUL > => 0
-    rule Gmclencutoff    < ISTANBUL > => 0
-    rule Gmultcompfactor < ISTANBUL > => 1
+    rule Gminmultcomp < ISTANBUL > => 0
+    rule Gmclencutoff < ISTANBUL > => 0
+    rule Gmulcompfctr < ISTANBUL > => 1
 
     rule Gtransaction   < ISTANBUL > => 21000
     rule Gtxcreate      < ISTANBUL > => 53000
@@ -1243,9 +1242,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < BERLIN > => 3
     rule Gmexpfactor  < BERLIN > => 8
     rule Gmexpmin     < BERLIN > => 200
-    rule Gminmultcomp    < BERLIN > => 0
-    rule Gmclencutoff    < BERLIN > => 0
-    rule Gmultcompfactor < BERLIN > => 1
+    rule Gminmultcomp < BERLIN > => 0
+    rule Gmclencutoff < BERLIN > => 0
+    rule Gmulcompfctr < BERLIN > => 1
 
     rule Gtransaction   < BERLIN > => 21000
     rule Gtxcreate      < BERLIN > => 53000
@@ -1382,9 +1381,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < LONDON > => 3
     rule Gmexpfactor  < LONDON > => 8
     rule Gmexpmin     < LONDON > => 200
-    rule Gminmultcomp    < LONDON > => 0
-    rule Gmclencutoff    < LONDON > => 0
-    rule Gmultcompfactor < LONDON > => 1
+    rule Gminmultcomp < LONDON > => 0
+    rule Gmclencutoff < LONDON > => 0
+    rule Gmulcompfctr < LONDON > => 1
 
     rule Gtransaction   < LONDON > => 21000
     rule Gtxcreate      < LONDON > => 53000
@@ -1521,9 +1520,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < MERGE > => 3
     rule Gmexpfactor  < MERGE > => 8
     rule Gmexpmin     < MERGE > => 200
-    rule Gminmultcomp    < MERGE > => 0
-    rule Gmclencutoff    < MERGE > => 0
-    rule Gmultcompfactor < MERGE > => 1
+    rule Gminmultcomp < MERGE > => 0
+    rule Gmclencutoff < MERGE > => 0
+    rule Gmulcompfctr < MERGE > => 1
 
     rule Gtransaction   < MERGE > => 21000
     rule Gtxcreate      < MERGE > => 53000
@@ -1661,9 +1660,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < SHANGHAI > => 3
     rule Gmexpfactor  < SHANGHAI > => 8
     rule Gmexpmin     < SHANGHAI > => 200
-    rule Gminmultcomp    < SHANGHAI > => 0
-    rule Gmclencutoff    < SHANGHAI > => 0
-    rule Gmultcompfactor < SHANGHAI > => 1
+    rule Gminmultcomp < SHANGHAI > => 0
+    rule Gmclencutoff < SHANGHAI > => 0
+    rule Gmulcompfctr < SHANGHAI > => 1
 
     rule Gtransaction   < SHANGHAI > => 21000
     rule Gtxcreate      < SHANGHAI > => 53000
@@ -1801,9 +1800,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < CANCUN > => 3
     rule Gmexpfactor  < CANCUN > => 8
     rule Gmexpmin     < CANCUN > => 200
-    rule Gminmultcomp    < CANCUN > => 0
-    rule Gmclencutoff    < CANCUN > => 0
-    rule Gmultcompfactor < CANCUN > => 1
+    rule Gminmultcomp < CANCUN > => 0
+    rule Gmclencutoff < CANCUN > => 0
+    rule Gmulcompfctr < CANCUN > => 1
 
     rule Gtransaction   < CANCUN > => 21000
     rule Gtxcreate      < CANCUN > => 53000
@@ -1943,9 +1942,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < PRAGUE > => 3
     rule Gmexpfactor  < PRAGUE > => 8
     rule Gmexpmin     < PRAGUE > => 200
-    rule Gminmultcomp    < PRAGUE > => 0
-    rule Gmclencutoff    < PRAGUE > => 0
-    rule Gmultcompfactor < PRAGUE > => 1
+    rule Gminmultcomp < PRAGUE > => 0
+    rule Gmclencutoff < PRAGUE > => 0
+    rule Gmulcompfctr < PRAGUE > => 1
 
     rule Gtransaction   < PRAGUE > => 21000
     rule Gtxcreate      < PRAGUE > => 53000
@@ -2092,9 +2091,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < OSAKA > => 1
     rule Gmexpfactor  < OSAKA > => 16
     rule Gmexpmin     < OSAKA > => 500
-    rule Gminmultcomp    < OSAKA > => 16
-    rule Gmclencutoff    < OSAKA > => 32
-    rule Gmultcompfactor < OSAKA > => 2
+    rule Gminmultcomp < OSAKA > => 16
+    rule Gmclencutoff < OSAKA > => 32
+    rule Gmulcompfctr < OSAKA > => 2
 
     rule Gtransaction   < OSAKA > => 21000
     rule Gtxcreate      < OSAKA > => 53000
@@ -2239,9 +2238,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < BEDROCK > => 3
     rule Gmexpfactor  < BEDROCK > => 8
     rule Gmexpmin     < BEDROCK > => 200
-    rule Gminmultcomp    < BEDROCK > => 0
-    rule Gmclencutoff    < BEDROCK > => 0
-    rule Gmultcompfactor < BEDROCK > => 1
+    rule Gminmultcomp < BEDROCK > => 0
+    rule Gmclencutoff < BEDROCK > => 0
+    rule Gmulcompfctr < BEDROCK > => 1
 
     rule Gtransaction   < BEDROCK > => 21000
     rule Gtxcreate      < BEDROCK > => 53000
@@ -2378,9 +2377,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < REGOLITH > => 3
     rule Gmexpfactor  < REGOLITH > => 8
     rule Gmexpmin     < REGOLITH > => 200
-    rule Gminmultcomp    < REGOLITH > => 0
-    rule Gmclencutoff    < REGOLITH > => 0
-    rule Gmultcompfactor < REGOLITH > => 1
+    rule Gminmultcomp < REGOLITH > => 0
+    rule Gmclencutoff < REGOLITH > => 0
+    rule Gmulcompfctr < REGOLITH > => 1
 
     rule Gtransaction   < REGOLITH > => 21000
     rule Gtxcreate      < REGOLITH > => 53000
@@ -2518,9 +2517,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < CANYON > => 3
     rule Gmexpfactor  < CANYON > => 8
     rule Gmexpmin     < CANYON > => 200
-    rule Gminmultcomp    < CANYON > => 0
-    rule Gmclencutoff    < CANYON > => 0
-    rule Gmultcompfactor < CANYON > => 1
+    rule Gminmultcomp < CANYON > => 0
+    rule Gmclencutoff < CANYON > => 0
+    rule Gmulcompfctr < CANYON > => 1
 
     rule Gtransaction   < CANYON > => 21000
     rule Gtxcreate      < CANYON > => 53000
@@ -2658,9 +2657,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < ECOTONE > => 3
     rule Gmexpfactor  < ECOTONE > => 8
     rule Gmexpmin     < ECOTONE > => 200
-    rule Gminmultcomp    < ECOTONE > => 0
-    rule Gmclencutoff    < ECOTONE > => 0
-    rule Gmultcompfactor < ECOTONE > => 1
+    rule Gminmultcomp < ECOTONE > => 0
+    rule Gmclencutoff < ECOTONE > => 0
+    rule Gmulcompfctr < ECOTONE > => 1
 
     rule Gtransaction   < ECOTONE > => 21000
     rule Gtxcreate      < ECOTONE > => 53000
@@ -2799,9 +2798,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < FJORD > => 3
     rule Gmexpfactor  < FJORD > => 8
     rule Gmexpmin     < FJORD > => 200
-    rule Gminmultcomp    < FJORD > => 0
-    rule Gmclencutoff    < FJORD > => 0
-    rule Gmultcompfactor < FJORD > => 1
+    rule Gminmultcomp < FJORD > => 0
+    rule Gmclencutoff < FJORD > => 0
+    rule Gmulcompfctr < FJORD > => 1
 
     rule Gtransaction   < FJORD > => 21000
     rule Gtxcreate      < FJORD > => 53000
@@ -2941,9 +2940,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < GRANITE > => 3
     rule Gmexpfactor  < GRANITE > => 8
     rule Gmexpmin     < GRANITE > => 200
-    rule Gminmultcomp    < GRANITE > => 0
-    rule Gmclencutoff    < GRANITE > => 0
-    rule Gmultcompfactor < GRANITE > => 1
+    rule Gminmultcomp < GRANITE > => 0
+    rule Gmclencutoff < GRANITE > => 0
+    rule Gmulcompfctr < GRANITE > => 1
 
     rule Gtransaction   < GRANITE > => 21000
     rule Gtxcreate      < GRANITE > => 53000
@@ -3083,9 +3082,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < HOLOCENE > => 3
     rule Gmexpfactor  < HOLOCENE > => 8
     rule Gmexpmin     < HOLOCENE > => 200
-    rule Gminmultcomp    < HOLOCENE > => 0
-    rule Gmclencutoff    < HOLOCENE > => 0
-    rule Gmultcompfactor < HOLOCENE > => 1
+    rule Gminmultcomp < HOLOCENE > => 0
+    rule Gmclencutoff < HOLOCENE > => 0
+    rule Gmulcompfctr < HOLOCENE > => 1
 
     rule Gtransaction   < HOLOCENE > => 21000
     rule Gtxcreate      < HOLOCENE > => 53000
@@ -3226,9 +3225,9 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gquaddivisor < ISTHMUS > => 3
     rule Gmexpfactor  < ISTHMUS > => 8
     rule Gmexpmin     < ISTHMUS > => 200
-    rule Gminmultcomp    < ISTHMUS > => 0
-    rule Gmclencutoff    < ISTHMUS > => 0
-    rule Gmultcompfactor < ISTHMUS > => 1
+    rule Gminmultcomp < ISTHMUS > => 0
+    rule Gmclencutoff < ISTHMUS > => 0
+    rule Gmulcompfctr < ISTHMUS > => 1
 
     rule Gtransaction   < ISTHMUS > => 21000
     rule Gtxcreate      < ISTHMUS > => 53000

@@ -48,20 +48,38 @@ The following codes all indicate that the VM ended execution with an exception, 
                                    | "EVMC_PRECOMPILE_FAILURE"
                                    | "EVMC_NONCE_EXCEEDED"
                                    | "EVMC_PRECOMPILE_OOG"
- // -------------------------------------------------------------
-    rule StatusCode2String(EVMC_FAILURE)               => "EVMC_FAILURE"
-    rule StatusCode2String(EVMC_INVALID_INSTRUCTION)   => "EVMC_INVALID_INSTRUCTION"
-    rule StatusCode2String(EVMC_UNDEFINED_INSTRUCTION) => "EVMC_UNDEFINED_INSTRUCTION"
-    rule StatusCode2String(EVMC_OUT_OF_GAS)            => "EVMC_OUT_OF_GAS"
-    rule StatusCode2String(EVMC_BAD_JUMP_DESTINATION)  => "EVMC_BAD_JUMP_DESTINATION"
-    rule StatusCode2String(EVMC_STACK_OVERFLOW)        => "EVMC_STACK_OVERFLOW"
-    rule StatusCode2String(EVMC_STACK_UNDERFLOW)       => "EVMC_STACK_UNDERFLOW"
-    rule StatusCode2String(EVMC_CALL_DEPTH_EXCEEDED)   => "EVMC_CALL_DEPTH_EXCEEDED"
-    rule StatusCode2String(EVMC_INVALID_MEMORY_ACCESS) => "EVMC_INVALID_MEMORY_ACCESS"
-    rule StatusCode2String(EVMC_STATIC_MODE_VIOLATION) => "EVMC_STATIC_MODE_VIOLATION"
-    rule StatusCode2String(EVMC_PRECOMPILE_FAILURE)    => "EVMC_PRECOMPILE_FAILURE"
-    rule StatusCode2String(EVMC_NONCE_EXCEEDED)        => "EVMC_NONCE_EXCEEDED"
-    rule StatusCode2String(EVMC_PRECOMPILE_OOG)        => "EVMC_PRECOMPILE_OOG"
+                                   | "EVMC_PRECOMPILE_ECPAIRING_LENGTH"
+                                   | "EVMC_PRECOMPILE_BLS12G1ADD_LENGTH"
+                                   | "EVMC_PRECOMPILE_BLS12G1MSM_LENGTH"
+                                   | "EVMC_PRECOMPILE_BLS12G2ADD_LENGTH"
+                                   | "EVMC_PRECOMPILE_BLS12G2MSM_LENGTH"
+                                   | "EVMC_PRECOMPILE_BLS12PAIRING_LENGTH"
+                                   | "EVMC_PRECOMPILE_BLS12MAPFPTOG1_LENGTH"
+                                   | "EVMC_PRECOMPILE_BLS12MAPFP2TOG2_LENGTH"
+                                   | "EVMC_PRECOMPILE_BLS12_FP_PADDING"
+ // -------------------------------------------------------------------------
+    rule StatusCode2String(EVMC_FAILURE)                        => "EVMC_FAILURE"
+    rule StatusCode2String(EVMC_INVALID_INSTRUCTION)            => "EVMC_INVALID_INSTRUCTION"
+    rule StatusCode2String(EVMC_UNDEFINED_INSTRUCTION)          => "EVMC_UNDEFINED_INSTRUCTION"
+    rule StatusCode2String(EVMC_OUT_OF_GAS)                     => "EVMC_OUT_OF_GAS"
+    rule StatusCode2String(EVMC_BAD_JUMP_DESTINATION)           => "EVMC_BAD_JUMP_DESTINATION"
+    rule StatusCode2String(EVMC_STACK_OVERFLOW)                 => "EVMC_STACK_OVERFLOW"
+    rule StatusCode2String(EVMC_STACK_UNDERFLOW)                => "EVMC_STACK_UNDERFLOW"
+    rule StatusCode2String(EVMC_CALL_DEPTH_EXCEEDED)            => "EVMC_CALL_DEPTH_EXCEEDED"
+    rule StatusCode2String(EVMC_INVALID_MEMORY_ACCESS)          => "EVMC_INVALID_MEMORY_ACCESS"
+    rule StatusCode2String(EVMC_STATIC_MODE_VIOLATION)          => "EVMC_STATIC_MODE_VIOLATION"
+    rule StatusCode2String(EVMC_PRECOMPILE_FAILURE)             => "EVMC_PRECOMPILE_FAILURE"
+    rule StatusCode2String(EVMC_NONCE_EXCEEDED)                 => "EVMC_NONCE_EXCEEDED"
+    rule StatusCode2String(EVMC_PRECOMPILE_OOG)                 => "EVMC_PRECOMPILE_OOG"
+    rule StatusCode2String(EVMC_PRECOMPILE_ECPAIRING_LENGTH)    => "EVMC_PRECOMPILE_ECPAIRING_LENGTH"
+    rule StatusCode2String(EVMC_PRECOMPILE_BLS12G1ADD_LENGTH)   => "EVMC_PRECOMPILE_BLS12G1ADD_LENGTH"
+    rule StatusCode2String(EVMC_PRECOMPILE_BLS12G1MSM_LENGTH)   => "EVMC_PRECOMPILE_BLS12G1MSM_LENGTH"
+    rule StatusCode2String(EVMC_PRECOMPILE_BLS12G2ADD_LENGTH)   => "EVMC_PRECOMPILE_BLS12G2ADD_LENGTH"
+    rule StatusCode2String(EVMC_PRECOMPILE_BLS12G2MSM_LENGTH)   => "EVMC_PRECOMPILE_BLS12G2MSM_LENGTH"
+    rule StatusCode2String(EVMC_PRECOMPILE_BLS12PAIRING_LENGTH) => "EVMC_PRECOMPILE_BLS12PAIRING_LENGTH"
+    rule StatusCode2String(EVMC_PRECOMPILE_BLS12MAPFPTOG1_LENGTH) => "EVMC_PRECOMPILE_BLS12MAPFPTOG1_LENGTH"
+    rule StatusCode2String(EVMC_PRECOMPILE_BLS12MAPFP2TOG2_LENGTH) => "EVMC_PRECOMPILE_BLS12MAPFP2TOG2_LENGTH"
+    rule StatusCode2String(EVMC_PRECOMPILE_BLS12_FP_PADDING)    => "EVMC_PRECOMPILE_BLS12_FP_PADDING"
 ```
 
 ### Ending Codes
@@ -69,14 +87,17 @@ The following codes all indicate that the VM ended execution with an exception, 
 These additional status codes indicate that execution has ended in some non-exceptional way.
 
 -   `EVMC_SUCCESS` indicates successful end of execution.
+-   `EVMC_STOP` indicates successful end of execution with the `STOP` opcode.
 -   `EVMC_REVERT` indicates that the contract called `REVERT`.
 
 ```k
     syntax EndStatusCode ::= ExceptionalStatusCode
                            | "EVMC_SUCCESS"
+                           | "EVMC_STOP"
                            | "EVMC_REVERT"
  // --------------------------------------
     rule StatusCode2String(EVMC_SUCCESS) => "EVMC_SUCCESS"
+    rule StatusCode2String(EVMC_STOP) => "EVMC_STOP"
     rule StatusCode2String(EVMC_REVERT)  => "EVMC_REVERT"
 ```
 

@@ -104,6 +104,7 @@ Output Extraction
     rule getStatus(EVMC_REJECTED) => EVMC_REJECTED
     rule getStatus(EVMC_INTERNAL_ERROR) => EVMC_INTERNAL_ERROR
     rule getStatus(EVMC_SUCCESS) => EVMC_SUCCESS
+    rule getStatus(EVMC_STOP) => EVMC_STOP
     rule getStatus(EVMC_REVERT) => EVMC_REVERT
     rule getStatus(EVMC_FAILURE) => EVMC_FAILURE
     rule getStatus(EVMC_INVALID_INSTRUCTION) => EVMC_INVALID_INSTRUCTION
@@ -118,11 +119,26 @@ Output Extraction
     rule getStatus(EVMC_PRECOMPILE_FAILURE) => EVMC_PRECOMPILE_FAILURE
     rule getStatus(EVMC_NONCE_EXCEEDED) => EVMC_NONCE_EXCEEDED
     rule getStatus(EVMC_PRECOMPILE_OOG) => EVMC_PRECOMPILE_OOG
+    rule getStatus(EVMC_PRECOMPILE_ECPAIRING_LENGTH) => EVMC_PRECOMPILE_ECPAIRING_LENGTH
+    rule getStatus(EVMC_PRECOMPILE_BLS12G1ADD_LENGTH) => EVMC_PRECOMPILE_BLS12G1ADD_LENGTH
+    rule getStatus(EVMC_PRECOMPILE_BLS12G1MSM_LENGTH) => EVMC_PRECOMPILE_BLS12G1MSM_LENGTH
+    rule getStatus(EVMC_PRECOMPILE_BLS12G2ADD_LENGTH) => EVMC_PRECOMPILE_BLS12G2ADD_LENGTH
+    rule getStatus(EVMC_PRECOMPILE_BLS12G2MSM_LENGTH) => EVMC_PRECOMPILE_BLS12G2MSM_LENGTH
+    rule getStatus(EVMC_PRECOMPILE_BLS12PAIRING_LENGTH) => EVMC_PRECOMPILE_BLS12PAIRING_LENGTH
+    rule getStatus(EVMC_PRECOMPILE_BLS12MAPFPTOG1_LENGTH) => EVMC_PRECOMPILE_BLS12MAPFPTOG1_LENGTH
+    rule getStatus(EVMC_PRECOMPILE_BLS12MAPFP2TOG2_LENGTH) => EVMC_PRECOMPILE_BLS12MAPFP2TOG2_LENGTH
+    rule getStatus(EVMC_PRECOMPILE_BLS12_FP_PADDING) => EVMC_PRECOMPILE_BLS12_FP_PADDING
 
-    rule getGasLeft(G) => 0 requires getStatus(G) =/=Int EVMC_SUCCESS andBool getStatus(G) =/=Int EVMC_REVERT
+    rule getGasLeft(G) => 0
+      requires getStatus(G) =/=Int EVMC_SUCCESS
+       andBool getStatus(G) =/=Int EVMC_STOP
+       andBool getStatus(G) =/=Int EVMC_REVERT
     rule getGasLeft(<generatedTop>... <gas> G </gas> ...</generatedTop>) => G [priority(51)]
 
-    rule getOutput(G) => .Bytes requires getStatus(G) =/=Int EVMC_SUCCESS andBool getStatus(G) =/=Int EVMC_REVERT
+    rule getOutput(G) => .Bytes
+      requires getStatus(G) =/=Int EVMC_SUCCESS
+       andBool getStatus(G) =/=Int EVMC_STOP
+       andBool getStatus(G) =/=Int EVMC_REVERT
     rule getOutput(<generatedTop>... <output> O </output> ...</generatedTop>) => O [priority(51)]
 ```
 
@@ -230,7 +246,7 @@ OpCode Execution
 ### Single Step
 
 If the program-counter points to an actual opcode, it's loaded into the `#next [_]` operator.
-If `.NoOpCode` is loaded into `#next [_]`, then it means that there is no next opcode and the execution will halt with an `EVMC_SUCCESS` status code.
+If `.NoOpCode` is loaded into `#next [_]`, then it means that there is no next opcode and the execution will halt with an `EVMC_STOP` status code.
 The `#next [_]` operator initiates execution by:
 
 1.  checking if there will be a stack over/underflow, or a static mode violation,
@@ -241,7 +257,7 @@ The `#next [_]` operator initiates execution by:
 ```k
     syntax InternalOp ::= "#next" "[" MaybeOpCode "]"
  // -------------------------------------------------
-    rule <k> #next [ .NoOpCode ] => #end EVMC_SUCCESS ... </k>
+    rule <k> #next [ .NoOpCode ] => #end EVMC_STOP ... </k>
          <output> _ => .Bytes </output>
 
     rule <k> #next [ OP:OpCode ]
@@ -706,7 +722,7 @@ The `JUMP*` family of operations affect the current program counter.
 ```k
     syntax NullStackOp ::= "STOP"
  // -----------------------------
-    rule <k> STOP => #end EVMC_SUCCESS ... </k>
+    rule <k> STOP => #end EVMC_STOP ... </k>
          <output> _ => .Bytes </output>
 
     syntax BinStackOp ::= "RETURN"
@@ -1000,6 +1016,16 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
          <output> OUT </output>
          <gas> GAVAIL </gas>
 
+    rule [return.stop]:
+         <statusCode> EVMC_STOP </statusCode>
+         <k> #halt ~> #return RETSTART RETWIDTH
+          => #popCallStack ~> #dropWorldState
+          ~> 1p256 ~> #push ~> #refund GAVAIL ~> #setLocalMem RETSTART RETWIDTH OUT
+         ...
+         </k>
+         <output> OUT </output>
+         <gas> GAVAIL </gas>
+
 
     syntax InternalOp ::= "#refund" Gas
                         | "#setLocalMem" MInt{256} MInt{256} Bytes
@@ -1138,6 +1164,9 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
          <gas> GAVAIL </gas>
 
     rule <statusCode> EVMC_SUCCESS </statusCode>
+         <k> #halt ~> #codeDeposit ACCT => #mkCodeDeposit ACCT ... </k>
+
+    rule <statusCode> EVMC_STOP </statusCode>
          <k> #halt ~> #codeDeposit ACCT => #mkCodeDeposit ACCT ... </k>
 
     rule <k> #mkCodeDeposit ACCT
@@ -1357,7 +1386,7 @@ Precompiled Contracts
     rule <k> ECPAIRING => #ecpairing(.List, .List, 0, CD, lengthBytes(CD)) ... </k>
          <callData> CD </callData>
       requires lengthBytes(CD) modInt 192 ==Int 0
-    rule <k> ECPAIRING => #end EVMC_PRECOMPILE_FAILURE ... </k>
+    rule <k> ECPAIRING => #end EVMC_PRECOMPILE_ECPAIRING_LENGTH ... </k>
          <callData> CD </callData>
       requires lengthBytes(CD) modInt 192 =/=Int 0
 
@@ -1437,6 +1466,10 @@ Precompiled Contracts
   // -------------------------------------------------------------------------------
     rule isValidBLS12Fp(X) => X >=Int 0 andBool X <Int (1 <<Int 384) andBool X <Int BLS12_FIELD_MODULUS
 
+    syntax Bool ::= invalidBLS12FpPadding ( Int ) [symbol(invalidBLS12FpPadding), function, total]
+  // ---------------------------------------------------------------------------------------------
+    rule invalidBLS12FpPadding(X) => X >=Int (1 <<Int 384)
+
     syntax Bool ::= isValidBLS12Scalar ( Int ) [symbol(isValidBLS12Scalar), function, total]
   // ---------------------------------------------------------------------------------------
     rule isValidBLS12Scalar(X) => X >=Int 0 andBool X <Int (1 <<Int 256)
@@ -1463,10 +1496,14 @@ Precompiled Contracts
             , Bytes2Int(substrBytes(CD, 192, 256), BE, Unsigned)
             )
 
-    rule <k> BLS12G1ADD => #end EVMC_PRECOMPILE_FAILURE ... </k>
+    rule <k> BLS12G1ADD => #end EVMC_PRECOMPILE_BLS12G1ADD_LENGTH ... </k>
          <callData> CD </callData>
       requires lengthBytes( CD ) =/=Int 256
-        orBool notBool bls12ValidForAdd
+
+    rule <k> BLS12G1ADD => #end EVMC_PRECOMPILE_FAILURE ... </k>
+         <callData> CD </callData>
+      requires lengthBytes( CD ) ==Int 256
+        andBool notBool bls12ValidForAdd
             ( Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned)
             , Bytes2Int(substrBytes(CD, 64, 128), BE, Unsigned)
             , Bytes2Int(substrBytes(CD, 128, 192), BE, Unsigned)
@@ -1502,20 +1539,25 @@ Precompiled Contracts
             _ => #bls12point(g1MsmResult.getPoint(R))
          </output>
       requires R =/=K g1MsmError
+    rule <k> g1MsmInputLengthError => #end EVMC_PRECOMPILE_BLS12G1MSM_LENGTH ... </k>
+    rule <k> g1MsmInputPaddingError => #end EVMC_PRECOMPILE_BLS12_FP_PADDING ... </k>
     rule <k> g1MsmError => #end EVMC_PRECOMPILE_FAILURE ... </k>
 
-    syntax G1MsmResult ::= "g1MsmError" | g1MsmResult(G1Point)
- // ----------------------------------------------------------
+    syntax G1MsmResult ::= "g1MsmError"
+                         | "g1MsmInputLengthError"
+                         | "g1MsmInputPaddingError"
+                         | g1MsmResult(G1Point)
+ // -----------------------------------------------
     syntax G1MsmResult ::= bls12G1Msm(Bytes) [symbol(bls12G1Msm), function, total]
     syntax G1MsmResult ::= #bls12G1Msm(Bytes, List, List) [function, total]
     syntax G1MsmResult ::= #bls12G1MsmCheck(Bytes, List, List, Int, Int, Int) [function, total]
- // ----------------------------------------------------------------------------
-    rule bls12G1Msm(B:Bytes) => g1MsmError requires lengthBytes(B) ==Int 0
+ // -------------------------------------------------------------------------------------------
+    rule bls12G1Msm(B:Bytes) => g1MsmInputLengthError requires lengthBytes(B) ==Int 0
     rule bls12G1Msm(B:Bytes) => #bls12G1Msm(B, .List, .List) requires lengthBytes(B) >Int 0
 
     rule #bls12G1Msm(B:Bytes, Ps:List, Ss:List) => g1MsmResult(BLS12G1Msm(... scalars: Ss, points: Ps))
         requires lengthBytes(B) ==Int 0
-    rule #bls12G1Msm(B:Bytes, _:List, _:List) => g1MsmError
+    rule #bls12G1Msm(B:Bytes, _:List, _:List) => g1MsmInputLengthError
         requires 0 <Int lengthBytes(B) andBool lengthBytes(B) <Int 160
     rule #bls12G1Msm(B:Bytes, Ps:List, Ss:List)
         => #bls12G1MsmCheck
@@ -1531,6 +1573,8 @@ Precompiled Contracts
       requires isValidBLS12Coordinate(X) andBool isValidBLS12Coordinate(Y)
         andBool isValidBLS12Scalar(N)
         andBool BLS12G1InSubgroup((X, Y))
+    rule #bls12G1MsmCheck(_:Bytes, _:List, _:List, X:Int, Y:Int, _:Int) => g1MsmInputPaddingError
+      requires invalidBLS12FpPadding(X) orBool invalidBLS12FpPadding(Y)
     rule #bls12G1MsmCheck(_, _, _, _, _, _) => g1MsmError  [owise]
 
     syntax G1Point ::= "g1MsmResult.getPoint" "(" G1MsmResult ")" [function]
@@ -1567,10 +1611,14 @@ Precompiled Contracts
             , Bytes2Int(substrBytes(CD, 448, 512), BE, Unsigned)
             )
 
-    rule <k> BLS12G2ADD => #end EVMC_PRECOMPILE_FAILURE ... </k>
+    rule <k> BLS12G2ADD => #end EVMC_PRECOMPILE_BLS12G2ADD_LENGTH ... </k>
          <callData> CD </callData>
       requires lengthBytes( CD ) =/=Int 512
-        orBool notBool bls12ValidForAdd2
+
+    rule <k> BLS12G2ADD => #end EVMC_PRECOMPILE_FAILURE ... </k>
+         <callData> CD </callData>
+      requires lengthBytes( CD ) ==Int 512
+        andBool notBool bls12ValidForAdd2
             ( Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned)
             , Bytes2Int(substrBytes(CD, 64, 128), BE, Unsigned)
             , Bytes2Int(substrBytes(CD, 128, 192), BE, Unsigned)
@@ -1606,20 +1654,25 @@ Precompiled Contracts
             _ => #bls12point(g2MsmResult.getPoint(R))
          </output>
       requires R =/=K g2MsmError
+    rule <k> g2MsmInputLengthError => #end EVMC_PRECOMPILE_BLS12G2MSM_LENGTH ... </k>
+    rule <k> g2MsmInputPaddingError => #end EVMC_PRECOMPILE_BLS12_FP_PADDING ... </k>
     rule <k> g2MsmError => #end EVMC_PRECOMPILE_FAILURE ... </k>
 
-    syntax G2MsmResult ::= "g2MsmError" | g2MsmResult(G2Point)
- // ----------------------------------------------------------
+    syntax G2MsmResult ::= "g2MsmError"
+                         | "g2MsmInputLengthError"
+                         | "g2MsmInputPaddingError"
+                         | g2MsmResult(G2Point)
+ // -----------------------------------------------
     syntax G2MsmResult ::= bls12G2Msm(Bytes) [symbol(bls12G2Msm), function, total]
     syntax G2MsmResult ::= #bls12G2Msm(Bytes, List, List) [function, total]
     syntax G2MsmResult ::= #bls12G2MsmCheck(Bytes, List, List, Int, Int, Int, Int, Int) [function, total]
  // ------------------------------------------------------------------------------------
-    rule bls12G2Msm(B:Bytes) => g2MsmError requires lengthBytes(B) ==Int 0
+    rule bls12G2Msm(B:Bytes) => g2MsmInputLengthError requires lengthBytes(B) ==Int 0
     rule bls12G2Msm(B:Bytes) => #bls12G2Msm(B, .List, .List) requires lengthBytes(B) >Int 0
 
     rule #bls12G2Msm(B:Bytes, Ps:List, Ss:List) => g2MsmResult(BLS12G2Msm(... scalars: Ss, points: Ps))
         requires lengthBytes(B) ==Int 0
-    rule #bls12G2Msm(B:Bytes, _:List, _:List) => g2MsmError
+    rule #bls12G2Msm(B:Bytes, _:List, _:List) => g2MsmInputLengthError
         requires 0 <Int lengthBytes(B) andBool lengthBytes(B) <Int 288
     rule #bls12G2Msm(B:Bytes, Ps:List, Ss:List)
         => #bls12G2MsmCheck
@@ -1638,6 +1691,10 @@ Precompiled Contracts
         andBool isValidBLS12Coordinate(Y0) andBool isValidBLS12Coordinate(Y1)
         andBool isValidBLS12Scalar(N)
         andBool BLS12G2InSubgroup(( X0 x X1, Y0 x Y1 ))
+    rule #bls12G2MsmCheck(_:Bytes, _:List, _:List, X0:Int, X1:Int, Y0:Int, Y1:Int, _:Int)
+        => g2MsmInputPaddingError
+      requires invalidBLS12FpPadding(X0) orBool invalidBLS12FpPadding(X1)
+        orBool invalidBLS12FpPadding(Y0) orBool invalidBLS12FpPadding(Y1)
     rule #bls12G2MsmCheck(_, _, _, _, _, _, _, _) => g2MsmError  [owise]
 
     syntax G2Point ::= "g2MsmResult.getPoint" "(" G2MsmResult ")" [function]
@@ -1654,10 +1711,15 @@ Precompiled Contracts
             _ => #if bls12PairingResult.get(R) #then Int2Bytes(32, 1, BE:Endianness) #else Int2Bytes(32, 0, BE:Endianness) #fi
          </output>
        requires notBool R ==K bls12PairingError
+    rule <k> bls12PairingInputLengthError => #end EVMC_PRECOMPILE_BLS12PAIRING_LENGTH ... </k>
+    rule <k> bls12PairingInputPaddingError => #end EVMC_PRECOMPILE_BLS12_FP_PADDING ... </k>
     rule <k> bls12PairingError => #end EVMC_PRECOMPILE_FAILURE ... </k>
 
-    syntax Bls12PairingResult ::= "bls12PairingError" | bls12PairingResult(Bool)
- // --------------------------------------------------------------------------
+    syntax Bls12PairingResult ::= "bls12PairingError"
+                                | "bls12PairingInputLengthError"
+                                | "bls12PairingInputPaddingError"
+                                | bls12PairingResult(Bool)
+ // -------------------------------------------------------------
     syntax Bls12PairingResult ::= bls12PairingCheck(Bytes, List, List) [symbol(bls12PairingCheck), function, total]
  // -------------------------------------------------------------------------------------------------------------
     rule bls12PairingCheck(B:Bytes, L1:List, L2:List) => bls12PairingResult(BLS12PairingCheck(L1, L2))
@@ -1683,11 +1745,22 @@ Precompiled Contracts
               )
             )
       requires lengthBytes(B) >=Int 384
+    rule bls12PairingCheck(B:Bytes, L1:List, L2:List) => bls12PairingInputPaddingError
+        requires lengthBytes(B) ==Int 0
+          andBool invalidBls12G1PairingPointsFpPadding(L1)
+          andBool invalidBls12G2PairingPointsFpPadding(L2)
+          andBool size(L1) ==Int size(L2)
+          andBool size(L1) >Int 0
+    rule bls12PairingCheck(B:Bytes, .List, .List) => bls12PairingInputLengthError
+        requires lengthBytes(B) ==Int 0
+    rule bls12PairingCheck(B:Bytes, _:List, _:List) => bls12PairingInputLengthError
+        requires lengthBytes(B) >Int 0 andBool lengthBytes(B) <Int 384
     rule bls12PairingCheck(_:Bytes, _:List, _:List) => bls12PairingError  [owise]
 
     syntax Bool ::= validBls12G1PairingPoints(List)  [function, total]
     syntax Bool ::= validBls12G1PairingPoint(G1Point)  [function, total]
-// ------------------------------------------------------------------
+    syntax Bool ::= invalidBls12G1PairingPointsFpPadding(List)  [function, total]
+// ------------------------------------------------------------------------------
     rule validBls12G1PairingPoints(.List) => true
     rule validBls12G1PairingPoints(ListItem(P:G1Point) L:List) => validBls12G1PairingPoints(L)
       requires validBls12G1PairingPoint(P)
@@ -1698,9 +1771,17 @@ Precompiled Contracts
           andBool isValidBLS12Coordinate(Y)
           andBool BLS12G1InSubgroup(P)
 
+    rule invalidBls12G1PairingPointsFpPadding(.List) => false
+    rule invalidBls12G1PairingPointsFpPadding(ListItem((X, Y) #as _:G1Point) L:List)
+        => invalidBls12G1PairingPointsFpPadding(L)
+      requires notBool invalidBLS12FpPadding(X)
+        andBool notBool invalidBLS12FpPadding(Y)
+    rule invalidBls12G1PairingPointsFpPadding(_) => true  [owise]
+
     syntax Bool ::= validBls12G2PairingPoints(List)  [function, total]
     syntax Bool ::= validBls12G2PairingPoint(G2Point)  [function, total]
-// ------------------------------------------------------------------
+    syntax Bool ::= invalidBls12G2PairingPointsFpPadding(List)  [function, total]
+// ------------------------------------------------------------------------------
     rule validBls12G2PairingPoints(.List) => true
     rule validBls12G2PairingPoints(ListItem(P:G2Point) L:List) => validBls12G2PairingPoints(L)
       requires validBls12G2PairingPoint(P)
@@ -1716,6 +1797,15 @@ Precompiled Contracts
     syntax Bool ::= "bls12PairingResult.get" "(" Bls12PairingResult ")" [function]
     rule bls12PairingResult.get(bls12PairingResult(P)) => P
 
+    rule invalidBls12G2PairingPointsFpPadding(.List) => false
+    rule invalidBls12G2PairingPointsFpPadding(ListItem((X0 x X1, Y0 x Y1) #as _:G2Point) L:List)
+        => invalidBls12G2PairingPointsFpPadding(L)
+      requires notBool invalidBLS12FpPadding(X0)
+        andBool notBool invalidBLS12FpPadding(X1)
+        andBool notBool invalidBLS12FpPadding(Y0)
+        andBool notBool invalidBLS12FpPadding(Y1)
+    rule invalidBls12G2PairingPointsFpPadding(_) => true  [owise]
+
 
     syntax PrecompiledOp ::= "BLS12MAPFPTOG1"
  // -----------------------------------------
@@ -1727,10 +1817,14 @@ Precompiled Contracts
       requires lengthBytes( CD ) ==Int 64
         andBool isValidBLS12Fp(Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned))
 
-    rule <k> BLS12MAPFPTOG1 => #end EVMC_PRECOMPILE_FAILURE ... </k>
+    rule <k> BLS12MAPFPTOG1 => #end EVMC_PRECOMPILE_BLS12MAPFPTOG1_LENGTH ... </k>
          <callData> CD </callData>
       requires lengthBytes( CD ) =/=Int 64
-        orBool notBool isValidBLS12Fp(Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned))
+
+    rule <k> BLS12MAPFPTOG1 => #end EVMC_PRECOMPILE_FAILURE ... </k>
+         <callData> CD </callData>
+      requires lengthBytes( CD ) ==Int 64
+        andBool notBool isValidBLS12Fp(Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned))
 
 
     syntax PrecompiledOp ::= "BLS12MAPFP2TOG2"
@@ -1747,11 +1841,15 @@ Precompiled Contracts
         andBool isValidBLS12Fp(Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned))
         andBool isValidBLS12Fp(Bytes2Int(substrBytes(CD, 64, 128), BE, Unsigned))
 
-    rule <k> BLS12MAPFP2TOG2 => #end EVMC_PRECOMPILE_FAILURE ... </k>
+    rule <k> BLS12MAPFP2TOG2 => #end EVMC_PRECOMPILE_BLS12MAPFP2TOG2_LENGTH ... </k>
          <callData> CD </callData>
       requires lengthBytes( CD ) =/=Int 128
-        orBool notBool isValidBLS12Fp(Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned))
-        orBool notBool isValidBLS12Fp(Bytes2Int(substrBytes(CD, 64, 128), BE, Unsigned))
+
+    rule <k> BLS12MAPFP2TOG2 => #end EVMC_PRECOMPILE_FAILURE ... </k>
+         <callData> CD </callData>
+      requires lengthBytes( CD ) ==Int 128
+        andBool (notBool isValidBLS12Fp(Bytes2Int(substrBytes(CD, 0, 64), BE, Unsigned))
+                   orBool notBool isValidBLS12Fp(Bytes2Int(substrBytes(CD, 64, 128), BE, Unsigned)))
 
 
     syntax PrecompiledOp ::= "P256VERIFY"
@@ -2112,15 +2210,15 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
 
     rule <k> #gasExec(SCHED, ECADD)     => Gecadd < SCHED>  ... </k>
     rule <k> #gasExec(SCHED, ECMUL)     => Gecmul < SCHED > ... </k>
-   rule <k> #gasExec(SCHED, ECPAIRING) => #if Gecpairinputcheck << SCHED >> andBool lengthBytes(CD) >Int graniteMaxInputSize #then #end EVMC_PRECOMPILE_FAILURE #else Gecpairconst < SCHED > +Int (lengthBytes(CD) /Int 192) *Int Gecpaircoeff < SCHED > #fi ... </k> <callData> CD </callData>
+   rule <k> #gasExec(SCHED, ECPAIRING) => #if Gecpairinputcheck << SCHED >> andBool lengthBytes(CD) >Int graniteMaxInputSize #then #end EVMC_PRECOMPILE_ECPAIRING_LENGTH #else Gecpairconst < SCHED > +Int (lengthBytes(CD) /Int 192) *Int Gecpaircoeff < SCHED > #fi ... </k> <callData> CD </callData>
 
     rule <k> #gasExec(SCHED, BLAKE2F)   => Gfround < SCHED > *Int #asWord(#range(CD, 0, 4) ) ... </k> <callData> CD </callData>
     rule <k> #gasExec(SCHED, KZGPOINTEVAL)  => Gpointeval < SCHED > ... </k>
     rule <k> #gasExec(SCHED, BLS12G1ADD)    => Gbls12g1add < SCHED > ... </k>
-    rule <k> #gasExec(SCHED, BLS12G1MSM)    => #if Gbls12g1msminputcheck << SCHED >> andBool lengthBytes(CD) >Int isthmusG1msmMaxInputSize #then #end EVMC_PRECOMPILE_FAILURE #else #let N = lengthBytes(CD) /Int 160 #in N *Int Gbls12g1mul < SCHED > *Int Cbls12g1MsmDiscount(SCHED, N) /Int 1000 #fi ... </k> <callData> CD </callData>
+    rule <k> #gasExec(SCHED, BLS12G1MSM)    => #if Gbls12g1msminputcheck << SCHED >> andBool lengthBytes(CD) >Int isthmusG1msmMaxInputSize #then #end EVMC_PRECOMPILE_BLS12G1MSM_LENGTH #else #let N = lengthBytes(CD) /Int 160 #in N *Int Gbls12g1mul < SCHED > *Int Cbls12g1MsmDiscount(SCHED, N) /Int 1000 #fi ... </k> <callData> CD </callData>
     rule <k> #gasExec(SCHED, BLS12G2ADD)    => Gbls12g2add < SCHED > ... </k>
-    rule <k> #gasExec(SCHED, BLS12G2MSM)    => #if Gbls12g2msminputcheck << SCHED >> andBool lengthBytes(CD) >Int isthmusG2msmMaxInputSize #then #end EVMC_PRECOMPILE_FAILURE #else #let N = lengthBytes(CD) /Int 288 #in N *Int Gbls12g2mul < SCHED > *Int Cbls12g2MsmDiscount(SCHED, N) /Int 1000 #fi ... </k> <callData> CD </callData>
-    rule <k> #gasExec(SCHED, BLS12PAIRING_CHECK)    => #if Gbls12pairingcheckinputcheck << SCHED >> andBool lengthBytes(CD) >Int isthmusPairingMaxInputSize #then #end EVMC_PRECOMPILE_FAILURE #else #let N = lengthBytes(CD) /Int 384 #in N *Int Gbls12PairingCheckMul < SCHED > +Int Gbls12PairingCheckAdd < SCHED > #fi ... </k> <callData> CD </callData>
+    rule <k> #gasExec(SCHED, BLS12G2MSM)    => #if Gbls12g2msminputcheck << SCHED >> andBool lengthBytes(CD) >Int isthmusG2msmMaxInputSize #then #end EVMC_PRECOMPILE_BLS12G2MSM_LENGTH #else #let N = lengthBytes(CD) /Int 288 #in N *Int Gbls12g2mul < SCHED > *Int Cbls12g2MsmDiscount(SCHED, N) /Int 1000 #fi ... </k> <callData> CD </callData>
+    rule <k> #gasExec(SCHED, BLS12PAIRING_CHECK)    => #if Gbls12pairingcheckinputcheck << SCHED >> andBool lengthBytes(CD) >Int isthmusPairingMaxInputSize #then #end EVMC_PRECOMPILE_BLS12PAIRING_LENGTH #else #let N = lengthBytes(CD) /Int 384 #in N *Int Gbls12PairingCheckMul < SCHED > +Int Gbls12PairingCheckAdd < SCHED > #fi ... </k> <callData> CD </callData>
     rule <k> #gasExec(SCHED, BLS12MAPFPTOG1) => Gbls12mapfptog1 < SCHED > ... </k>
     rule <k> #gasExec(SCHED, BLS12MAPFP2TOG2) => Gbls12mapfp2tog2 < SCHED > ... </k>
     rule <k> #gasExec(SCHED, P256VERIFY)  => Gp256verify < SCHED > ... </k>

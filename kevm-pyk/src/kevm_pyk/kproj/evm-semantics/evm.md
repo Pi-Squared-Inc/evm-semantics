@@ -1343,12 +1343,12 @@ Precompiled Contracts
          <output> _ => #let DATA = CD #in #modexp1(#asWord(#range(DATA, 0, 32)), #asWord(#range(DATA, 32, 32)), #asWord(#range(DATA, 64, 32)), #range(DATA, 96, maxInt(0, lengthBytes(DATA) -Int 96))) </output>
          <callData> CD </callData>
          <schedule> SCHED </schedule>
-      requires notBool Ghasmodexplimits << SCHED >> orBool  modexpInputRangeCheck(CD)
+      requires notBool hasmodexplimits << SCHED >> orBool  modexpInputRangeCheck(CD)
 
    rule <k> MODEXP => #end EVMC_PRECOMPILE_FAILURE ... </k>
         <callData> CD </callData>
         <schedule> SCHED </schedule>
-      requires Ghasmodexplimits << SCHED >> andBool (notBool modexpInputRangeCheck(CD))
+      requires hasmodexplimits << SCHED >> andBool (notBool modexpInputRangeCheck(CD))
 
     syntax Bool ::= modexpInputRangeCheck(Bytes) [function]
     rule modexpInputRangeCheck(DATA) => false requires #asWord(#range(DATA, 0, 32)) >Int modexpInputLimit

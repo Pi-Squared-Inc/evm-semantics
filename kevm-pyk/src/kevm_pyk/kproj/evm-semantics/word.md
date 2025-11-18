@@ -482,6 +482,10 @@ The maximum and minimum values of each type are defined below.
     rule isthmusG1msmMaxInputSize => 513760
     rule isthmusG2msmMaxInputSize => 488448
     rule isthmusPairingMaxInputSize => 235008
+
+    syntax Int ::= "modexpInputLimit" [macro]
+ // -----------------------------------------------------
+    rule modexpInputLimit => 1024
 ```
 
 Range of types

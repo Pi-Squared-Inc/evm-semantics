@@ -553,10 +553,11 @@ Expression calculations are simple and don't require anything but the arguments 
 NOTE: We have to call the opcode `OR` by `EVMOR` instead, because K has trouble parsing it/compiling the definition otherwise.
 
 ```k
-    syntax UnStackOp ::= "ISZERO" | "NOT"
+    syntax UnStackOp ::= "ISZERO" | "NOT" | "CLZ"
  // -------------------------------------
     rule <k> ISZERO W => bool2MInt256(W ==MInt 0p256) ~> #push ... </k>
     rule <k> NOT    W => ~MInt W                      ~> #push ... </k>
+    rule <k> CLZ    W => clzMInt(W)                   ~> #push ... </k>
 
     syntax BinStackOp ::= "ADD" | "MUL" | "SUB" | "DIV" | "EXP" | "MOD"
  // -------------------------------------------------------------------
@@ -2176,6 +2177,7 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
     rule <k> #gasExec(SCHED, BLOBHASH _)     => Gverylow < SCHED > ... </k>
 
     // Wlow
+    rule <k> #gasExec(SCHED, CLZ _)          => Glow < SCHED > ... </k>
     rule <k> #gasExec(SCHED, MUL _ _)        => Glow < SCHED > ... </k>
     rule <k> #gasExec(SCHED, DIV _ _)        => Glow < SCHED > ... </k>
     rule <k> #gasExec(SCHED, SDIV _ _)       => Glow < SCHED > ... </k>
@@ -2325,6 +2327,7 @@ After interpreting the strings representing programs as a `WordStack`, it should
     rule #dasmOpCode(  27p256, SCHED ) => SHL requires Ghasshift << SCHED >>
     rule #dasmOpCode(  28p256, SCHED ) => SHR requires Ghasshift << SCHED >>
     rule #dasmOpCode(  29p256, SCHED ) => SAR requires Ghasshift << SCHED >>
+    rule #dasmOpCode(  30p256, SCHED ) => CLZ requires Ghasclz << SCHED >>
     rule #dasmOpCode(  32p256,     _ ) => SHA3
     rule #dasmOpCode(  48p256,     _ ) => ADDRESS
     rule #dasmOpCode(  49p256,     _ ) => BALANCE

@@ -203,11 +203,17 @@ module GAS-FEES
     rule [Cextcodecopy.new]: Cextcodecopy(SCHED, WIDTH) => Gcopy < SCHED > *Int (WIDTH up/Int 32)                               requires         Ghasaccesslist << SCHED >> [concrete]
     rule [Cextcodecopy.old]: Cextcodecopy(SCHED, WIDTH) => Gextcodecopy < SCHED > +Int (Gcopy < SCHED > *Int (WIDTH up/Int 32)) requires notBool Ghasaccesslist << SCHED >> [concrete]
 
-    rule [Cmodexp.old]: Cmodexp(SCHED, DATA, BASELEN, EXPLEN, MODLEN) => #multComplexity(maxInt(BASELEN, MODLEN)) *Int maxInt(#adjustedExpLength(BASELEN, EXPLEN, DATA), 1) /Int Gquaddivisor < SCHED >
+    rule [Cmodexp.old]: Cmodexp(SCHED, DATA, BASELEN, EXPLEN, MODLEN) => #multComplexity(maxInt(BASELEN,
+    MODLEN)) *Int maxInt(#adjustedExpLength(BASELEN, EXPLEN, DATA, Gmexpfactor < SCHED >), 1) /Int Gquaddivisor < SCHED >
       requires notBool Ghasaccesslist << SCHED >>
       [concrete]
 
-    rule [Cmodexp.new]: Cmodexp(SCHED, DATA, BASELEN, EXPLEN, MODLEN) => maxInt(200, (#newMultComplexity(maxInt(BASELEN, MODLEN)) *Int maxInt(#adjustedExpLength(BASELEN, EXPLEN, DATA), 1)) /Int Gquaddivisor < SCHED > )
+    rule [Cmodexp.new]: Cmodexp(SCHED, DATA, BASELEN, EXPLEN, MODLEN) => maxInt(
+      Gmexpmin < SCHED >,
+      (#if maxInt(BASELEN, MODLEN) >Int Gmclencutoff < SCHED > #then (Gmulcompfctr < SCHED > *Int #newMultComplexity(maxInt(BASELEN, MODLEN))) #else Gminmultcomp < SCHED > #fi 
+        *Int maxInt(#adjustedExpLength(BASELEN, EXPLEN, DATA, Gmexpfactor < SCHED >), 1)) 
+    /Int Gquaddivisor < SCHED > 
+    )
       requires Ghasaccesslist << SCHED >>
       [concrete]
 
@@ -514,10 +520,10 @@ module GAS-FEES
 
     rule #newMultComplexity(X) => (X up/Int 8) ^Int 2
 
-    syntax Int ::= #adjustedExpLength(Int, Int, Bytes) [symbol(#adjustedExpLength),    function]
-                 | #adjustedExpLength(Int)             [symbol(#adjustedExpLengthAux), function]
+    syntax Int ::= #adjustedExpLength(Int, Int, Bytes, Int) [symbol(#adjustedExpLength),    function]
+                 | #adjustedExpLength(Int)                  [symbol(#adjustedExpLengthAux), function]
  // --------------------------------------------------------------------------------------------
-    rule #adjustedExpLength(BASELEN, EXPLEN, DATA) => #if EXPLEN <=Int 32 #then 0 #else 8 *Int (EXPLEN -Int 32) #fi +Int #adjustedExpLength(#asInteger(#range(DATA, 96 +Int BASELEN, minInt(EXPLEN, 32))))
+    rule #adjustedExpLength(BASELEN, EXPLEN, DATA, FACTOR) => #if EXPLEN <=Int 32 #then 0 #else FACTOR *Int (EXPLEN -Int 32) #fi +Int #adjustedExpLength(#asInteger(#range(DATA, 96 +Int BASELEN, minInt(EXPLEN, 32))))
 
     rule #adjustedExpLength(0) => 0
     rule #adjustedExpLength(1) => 0

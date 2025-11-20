@@ -2145,7 +2145,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Gbls12mapfptog1 < OSAKA > => 5500
     rule Gbls12mapfp2tog2 < OSAKA > => 23800
 
-    rule Gp256verify < OSAKA > => 0
+    rule Gp256verify < OSAKA > => 6900
 
     rule Gaccessliststoragekey < OSAKA > => 1900
     rule Gaccesslistaddress    < OSAKA > => 2400
@@ -2209,6 +2209,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule #isPrecompiledAccount(15p256, OSAKA) => true
     rule #isPrecompiledAccount(16p256, OSAKA) => true
     rule #isPrecompiledAccount(17p256, OSAKA) => true
+    rule #isPrecompiledAccount(256p256, OSAKA) => true
 ```
 
 ### Bedrock Schedule

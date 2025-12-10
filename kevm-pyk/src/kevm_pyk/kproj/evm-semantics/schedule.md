@@ -44,6 +44,7 @@ module SCHEDULE
     rule getSchedule(105) => GRANITE
     rule getSchedule(106) => HOLOCENE
     rule getSchedule(107) => ISTHMUS
+    rule getSchedule(108) => JOVIAN
 
     syntax Bool ::= isOptimismSchedule(Schedule) [function]
  // -------------------------------------------------------
@@ -55,6 +56,7 @@ module SCHEDULE
     rule isOptimismSchedule(GRANITE) => true
     rule isOptimismSchedule(HOLOCENE) => true
     rule isOptimismSchedule(ISTHMUS) => true
+    rule isOptimismSchedule(JOVIAN) => true
     rule isOptimismSchedule(FRONTIER) => false
     rule isOptimismSchedule(HOMESTEAD) => false
     rule isOptimismSchedule(TANGERINE_WHISTLE) => false
@@ -3353,6 +3355,157 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule #isPrecompiledAccount(16p256, ISTHMUS) => true
     rule #isPrecompiledAccount(17p256, ISTHMUS) => true
     rule #isPrecompiledAccount(256p256, ISTHMUS) => true
+```
+
+### Jovian Schedule
+
+```k
+    syntax Schedule ::= "JOVIAN" [symbol(JOVIAN_EVM), smtlib(schedule_JOVIAN)]
+ // --------------------------------------------------------------------------
+
+    rule Gzero    < JOVIAN > => 0
+
+    rule Gbase    < JOVIAN > => 2
+    rule Gverylow < JOVIAN > => 3
+    rule Glow     < JOVIAN > => 5
+    rule Gmid     < JOVIAN > => 8
+    rule Ghigh    < JOVIAN > => 10
+
+    rule Gexp      < JOVIAN > => 10
+    rule Gexpbyte  < JOVIAN > => 50
+    rule Gsha3     < JOVIAN > => 30
+    rule Gsha3word < JOVIAN > => 6
+
+    rule Gsload       < JOVIAN > => 100
+    rule Gsstoreset   < JOVIAN > => 20000
+    rule Gsstorereset < JOVIAN > => 2900
+    rule Rsstoreclear < JOVIAN > => 4800
+
+    rule Glog      < JOVIAN > => 375
+    rule Glogdata  < JOVIAN > => 8
+    rule Glogtopic < JOVIAN > => 375
+
+    rule Gcall        < JOVIAN > => 700
+    rule Gcallstipend < JOVIAN > => 2300
+    rule Gcallvalue   < JOVIAN > => 9000
+    rule Gnewaccount  < JOVIAN > => 25000
+
+    rule Gcreate       < JOVIAN > => 32000
+    rule Gcodedeposit  < JOVIAN > => 200
+    rule Gselfdestruct < JOVIAN > => 5000
+    rule Rselfdestruct < JOVIAN > => 0
+
+    rule Gmemory      < JOVIAN > => 3
+    rule Gquadcoeff   < JOVIAN > => 512
+    rule Gcopy        < JOVIAN > => 3
+    rule Gquaddivisor < JOVIAN > => 3
+    rule Gmexpfactor  < JOVIAN > => 8
+    rule Gmexpmin     < JOVIAN > => 200
+    rule Gminmultcomp < JOVIAN > => 0
+    rule Gmclencutoff < JOVIAN > => 0
+    rule Gmulcompfctr < JOVIAN > => 1
+
+    rule Gtransaction   < JOVIAN > => 21000
+    rule Gtxcreate      < JOVIAN > => 53000
+    rule Gtxdatazero    < JOVIAN > => 4
+    rule Gtxdatanonzero < JOVIAN > => 16
+
+    rule Gjumpdest    < JOVIAN > => 1
+    rule Gbalance     < JOVIAN > => 700
+    rule Gblockhash   < JOVIAN > => 20
+    rule Gextcodesize < JOVIAN > => 700
+    rule Gextcodecopy < JOVIAN > => 700
+
+    rule Gecadd       < JOVIAN > => 150
+    rule Gecmul       < JOVIAN > => 6000
+    rule Gecpairconst < JOVIAN > => 45000
+    rule Gecpaircoeff < JOVIAN > => 34000
+    rule Gfround      < JOVIAN > => 1
+
+    rule maxCodeSize < JOVIAN > => 24576
+    rule Rb          < JOVIAN > => 0
+
+    rule Gcoldsload             < JOVIAN > => 2100
+    rule Gcoldaccountaccess     < JOVIAN > => 2600
+    rule Gwarmstorageread       < JOVIAN > => 100
+    rule Gwarmstoragedirtystore < JOVIAN > => 100
+
+    rule Gpointeval < JOVIAN > => 50000
+
+    rule Gbls12g1add < JOVIAN > => 375
+    rule Gbls12g1mul < JOVIAN > => 12000
+    rule Gbls12g2add < JOVIAN > => 600
+    rule Gbls12g2mul < JOVIAN > => 22500
+    rule Gbls12PairingCheckMul < JOVIAN > => 32600
+    rule Gbls12PairingCheckAdd < JOVIAN > => 37700
+    rule Gbls12mapfptog1 < JOVIAN > => 5500
+    rule Gbls12mapfp2tog2 < JOVIAN > => 23800
+
+    rule Gp256verify < JOVIAN > => 3450
+
+    rule Gaccessliststoragekey < JOVIAN > => 1900
+    rule Gaccesslistaddress    < JOVIAN > => 2400
+
+    rule maxInitCodeSize   < JOVIAN > => 49152
+    rule Ginitcodewordcost < JOVIAN > => 2
+
+    rule Rmaxquotient < JOVIAN > => 5
+
+    rule Gselfdestructnewaccount      << JOVIAN >> => true
+    rule Gstaticcalldepth             << JOVIAN >> => false
+    rule Gemptyisnonexistent          << JOVIAN >> => true
+    rule Gzerovaluenewaccountgas      << JOVIAN >> => false
+    rule Ghasrevert                   << JOVIAN >> => true
+    rule Ghasreturndata               << JOVIAN >> => true
+    rule Ghasstaticcall               << JOVIAN >> => true
+    rule Ghasshift                    << JOVIAN >> => true
+    rule Ghasdirtysstore              << JOVIAN >> => true
+    rule Ghassstorestipend            << JOVIAN >> => true
+    rule Ghascreate2                  << JOVIAN >> => true
+    rule Ghasextcodehash              << JOVIAN >> => true
+    rule Ghasselfbalance              << JOVIAN >> => true
+    rule Ghaschainid                  << JOVIAN >> => true
+    rule Ghasaccesslist               << JOVIAN >> => true
+    rule Ghasbasefee                  << JOVIAN >> => true
+    rule Ghasrejectedfirstbyte        << JOVIAN >> => true
+    rule Ghasprevrandao               << JOVIAN >> => true
+    rule Ghasmaxinitcodesize          << JOVIAN >> => true
+    rule Ghaspushzero                 << JOVIAN >> => true
+    rule Ghaswarmcoinbase             << JOVIAN >> => true
+    rule Ghaswithdrawals              << JOVIAN >> => true
+    rule Ghastransient                << JOVIAN >> => true
+    rule Ghasmcopy                    << JOVIAN >> => true
+    rule Ghasbeaconroot               << JOVIAN >> => true
+    rule Ghaseip6780                  << JOVIAN >> => true
+    rule Ghasblobbasefee              << JOVIAN >> => true
+    rule Ghasblobhash                 << JOVIAN >> => true
+    rule Ghasbls12msmdiscount         << JOVIAN >> => true
+    rule Ghasdelegation               << JOVIAN >> => true
+    rule Gecpairinputcheck            << JOVIAN >> => true
+    rule Ghasclz                      << JOVIAN >> => false
+    rule Gbls12g1msminputcheck        << JOVIAN >> => true
+    rule Gbls12g2msminputcheck        << JOVIAN >> => true
+    rule Gbls12pairingcheckinputcheck << JOVIAN >> => true
+    rule Ghasmodexplimits             << JOVIAN >> => false
+
+    rule #isPrecompiledAccount(1p256, JOVIAN) => true
+    rule #isPrecompiledAccount(2p256, JOVIAN) => true
+    rule #isPrecompiledAccount(3p256, JOVIAN) => true
+    rule #isPrecompiledAccount(4p256, JOVIAN) => true
+    rule #isPrecompiledAccount(5p256, JOVIAN) => true
+    rule #isPrecompiledAccount(6p256, JOVIAN) => true
+    rule #isPrecompiledAccount(7p256, JOVIAN) => true
+    rule #isPrecompiledAccount(8p256, JOVIAN) => true
+    rule #isPrecompiledAccount(9p256, JOVIAN) => true
+    rule #isPrecompiledAccount(10p256, JOVIAN) => true
+    rule #isPrecompiledAccount(11p256, JOVIAN) => true
+    rule #isPrecompiledAccount(12p256, JOVIAN) => true
+    rule #isPrecompiledAccount(13p256, JOVIAN) => true
+    rule #isPrecompiledAccount(14p256, JOVIAN) => true
+    rule #isPrecompiledAccount(15p256, JOVIAN) => true
+    rule #isPrecompiledAccount(16p256, JOVIAN) => true
+    rule #isPrecompiledAccount(17p256, JOVIAN) => true
+    rule #isPrecompiledAccount(256p256, JOVIAN) => true
 
 endmodule
 ```

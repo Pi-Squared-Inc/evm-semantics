@@ -470,22 +470,6 @@ The maximum and minimum values of each type are defined below.
     syntax Int ::= "blsModulus" [macro]
  // -----------------------------------
     rule blsModulus => 52435875175126190479447740508185965837690552500527637822603658699938581184513
-
-    syntax Int ::= "graniteMaxInputSize" [macro]
- // --------------------------------------------
-    rule graniteMaxInputSize => 112687
-
-    syntax Int ::= "isthmusG1msmMaxInputSize"   [macro]
-                 | "isthmusG2msmMaxInputSize"   [macro]
-                 | "isthmusPairingMaxInputSize" [macro]
- // ---------------------------------------------------
-    rule isthmusG1msmMaxInputSize => 513760
-    rule isthmusG2msmMaxInputSize => 488448
-    rule isthmusPairingMaxInputSize => 235008
-
-    syntax Int ::= "modexpInputLimit" [macro]
- // -----------------------------------------------------
-    rule modexpInputLimit => 1024
 ```
 
 Range of types

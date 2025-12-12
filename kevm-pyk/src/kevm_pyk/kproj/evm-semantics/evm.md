@@ -1343,18 +1343,18 @@ Precompiled Contracts
          <output> _ => #let DATA = CD #in #modexp1(#asWord(#range(DATA, 0, 32)), #asWord(#range(DATA, 32, 32)), #asWord(#range(DATA, 64, 32)), #range(DATA, 96, maxInt(0, lengthBytes(DATA) -Int 96))) </output>
          <callData> CD </callData>
          <schedule> SCHED </schedule>
-      requires notBool Ghasmodexplimits << SCHED >> orBool  modexpInputRangeCheck(CD)
+      requires notBool Ghasmodexplimits << SCHED >> orBool  modexpInputRangeCheck(SCHED, CD)
 
    rule <k> MODEXP => #end EVMC_PRECOMPILE_FAILURE ... </k>
         <callData> CD </callData>
         <schedule> SCHED </schedule>
-      requires Ghasmodexplimits << SCHED >> andBool (notBool modexpInputRangeCheck(CD))
+      requires Ghasmodexplimits << SCHED >> andBool (notBool modexpInputRangeCheck(SCHED, CD))
 
-    syntax Bool ::= modexpInputRangeCheck(Bytes) [function]
-    rule modexpInputRangeCheck(DATA) => false requires #asWord(#range(DATA, 0, 32)) >Int modexpInputLimit
-    rule modexpInputRangeCheck(DATA) => false requires #asWord(#range(DATA, 32, 32)) >Int modexpInputLimit
-    rule modexpInputRangeCheck(DATA) => false requires #asWord(#range(DATA, 64, 32)) >Int modexpInputLimit
-    rule modexpInputRangeCheck(DATA) => true [owise]
+    syntax Bool ::= modexpInputRangeCheck(Schedule, Bytes) [function]
+    rule modexpInputRangeCheck(SCHED, DATA) => false requires #asWord(#range(DATA, 0, 32))  >Int Gmodexplimits < SCHED >
+    rule modexpInputRangeCheck(SCHED, DATA) => false requires #asWord(#range(DATA, 32, 32)) >Int Gmodexplimits < SCHED >
+    rule modexpInputRangeCheck(SCHED, DATA) => false requires #asWord(#range(DATA, 64, 32)) >Int Gmodexplimits < SCHED >
+    rule modexpInputRangeCheck(_, _)        => true [owise]
 
     syntax Bytes ::= #modexp1 ( Int , Int , Int , Bytes ) [symbol(#modexp1), function]
                    | #modexp2 ( Int , Int , Int , Bytes ) [symbol(#modexp2), function]
@@ -2225,15 +2225,15 @@ The intrinsic gas calculation mirrors the style of the YellowPaper (appendix H).
 
     rule <k> #gasExec(SCHED, ECADD)     => Gecadd < SCHED>  ... </k>
     rule <k> #gasExec(SCHED, ECMUL)     => Gecmul < SCHED > ... </k>
-   rule <k> #gasExec(SCHED, ECPAIRING) => #if Gecpairinputcheck << SCHED >> andBool lengthBytes(CD) >Int graniteMaxInputSize #then #end EVMC_PRECOMPILE_ECPAIRING_LENGTH #else Gecpairconst < SCHED > +Int (lengthBytes(CD) /Int 192) *Int Gecpaircoeff < SCHED > #fi ... </k> <callData> CD </callData>
+   rule <k> #gasExec(SCHED, ECPAIRING) => #if Gecpairinginputcheck << SCHED >> andBool lengthBytes(CD) >Int Gecpairingmaxinputsize < SCHED > #then #end EVMC_PRECOMPILE_ECPAIRING_LENGTH #else Gecpairconst < SCHED > +Int (lengthBytes(CD) /Int 192) *Int Gecpaircoeff < SCHED > #fi ... </k> <callData> CD </callData>
 
     rule <k> #gasExec(SCHED, BLAKE2F)   => Gfround < SCHED > *Int #asWord(#range(CD, 0, 4) ) ... </k> <callData> CD </callData>
     rule <k> #gasExec(SCHED, KZGPOINTEVAL)  => Gpointeval < SCHED > ... </k>
     rule <k> #gasExec(SCHED, BLS12G1ADD)    => Gbls12g1add < SCHED > ... </k>
-    rule <k> #gasExec(SCHED, BLS12G1MSM)    => #if Gbls12g1msminputcheck << SCHED >> andBool lengthBytes(CD) >Int isthmusG1msmMaxInputSize #then #end EVMC_PRECOMPILE_BLS12G1MSM_LENGTH #else #let N = lengthBytes(CD) /Int 160 #in N *Int Gbls12g1mul < SCHED > *Int Cbls12g1MsmDiscount(SCHED, N) /Int 1000 #fi ... </k> <callData> CD </callData>
+    rule <k> #gasExec(SCHED, BLS12G1MSM)    => #if Gbls12g1msminputcheck << SCHED >> andBool lengthBytes(CD) >Int Gbls12g1msmmaxinputsize < SCHED > #then #end EVMC_PRECOMPILE_BLS12G1MSM_LENGTH #else #let N = lengthBytes(CD) /Int 160 #in N *Int Gbls12g1mul < SCHED > *Int Cbls12g1MsmDiscount(SCHED, N) /Int 1000 #fi ... </k> <callData> CD </callData>
     rule <k> #gasExec(SCHED, BLS12G2ADD)    => Gbls12g2add < SCHED > ... </k>
-    rule <k> #gasExec(SCHED, BLS12G2MSM)    => #if Gbls12g2msminputcheck << SCHED >> andBool lengthBytes(CD) >Int isthmusG2msmMaxInputSize #then #end EVMC_PRECOMPILE_BLS12G2MSM_LENGTH #else #let N = lengthBytes(CD) /Int 288 #in N *Int Gbls12g2mul < SCHED > *Int Cbls12g2MsmDiscount(SCHED, N) /Int 1000 #fi ... </k> <callData> CD </callData>
-    rule <k> #gasExec(SCHED, BLS12PAIRING_CHECK)    => #if Gbls12pairingcheckinputcheck << SCHED >> andBool lengthBytes(CD) >Int isthmusPairingMaxInputSize #then #end EVMC_PRECOMPILE_BLS12PAIRING_LENGTH #else #let N = lengthBytes(CD) /Int 384 #in N *Int Gbls12PairingCheckMul < SCHED > +Int Gbls12PairingCheckAdd < SCHED > #fi ... </k> <callData> CD </callData>
+    rule <k> #gasExec(SCHED, BLS12G2MSM)    => #if Gbls12g2msminputcheck << SCHED >> andBool lengthBytes(CD) >Int Gbls12g2msmmaxinputsize < SCHED > #then #end EVMC_PRECOMPILE_BLS12G2MSM_LENGTH #else #let N = lengthBytes(CD) /Int 288 #in N *Int Gbls12g2mul < SCHED > *Int Cbls12g2MsmDiscount(SCHED, N) /Int 1000 #fi ... </k> <callData> CD </callData>
+    rule <k> #gasExec(SCHED, BLS12PAIRING_CHECK)    => #if Gbls12pairingcheckinputcheck << SCHED >> andBool lengthBytes(CD) >Int Gbls12pairingcheckmaxinputsize < SCHED > #then #end EVMC_PRECOMPILE_BLS12PAIRING_LENGTH #else #let N = lengthBytes(CD) /Int 384 #in N *Int Gbls12PairingCheckMul < SCHED > +Int Gbls12PairingCheckAdd < SCHED > #fi ... </k> <callData> CD </callData>
     rule <k> #gasExec(SCHED, BLS12MAPFPTOG1) => Gbls12mapfptog1 < SCHED > ... </k>
     rule <k> #gasExec(SCHED, BLS12MAPFP2TOG2) => Gbls12mapfp2tog2 < SCHED > ... </k>
     rule <k> #gasExec(SCHED, P256VERIFY)  => Gp256verify < SCHED > ... </k>

@@ -44,6 +44,7 @@ module SCHEDULE
     rule getSchedule(105) => GRANITE
     rule getSchedule(106) => HOLOCENE
     rule getSchedule(107) => ISTHMUS
+    rule getSchedule(108) => JOVIAN
 
     syntax Bool ::= isOptimismSchedule(Schedule) [function]
  // -------------------------------------------------------
@@ -55,6 +56,7 @@ module SCHEDULE
     rule isOptimismSchedule(GRANITE) => true
     rule isOptimismSchedule(HOLOCENE) => true
     rule isOptimismSchedule(ISTHMUS) => true
+    rule isOptimismSchedule(JOVIAN) => true
     rule isOptimismSchedule(FRONTIER) => false
     rule isOptimismSchedule(HOMESTEAD) => false
     rule isOptimismSchedule(TANGERINE_WHISTLE) => false
@@ -74,14 +76,14 @@ module SCHEDULE
     syntax Bool ::= ScheduleFlag "<<" Schedule ">>" [function, total]
  // -----------------------------------------------------------------
 
-    syntax ScheduleFlag ::= "Gselfdestructnewaccount" | "Gstaticcalldepth" | "Gemptyisnonexistent" | "Gzerovaluenewaccountgas"
-                          | "Ghasrevert"              | "Ghasreturndata"        | "Ghasstaticcall"      | "Ghasshift"
-                          | "Ghasdirtysstore"         | "Ghascreate2"           | "Ghasextcodehash"     | "Ghasselfbalance"
-                          | "Ghassstorestipend"       | "Ghaschainid"           | "Ghasaccesslist"      | "Ghasbasefee"
-                          | "Ghasrejectedfirstbyte"   | "Ghasprevrandao"        | "Ghasmaxinitcodesize" | "Ghaspushzero"
-                          | "Ghaswarmcoinbase"        | "Ghaswithdrawals"       | "Ghastransient"       | "Ghasmcopy"
-                          | "Ghasbeaconroot"          | "Ghaseip6780"           | "Ghasblobbasefee"     | "Ghasblobhash"
-                          | "Ghasbls12msmdiscount"    | "Ghasdelegation"        | "Gecpairinputcheck"   | "Ghasclz"
+    syntax ScheduleFlag ::= "Gselfdestructnewaccount" | "Gstaticcalldepth"      | "Gemptyisnonexistent"  | "Gzerovaluenewaccountgas"
+                          | "Ghasrevert"              | "Ghasreturndata"        | "Ghasstaticcall"       | "Ghasshift"
+                          | "Ghasdirtysstore"         | "Ghascreate2"           | "Ghasextcodehash"      | "Ghasselfbalance"
+                          | "Ghassstorestipend"       | "Ghaschainid"           | "Ghasaccesslist"       | "Ghasbasefee"
+                          | "Ghasrejectedfirstbyte"   | "Ghasprevrandao"        | "Ghasmaxinitcodesize"  | "Ghaspushzero"
+                          | "Ghaswarmcoinbase"        | "Ghaswithdrawals"       | "Ghastransient"        | "Ghasmcopy"
+                          | "Ghasbeaconroot"          | "Ghaseip6780"           | "Ghasblobbasefee"      | "Ghasblobhash"
+                          | "Ghasbls12msmdiscount"    | "Ghasdelegation"        | "Gecpairinginputcheck" | "Ghasclz"
                           | "Gbls12g1msminputcheck"   | "Gbls12g2msminputcheck" | "Gbls12pairingcheckinputcheck"
                           | "Ghasmodexplimits"
 
@@ -108,8 +110,10 @@ A `ScheduleConst` is a constant determined by the fee schedule.
                            | "Gaccessliststoragekey"           | "Rmaxquotient"  | "Ginitcodewordcost" | "maxInitCodeSize"    | "Gwarmstoragedirtystore"
                            | "Gpointeval"    | "Gbls12g1add"   | "Gbls12g1mul"   | "Gbls12g2add"       | "Gbls12g2mul"        | "Gbls12PairingCheckMul"
                            | "Gbls12PairingCheckAdd"           | "Gbls12mapfptog1"                     | "Gbls12mapfp2tog2"   | "Gp256verify"      | "Gmexpfactor" 
-                           | "Gmexpmin"      | "Gminmultcomp"  | "Gmulcompfctr"                        | "Gmclencutoff"
- // ----------------------------------------------------------------------------------------------------------------------------------------------------
+                           | "Gmexpmin"      | "Gminmultcomp"  | "Gmulcompfctr"                        | "Gmclencutoff"       | "Gecpairingmaxinputsize"
+                           | "Gbls12g1msmmaxinputsize"         | "Gbls12g2msmmaxinputsize"             | "Gbls12pairingcheckmaxinputsize"
+                           | "Gmodexplimits"
+ // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ```
 
 ### Frontier Schedule
@@ -204,6 +208,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < FRONTIER > => 2
 
+    rule Gecpairingmaxinputsize         < FRONTIER > => 0
+    rule Gbls12g1msmmaxinputsize        < FRONTIER > => 0
+    rule Gbls12g2msmmaxinputsize        < FRONTIER > => 0
+    rule Gbls12pairingcheckmaxinputsize < FRONTIER > => 0
+    rule Gmodexplimits                  < FRONTIER > => 0
+
     rule Gselfdestructnewaccount      << FRONTIER >> => false
     rule Gstaticcalldepth             << FRONTIER >> => true
     rule Gemptyisnonexistent          << FRONTIER >> => false
@@ -234,7 +244,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << FRONTIER >> => false
     rule Ghasbls12msmdiscount         << FRONTIER >> => false
     rule Ghasdelegation               << FRONTIER >> => false
-    rule Gecpairinputcheck            << FRONTIER >> => false
+    rule Gecpairinginputcheck         << FRONTIER >> => false
     rule Ghasclz                      << FRONTIER >> => false
     rule Gbls12g1msminputcheck        << FRONTIER >> => false
     rule Gbls12g2msminputcheck        << FRONTIER >> => false
@@ -338,6 +348,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < HOMESTEAD > => 2
 
+    rule Gecpairingmaxinputsize         < HOMESTEAD > => 0
+    rule Gbls12g1msmmaxinputsize        < HOMESTEAD > => 0
+    rule Gbls12g2msmmaxinputsize        < HOMESTEAD > => 0
+    rule Gbls12pairingcheckmaxinputsize < HOMESTEAD > => 0
+    rule Gmodexplimits                  < HOMESTEAD > => 0
+
     rule Gselfdestructnewaccount      << HOMESTEAD >> => false
     rule Gstaticcalldepth             << HOMESTEAD >> => true
     rule Gemptyisnonexistent          << HOMESTEAD >> => false
@@ -368,7 +384,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << HOMESTEAD >> => false
     rule Ghasbls12msmdiscount         << HOMESTEAD >> => false
     rule Ghasdelegation               << HOMESTEAD >> => false
-    rule Gecpairinputcheck            << HOMESTEAD >> => false
+    rule Gecpairinginputcheck         << HOMESTEAD >> => false
     rule Ghasclz                      << HOMESTEAD >> => false
     rule Gbls12g1msminputcheck        << HOMESTEAD >> => false
     rule Gbls12g2msminputcheck        << HOMESTEAD >> => false
@@ -473,6 +489,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < TANGERINE_WHISTLE > => 2
 
+    rule Gecpairingmaxinputsize         < TANGERINE_WHISTLE > => 0
+    rule Gbls12g1msmmaxinputsize        < TANGERINE_WHISTLE > => 0
+    rule Gbls12g2msmmaxinputsize        < TANGERINE_WHISTLE > => 0
+    rule Gbls12pairingcheckmaxinputsize < TANGERINE_WHISTLE > => 0
+    rule Gmodexplimits                  < TANGERINE_WHISTLE > => 0
+
     rule Gselfdestructnewaccount      << TANGERINE_WHISTLE >> => true
     rule Gstaticcalldepth             << TANGERINE_WHISTLE >> => false
     rule Gemptyisnonexistent          << TANGERINE_WHISTLE >> => false
@@ -503,7 +525,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << TANGERINE_WHISTLE >> => false
     rule Ghasbls12msmdiscount         << TANGERINE_WHISTLE >> => false
     rule Ghasdelegation               << TANGERINE_WHISTLE >> => false
-    rule Gecpairinputcheck            << TANGERINE_WHISTLE >> => false
+    rule Gecpairinginputcheck         << TANGERINE_WHISTLE >> => false
     rule Ghasclz                      << TANGERINE_WHISTLE >> => false
     rule Gbls12g1msminputcheck        << TANGERINE_WHISTLE >> => false
     rule Gbls12g2msminputcheck        << TANGERINE_WHISTLE >> => false
@@ -608,6 +630,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < SPURIOUS_DRAGON > => 2
 
+    rule Gecpairingmaxinputsize         < SPURIOUS_DRAGON > => 0
+    rule Gbls12g1msmmaxinputsize        < SPURIOUS_DRAGON > => 0
+    rule Gbls12g2msmmaxinputsize        < SPURIOUS_DRAGON > => 0
+    rule Gbls12pairingcheckmaxinputsize < SPURIOUS_DRAGON > => 0
+    rule Gmodexplimits                  < SPURIOUS_DRAGON > => 0
+
     rule Gselfdestructnewaccount      << SPURIOUS_DRAGON >> => true
     rule Gstaticcalldepth             << SPURIOUS_DRAGON >> => false
     rule Gemptyisnonexistent          << SPURIOUS_DRAGON >> => true
@@ -638,7 +666,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << SPURIOUS_DRAGON >> => false
     rule Ghasbls12msmdiscount         << SPURIOUS_DRAGON >> => false
     rule Ghasdelegation               << SPURIOUS_DRAGON >> => false
-    rule Gecpairinputcheck            << SPURIOUS_DRAGON >> => false
+    rule Gecpairinginputcheck         << SPURIOUS_DRAGON >> => false
     rule Ghasclz                      << SPURIOUS_DRAGON >> => false
     rule Gbls12g1msminputcheck        << SPURIOUS_DRAGON >> => false
     rule Gbls12g2msminputcheck        << SPURIOUS_DRAGON >> => false
@@ -743,6 +771,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < BYZANTIUM > => 2
 
+    rule Gecpairingmaxinputsize         < BYZANTIUM > => 0
+    rule Gbls12g1msmmaxinputsize        < BYZANTIUM > => 0
+    rule Gbls12g2msmmaxinputsize        < BYZANTIUM > => 0
+    rule Gbls12pairingcheckmaxinputsize < BYZANTIUM > => 0
+    rule Gmodexplimits                  < BYZANTIUM > => 0
+
     rule Gselfdestructnewaccount      << BYZANTIUM >> => true
     rule Gstaticcalldepth             << BYZANTIUM >> => false
     rule Gemptyisnonexistent          << BYZANTIUM >> => true
@@ -773,7 +807,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << BYZANTIUM >> => false
     rule Ghasbls12msmdiscount         << BYZANTIUM >> => false
     rule Ghasdelegation               << BYZANTIUM >> => false
-    rule Gecpairinputcheck            << BYZANTIUM >> => false
+    rule Gecpairinginputcheck         << BYZANTIUM >> => false
     rule Ghasclz                      << BYZANTIUM >> => false
     rule Gbls12g1msminputcheck        << BYZANTIUM >> => false
     rule Gbls12g2msminputcheck        << BYZANTIUM >> => false
@@ -882,6 +916,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < CONSTANTINOPLE > => 2
 
+    rule Gecpairingmaxinputsize         < CONSTANTINOPLE > => 0
+    rule Gbls12g1msmmaxinputsize        < CONSTANTINOPLE > => 0
+    rule Gbls12g2msmmaxinputsize        < CONSTANTINOPLE > => 0
+    rule Gbls12pairingcheckmaxinputsize < CONSTANTINOPLE > => 0
+    rule Gmodexplimits                  < CONSTANTINOPLE > => 0
+
     rule Gselfdestructnewaccount      << CONSTANTINOPLE >> => true
     rule Gstaticcalldepth             << CONSTANTINOPLE >> => false
     rule Gemptyisnonexistent          << CONSTANTINOPLE >> => true
@@ -912,7 +952,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << CONSTANTINOPLE >> => false
     rule Ghasbls12msmdiscount         << CONSTANTINOPLE >> => false
     rule Ghasdelegation               << CONSTANTINOPLE >> => false
-    rule Gecpairinputcheck            << CONSTANTINOPLE >> => false
+    rule Gecpairinginputcheck         << CONSTANTINOPLE >> => false
     rule Ghasclz                      << CONSTANTINOPLE >> => false
     rule Gbls12g1msminputcheck        << CONSTANTINOPLE >> => false
     rule Gbls12g2msminputcheck        << CONSTANTINOPLE >> => false
@@ -1021,6 +1061,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < PETERSBURG > => 2
 
+    rule Gecpairingmaxinputsize         < PETERSBURG > => 0
+    rule Gbls12g1msmmaxinputsize        < PETERSBURG > => 0
+    rule Gbls12g2msmmaxinputsize        < PETERSBURG > => 0
+    rule Gbls12pairingcheckmaxinputsize < PETERSBURG > => 0
+    rule Gmodexplimits                  < PETERSBURG > => 0
+
     rule Gselfdestructnewaccount      << PETERSBURG >> => true
     rule Gstaticcalldepth             << PETERSBURG >> => false
     rule Gemptyisnonexistent          << PETERSBURG >> => true
@@ -1051,7 +1097,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << PETERSBURG >> => false
     rule Ghasbls12msmdiscount         << PETERSBURG >> => false
     rule Ghasdelegation               << PETERSBURG >> => false
-    rule Gecpairinputcheck            << PETERSBURG >> => false
+    rule Gecpairinginputcheck         << PETERSBURG >> => false
     rule Ghasclz                      << PETERSBURG >> => false
     rule Gbls12g1msminputcheck        << PETERSBURG >> => false
     rule Gbls12g2msminputcheck        << PETERSBURG >> => false
@@ -1160,6 +1206,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < ISTANBUL > => 2
 
+    rule Gecpairingmaxinputsize         < ISTANBUL > => 0
+    rule Gbls12g1msmmaxinputsize        < ISTANBUL > => 0
+    rule Gbls12g2msmmaxinputsize        < ISTANBUL > => 0
+    rule Gbls12pairingcheckmaxinputsize < ISTANBUL > => 0
+    rule Gmodexplimits                  < ISTANBUL > => 0
+
     rule Gselfdestructnewaccount      << ISTANBUL >> => true
     rule Gstaticcalldepth             << ISTANBUL >> => false
     rule Gemptyisnonexistent          << ISTANBUL >> => true
@@ -1190,7 +1242,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << ISTANBUL >> => false
     rule Ghasbls12msmdiscount         << ISTANBUL >> => false
     rule Ghasdelegation               << ISTANBUL >> => false
-    rule Gecpairinputcheck            << ISTANBUL >> => false
+    rule Gecpairinginputcheck         << ISTANBUL >> => false
     rule Ghasclz                      << ISTANBUL >> => false
     rule Gbls12g1msminputcheck        << ISTANBUL >> => false
     rule Gbls12g2msminputcheck        << ISTANBUL >> => false
@@ -1300,6 +1352,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < BERLIN > => 2
 
+    rule Gecpairingmaxinputsize         < BERLIN > => 0
+    rule Gbls12g1msmmaxinputsize        < BERLIN > => 0
+    rule Gbls12g2msmmaxinputsize        < BERLIN > => 0
+    rule Gbls12pairingcheckmaxinputsize < BERLIN > => 0
+    rule Gmodexplimits                  < BERLIN > => 0
+
     rule Gselfdestructnewaccount      << BERLIN >> => true
     rule Gstaticcalldepth             << BERLIN >> => false
     rule Gemptyisnonexistent          << BERLIN >> => true
@@ -1330,7 +1388,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << BERLIN >> => false
     rule Ghasbls12msmdiscount         << BERLIN >> => false
     rule Ghasdelegation               << BERLIN >> => false
-    rule Gecpairinputcheck            << BERLIN >> => false
+    rule Gecpairinginputcheck         << BERLIN >> => false
     rule Ghasclz                      << BERLIN >> => false
     rule Gbls12g1msminputcheck        << BERLIN >> => false
     rule Gbls12g2msminputcheck        << BERLIN >> => false
@@ -1440,6 +1498,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < LONDON > => 5
 
+    rule Gecpairingmaxinputsize         < LONDON > => 0
+    rule Gbls12g1msmmaxinputsize        < LONDON > => 0
+    rule Gbls12g2msmmaxinputsize        < LONDON > => 0
+    rule Gbls12pairingcheckmaxinputsize < LONDON > => 0
+    rule Gmodexplimits                  < LONDON > => 0
+
     rule Gselfdestructnewaccount      << LONDON >> => true
     rule Gstaticcalldepth             << LONDON >> => false
     rule Gemptyisnonexistent          << LONDON >> => true
@@ -1470,7 +1534,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << LONDON >> => false
     rule Ghasbls12msmdiscount         << LONDON >> => false
     rule Ghasdelegation               << LONDON >> => false
-    rule Gecpairinputcheck            << LONDON >> => false
+    rule Gecpairinginputcheck         << LONDON >> => false
     rule Ghasclz                      << LONDON >> => false
     rule Gbls12g1msminputcheck        << LONDON >> => false
     rule Gbls12g2msminputcheck        << LONDON >> => false
@@ -1580,6 +1644,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < MERGE > => 5
 
+    rule Gecpairingmaxinputsize         < MERGE > => 0
+    rule Gbls12g1msmmaxinputsize        < MERGE > => 0
+    rule Gbls12g2msmmaxinputsize        < MERGE > => 0
+    rule Gbls12pairingcheckmaxinputsize < MERGE > => 0
+    rule Gmodexplimits                  < MERGE > => 0
+
     rule Gselfdestructnewaccount      << MERGE >> => true
     rule Gstaticcalldepth             << MERGE >> => false
     rule Gemptyisnonexistent          << MERGE >> => true
@@ -1610,7 +1680,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << MERGE >> => false
     rule Ghasbls12msmdiscount         << MERGE >> => false
     rule Ghasdelegation               << MERGE >> => false
-    rule Gecpairinputcheck            << MERGE >> => false
+    rule Gecpairinginputcheck         << MERGE >> => false
     rule Ghasclz                      << MERGE >> => false
     rule Gbls12g1msminputcheck        << MERGE >> => false
     rule Gbls12g2msminputcheck        << MERGE >> => false
@@ -1721,6 +1791,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < SHANGHAI > => 5
 
+    rule Gecpairingmaxinputsize         < SHANGHAI > => 0
+    rule Gbls12g1msmmaxinputsize        < SHANGHAI > => 0
+    rule Gbls12g2msmmaxinputsize        < SHANGHAI > => 0
+    rule Gbls12pairingcheckmaxinputsize < SHANGHAI > => 0
+    rule Gmodexplimits                  < SHANGHAI > => 0
+
     rule Gselfdestructnewaccount      << SHANGHAI >> => true
     rule Gstaticcalldepth             << SHANGHAI >> => false
     rule Gemptyisnonexistent          << SHANGHAI >> => true
@@ -1751,7 +1827,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << SHANGHAI >> => false
     rule Ghasbls12msmdiscount         << SHANGHAI >> => false
     rule Ghasdelegation               << SHANGHAI >> => false
-    rule Gecpairinputcheck            << SHANGHAI >> => false
+    rule Gecpairinginputcheck         << SHANGHAI >> => false
     rule Ghasclz                      << SHANGHAI >> => false
     rule Gbls12g1msminputcheck        << SHANGHAI >> => false
     rule Gbls12g2msminputcheck        << SHANGHAI >> => false
@@ -1862,6 +1938,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < CANCUN > => 5
 
+    rule Gecpairingmaxinputsize         < CANCUN > => 0
+    rule Gbls12g1msmmaxinputsize        < CANCUN > => 0
+    rule Gbls12g2msmmaxinputsize        < CANCUN > => 0
+    rule Gbls12pairingcheckmaxinputsize < CANCUN > => 0
+    rule Gmodexplimits                  < CANCUN > => 0
+
     rule Gselfdestructnewaccount      << CANCUN >> => true
     rule Gstaticcalldepth             << CANCUN >> => false
     rule Gemptyisnonexistent          << CANCUN >> => true
@@ -1892,7 +1974,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << CANCUN >> => true
     rule Ghasbls12msmdiscount         << CANCUN >> => false
     rule Ghasdelegation               << CANCUN >> => false
-    rule Gecpairinputcheck            << CANCUN >> => false
+    rule Gecpairinginputcheck         << CANCUN >> => false
     rule Ghasclz                      << CANCUN >> => false
     rule Gbls12g1msminputcheck        << CANCUN >> => false
     rule Gbls12g2msminputcheck        << CANCUN >> => false
@@ -2005,6 +2087,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < PRAGUE > => 5
 
+    rule Gecpairingmaxinputsize         < PRAGUE > => 0
+    rule Gbls12g1msmmaxinputsize        < PRAGUE > => 0
+    rule Gbls12g2msmmaxinputsize        < PRAGUE > => 0
+    rule Gbls12pairingcheckmaxinputsize < PRAGUE > => 0
+    rule Gmodexplimits                  < PRAGUE > => 0
+
     rule Gselfdestructnewaccount      << PRAGUE >> => true
     rule Gstaticcalldepth             << PRAGUE >> => false
     rule Gemptyisnonexistent          << PRAGUE >> => true
@@ -2035,7 +2123,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << PRAGUE >> => true
     rule Ghasbls12msmdiscount         << PRAGUE >> => true
     rule Ghasdelegation               << PRAGUE >> => true
-    rule Gecpairinputcheck            << PRAGUE >> => false
+    rule Gecpairinginputcheck         << PRAGUE >> => false
     rule Ghasclz                      << PRAGUE >> => false
     rule Gbls12g1msminputcheck        << PRAGUE >> => false
     rule Gbls12g2msminputcheck        << PRAGUE >> => false
@@ -2155,6 +2243,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < OSAKA > => 5
 
+    rule Gecpairingmaxinputsize         < OSAKA > => 0
+    rule Gbls12g1msmmaxinputsize        < OSAKA > => 0
+    rule Gbls12g2msmmaxinputsize        < OSAKA > => 0
+    rule Gbls12pairingcheckmaxinputsize < OSAKA > => 0
+    rule Gmodexplimits                  < OSAKA > => 1024
+
     rule Gselfdestructnewaccount      << OSAKA >> => true
     rule Gstaticcalldepth             << OSAKA >> => false
     rule Gemptyisnonexistent          << OSAKA >> => true
@@ -2185,7 +2279,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << OSAKA >> => true
     rule Ghasbls12msmdiscount         << OSAKA >> => true
     rule Ghasdelegation               << OSAKA >> => true
-    rule Gecpairinputcheck            << OSAKA >> => false
+    rule Gecpairinginputcheck         << OSAKA >> => false
     rule Ghasclz                      << OSAKA >> => true
     rule Gbls12g1msminputcheck        << OSAKA >> => false
     rule Gbls12g2msminputcheck        << OSAKA >> => false
@@ -2304,6 +2398,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < BEDROCK > => 5
 
+    rule Gecpairingmaxinputsize         < BEDROCK > => 0
+    rule Gbls12g1msmmaxinputsize        < BEDROCK > => 0
+    rule Gbls12g2msmmaxinputsize        < BEDROCK > => 0
+    rule Gbls12pairingcheckmaxinputsize < BEDROCK > => 0
+    rule Gmodexplimits                  < BEDROCK > => 0
+
     rule Gselfdestructnewaccount      << BEDROCK >> => true
     rule Gstaticcalldepth             << BEDROCK >> => false
     rule Gemptyisnonexistent          << BEDROCK >> => true
@@ -2334,7 +2434,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << BEDROCK >> => false
     rule Ghasbls12msmdiscount         << BEDROCK >> => false
     rule Ghasdelegation               << BEDROCK >> => false
-    rule Gecpairinputcheck            << BEDROCK >> => false
+    rule Gecpairinginputcheck         << BEDROCK >> => false
     rule Ghasclz                      << BEDROCK >> => false
     rule Gbls12g1msminputcheck        << BEDROCK >> => false
     rule Gbls12g2msminputcheck        << BEDROCK >> => false
@@ -2444,6 +2544,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < REGOLITH > => 5
 
+    rule Gecpairingmaxinputsize         < REGOLITH > => 0
+    rule Gbls12g1msmmaxinputsize        < REGOLITH > => 0
+    rule Gbls12g2msmmaxinputsize        < REGOLITH > => 0
+    rule Gbls12pairingcheckmaxinputsize < REGOLITH > => 0
+    rule Gmodexplimits                  < REGOLITH > => 0
+
     rule Gselfdestructnewaccount      << REGOLITH >> => true
     rule Gstaticcalldepth             << REGOLITH >> => false
     rule Gemptyisnonexistent          << REGOLITH >> => true
@@ -2474,7 +2580,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << REGOLITH >> => false
     rule Ghasbls12msmdiscount         << REGOLITH >> => false
     rule Ghasdelegation               << REGOLITH >> => false
-    rule Gecpairinputcheck            << REGOLITH >> => false
+    rule Gecpairinginputcheck         << REGOLITH >> => false
     rule Ghasclz                      << REGOLITH >> => false
     rule Gbls12g1msminputcheck        << REGOLITH >> => false
     rule Gbls12g2msminputcheck        << REGOLITH >> => false
@@ -2585,6 +2691,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < CANYON > => 5
 
+    rule Gecpairingmaxinputsize         < CANYON > => 0
+    rule Gbls12g1msmmaxinputsize        < CANYON > => 0
+    rule Gbls12g2msmmaxinputsize        < CANYON > => 0
+    rule Gbls12pairingcheckmaxinputsize < CANYON > => 0
+    rule Gmodexplimits                  < CANYON > => 0
+
     rule Gselfdestructnewaccount      << CANYON >> => true
     rule Gstaticcalldepth             << CANYON >> => false
     rule Gemptyisnonexistent          << CANYON >> => true
@@ -2615,7 +2727,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << CANYON >> => false
     rule Ghasbls12msmdiscount         << CANYON >> => false
     rule Ghasdelegation               << CANYON >> => false
-    rule Gecpairinputcheck            << CANYON >> => false
+    rule Gecpairinginputcheck         << CANYON >> => false
     rule Ghasclz                      << CANYON >> => false
     rule Gbls12g1msminputcheck        << CANYON >> => false
     rule Gbls12g2msminputcheck        << CANYON >> => false
@@ -2726,6 +2838,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < ECOTONE > => 5
 
+    rule Gecpairingmaxinputsize         < ECOTONE > => 0
+    rule Gbls12g1msmmaxinputsize        < ECOTONE > => 0
+    rule Gbls12g2msmmaxinputsize        < ECOTONE > => 0
+    rule Gbls12pairingcheckmaxinputsize < ECOTONE > => 0
+    rule Gmodexplimits                  < ECOTONE > => 0
+
     rule Gselfdestructnewaccount      << ECOTONE >> => true
     rule Gstaticcalldepth             << ECOTONE >> => false
     rule Gemptyisnonexistent          << ECOTONE >> => true
@@ -2756,7 +2874,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << ECOTONE >> => true
     rule Ghasbls12msmdiscount         << ECOTONE >> => false
     rule Ghasdelegation               << ECOTONE >> => false
-    rule Gecpairinputcheck            << ECOTONE >> => false
+    rule Gecpairinginputcheck         << ECOTONE >> => false
     rule Ghasclz                      << ECOTONE >> => false
     rule Gbls12g1msminputcheck        << ECOTONE >> => false
     rule Gbls12g2msminputcheck        << ECOTONE >> => false
@@ -2868,6 +2986,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < FJORD > => 5
 
+    rule Gecpairingmaxinputsize         < FJORD > => 0
+    rule Gbls12g1msmmaxinputsize        < FJORD > => 0
+    rule Gbls12g2msmmaxinputsize        < FJORD > => 0
+    rule Gbls12pairingcheckmaxinputsize < FJORD > => 0
+    rule Gmodexplimits                  < FJORD > => 0
+
     rule Gselfdestructnewaccount      << FJORD >> => true
     rule Gstaticcalldepth             << FJORD >> => false
     rule Gemptyisnonexistent          << FJORD >> => true
@@ -2898,7 +3022,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << FJORD >> => true
     rule Ghasbls12msmdiscount         << FJORD >> => false
     rule Ghasdelegation               << FJORD >> => false
-    rule Gecpairinputcheck            << FJORD >> => false
+    rule Gecpairinginputcheck         << FJORD >> => false
     rule Ghasclz                      << FJORD >> => false
     rule Gbls12g1msminputcheck        << FJORD >> => false
     rule Gbls12g2msminputcheck        << FJORD >> => false
@@ -3011,6 +3135,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < GRANITE > => 5
 
+    rule Gecpairingmaxinputsize         < GRANITE > => 112687
+    rule Gbls12g1msmmaxinputsize        < GRANITE > => 0
+    rule Gbls12g2msmmaxinputsize        < GRANITE > => 0
+    rule Gbls12pairingcheckmaxinputsize < GRANITE > => 0
+    rule Gmodexplimits                  < GRANITE > => 0
+
     rule Gselfdestructnewaccount      << GRANITE >> => true
     rule Gstaticcalldepth             << GRANITE >> => false
     rule Gemptyisnonexistent          << GRANITE >> => true
@@ -3041,7 +3171,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << GRANITE >> => true
     rule Ghasbls12msmdiscount         << GRANITE >> => false
     rule Ghasdelegation               << GRANITE >> => false
-    rule Gecpairinputcheck            << GRANITE >> => true
+    rule Gecpairinginputcheck         << GRANITE >> => true
     rule Ghasclz                      << GRANITE >> => false
     rule Gbls12g1msminputcheck        << GRANITE >> => false
     rule Gbls12g2msminputcheck        << GRANITE >> => false
@@ -3154,6 +3284,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < HOLOCENE > => 5
 
+    rule Gecpairingmaxinputsize         < HOLOCENE > => 112687
+    rule Gbls12g1msmmaxinputsize        < HOLOCENE > => 0
+    rule Gbls12g2msmmaxinputsize        < HOLOCENE > => 0
+    rule Gbls12pairingcheckmaxinputsize < HOLOCENE > => 0
+    rule Gmodexplimits                  < HOLOCENE > => 0
+
     rule Gselfdestructnewaccount      << HOLOCENE >> => true
     rule Gstaticcalldepth             << HOLOCENE >> => false
     rule Gemptyisnonexistent          << HOLOCENE >> => true
@@ -3184,7 +3320,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << HOLOCENE >> => true
     rule Ghasbls12msmdiscount         << HOLOCENE >> => false
     rule Ghasdelegation               << HOLOCENE >> => false
-    rule Gecpairinputcheck            << HOLOCENE >> => true
+    rule Gecpairinginputcheck         << HOLOCENE >> => true
     rule Ghasclz                      << HOLOCENE >> => false
     rule Gbls12g1msminputcheck        << HOLOCENE >> => false
     rule Gbls12g2msminputcheck        << HOLOCENE >> => false
@@ -3298,6 +3434,12 @@ A `ScheduleConst` is a constant determined by the fee schedule.
 
     rule Rmaxquotient < ISTHMUS > => 5
 
+    rule Gecpairingmaxinputsize         < ISTHMUS > => 112687
+    rule Gbls12g1msmmaxinputsize        < ISTHMUS > => 513760
+    rule Gbls12g2msmmaxinputsize        < ISTHMUS > => 488448
+    rule Gbls12pairingcheckmaxinputsize < ISTHMUS > => 235008
+    rule Gmodexplimits                  < ISTHMUS > => 0
+
     rule Gselfdestructnewaccount      << ISTHMUS >> => true
     rule Gstaticcalldepth             << ISTHMUS >> => false
     rule Gemptyisnonexistent          << ISTHMUS >> => true
@@ -3328,7 +3470,7 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule Ghasblobhash                 << ISTHMUS >> => true
     rule Ghasbls12msmdiscount         << ISTHMUS >> => true
     rule Ghasdelegation               << ISTHMUS >> => true
-    rule Gecpairinputcheck            << ISTHMUS >> => true
+    rule Gecpairinginputcheck         << ISTHMUS >> => true
     rule Ghasclz                      << ISTHMUS >> => false
     rule Gbls12g1msminputcheck        << ISTHMUS >> => true
     rule Gbls12g2msminputcheck        << ISTHMUS >> => true
@@ -3353,6 +3495,163 @@ A `ScheduleConst` is a constant determined by the fee schedule.
     rule #isPrecompiledAccount(16p256, ISTHMUS) => true
     rule #isPrecompiledAccount(17p256, ISTHMUS) => true
     rule #isPrecompiledAccount(256p256, ISTHMUS) => true
+```
+
+### Jovian Schedule
+
+```k
+    syntax Schedule ::= "JOVIAN" [symbol(JOVIAN_EVM), smtlib(schedule_JOVIAN)]
+ // --------------------------------------------------------------------------
+
+    rule Gzero    < JOVIAN > => 0
+
+    rule Gbase    < JOVIAN > => 2
+    rule Gverylow < JOVIAN > => 3
+    rule Glow     < JOVIAN > => 5
+    rule Gmid     < JOVIAN > => 8
+    rule Ghigh    < JOVIAN > => 10
+
+    rule Gexp      < JOVIAN > => 10
+    rule Gexpbyte  < JOVIAN > => 50
+    rule Gsha3     < JOVIAN > => 30
+    rule Gsha3word < JOVIAN > => 6
+
+    rule Gsload       < JOVIAN > => 100
+    rule Gsstoreset   < JOVIAN > => 20000
+    rule Gsstorereset < JOVIAN > => 2900
+    rule Rsstoreclear < JOVIAN > => 4800
+
+    rule Glog      < JOVIAN > => 375
+    rule Glogdata  < JOVIAN > => 8
+    rule Glogtopic < JOVIAN > => 375
+
+    rule Gcall        < JOVIAN > => 700
+    rule Gcallstipend < JOVIAN > => 2300
+    rule Gcallvalue   < JOVIAN > => 9000
+    rule Gnewaccount  < JOVIAN > => 25000
+
+    rule Gcreate       < JOVIAN > => 32000
+    rule Gcodedeposit  < JOVIAN > => 200
+    rule Gselfdestruct < JOVIAN > => 5000
+    rule Rselfdestruct < JOVIAN > => 0
+
+    rule Gmemory      < JOVIAN > => 3
+    rule Gquadcoeff   < JOVIAN > => 512
+    rule Gcopy        < JOVIAN > => 3
+    rule Gquaddivisor < JOVIAN > => 3
+    rule Gmexpfactor  < JOVIAN > => 8
+    rule Gmexpmin     < JOVIAN > => 200
+    rule Gminmultcomp < JOVIAN > => 0
+    rule Gmclencutoff < JOVIAN > => 0
+    rule Gmulcompfctr < JOVIAN > => 1
+
+    rule Gtransaction   < JOVIAN > => 21000
+    rule Gtxcreate      < JOVIAN > => 53000
+    rule Gtxdatazero    < JOVIAN > => 4
+    rule Gtxdatanonzero < JOVIAN > => 16
+
+    rule Gjumpdest    < JOVIAN > => 1
+    rule Gbalance     < JOVIAN > => 700
+    rule Gblockhash   < JOVIAN > => 20
+    rule Gextcodesize < JOVIAN > => 700
+    rule Gextcodecopy < JOVIAN > => 700
+
+    rule Gecadd       < JOVIAN > => 150
+    rule Gecmul       < JOVIAN > => 6000
+    rule Gecpairconst < JOVIAN > => 45000
+    rule Gecpaircoeff < JOVIAN > => 34000
+    rule Gfround      < JOVIAN > => 1
+
+    rule maxCodeSize < JOVIAN > => 24576
+    rule Rb          < JOVIAN > => 0
+
+    rule Gcoldsload             < JOVIAN > => 2100
+    rule Gcoldaccountaccess     < JOVIAN > => 2600
+    rule Gwarmstorageread       < JOVIAN > => 100
+    rule Gwarmstoragedirtystore < JOVIAN > => 100
+
+    rule Gpointeval < JOVIAN > => 50000
+
+    rule Gbls12g1add < JOVIAN > => 375
+    rule Gbls12g1mul < JOVIAN > => 12000
+    rule Gbls12g2add < JOVIAN > => 600
+    rule Gbls12g2mul < JOVIAN > => 22500
+    rule Gbls12PairingCheckMul < JOVIAN > => 32600
+    rule Gbls12PairingCheckAdd < JOVIAN > => 37700
+    rule Gbls12mapfptog1 < JOVIAN > => 5500
+    rule Gbls12mapfp2tog2 < JOVIAN > => 23800
+
+    rule Gp256verify < JOVIAN > => 3450
+
+    rule Gaccessliststoragekey < JOVIAN > => 1900
+    rule Gaccesslistaddress    < JOVIAN > => 2400
+
+    rule maxInitCodeSize   < JOVIAN > => 49152
+    rule Ginitcodewordcost < JOVIAN > => 2
+
+    rule Rmaxquotient < JOVIAN > => 5
+
+    rule Gecpairingmaxinputsize         < JOVIAN > => 81984
+    rule Gbls12g1msmmaxinputsize        < JOVIAN > => 288960
+    rule Gbls12g2msmmaxinputsize        < JOVIAN > => 278784
+    rule Gbls12pairingcheckmaxinputsize < JOVIAN > => 156672
+    rule Gmodexplimits                  < JOVIAN > => 0
+
+    rule Gselfdestructnewaccount      << JOVIAN >> => true
+    rule Gstaticcalldepth             << JOVIAN >> => false
+    rule Gemptyisnonexistent          << JOVIAN >> => true
+    rule Gzerovaluenewaccountgas      << JOVIAN >> => false
+    rule Ghasrevert                   << JOVIAN >> => true
+    rule Ghasreturndata               << JOVIAN >> => true
+    rule Ghasstaticcall               << JOVIAN >> => true
+    rule Ghasshift                    << JOVIAN >> => true
+    rule Ghasdirtysstore              << JOVIAN >> => true
+    rule Ghassstorestipend            << JOVIAN >> => true
+    rule Ghascreate2                  << JOVIAN >> => true
+    rule Ghasextcodehash              << JOVIAN >> => true
+    rule Ghasselfbalance              << JOVIAN >> => true
+    rule Ghaschainid                  << JOVIAN >> => true
+    rule Ghasaccesslist               << JOVIAN >> => true
+    rule Ghasbasefee                  << JOVIAN >> => true
+    rule Ghasrejectedfirstbyte        << JOVIAN >> => true
+    rule Ghasprevrandao               << JOVIAN >> => true
+    rule Ghasmaxinitcodesize          << JOVIAN >> => true
+    rule Ghaspushzero                 << JOVIAN >> => true
+    rule Ghaswarmcoinbase             << JOVIAN >> => true
+    rule Ghaswithdrawals              << JOVIAN >> => true
+    rule Ghastransient                << JOVIAN >> => true
+    rule Ghasmcopy                    << JOVIAN >> => true
+    rule Ghasbeaconroot               << JOVIAN >> => true
+    rule Ghaseip6780                  << JOVIAN >> => true
+    rule Ghasblobbasefee              << JOVIAN >> => true
+    rule Ghasblobhash                 << JOVIAN >> => true
+    rule Ghasbls12msmdiscount         << JOVIAN >> => true
+    rule Ghasdelegation               << JOVIAN >> => true
+    rule Gecpairinginputcheck         << JOVIAN >> => true
+    rule Ghasclz                      << JOVIAN >> => false
+    rule Gbls12g1msminputcheck        << JOVIAN >> => true
+    rule Gbls12g2msminputcheck        << JOVIAN >> => true
+    rule Gbls12pairingcheckinputcheck << JOVIAN >> => true
+    rule Ghasmodexplimits             << JOVIAN >> => false
+
+    rule #isPrecompiledAccount(1p256, JOVIAN) => true
+    rule #isPrecompiledAccount(2p256, JOVIAN) => true
+    rule #isPrecompiledAccount(3p256, JOVIAN) => true
+    rule #isPrecompiledAccount(4p256, JOVIAN) => true
+    rule #isPrecompiledAccount(5p256, JOVIAN) => true
+    rule #isPrecompiledAccount(6p256, JOVIAN) => true
+    rule #isPrecompiledAccount(7p256, JOVIAN) => true
+    rule #isPrecompiledAccount(8p256, JOVIAN) => true
+    rule #isPrecompiledAccount(9p256, JOVIAN) => true
+    rule #isPrecompiledAccount(10p256, JOVIAN) => true
+    rule #isPrecompiledAccount(11p256, JOVIAN) => true
+    rule #isPrecompiledAccount(12p256, JOVIAN) => true
+    rule #isPrecompiledAccount(13p256, JOVIAN) => true
+    rule #isPrecompiledAccount(14p256, JOVIAN) => true
+    rule #isPrecompiledAccount(15p256, JOVIAN) => true
+    rule #isPrecompiledAccount(16p256, JOVIAN) => true
+    rule #isPrecompiledAccount(17p256, JOVIAN) => true
+    rule #isPrecompiledAccount(256p256, JOVIAN) => true
 
 endmodule
 ```
